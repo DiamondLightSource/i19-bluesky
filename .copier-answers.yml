@@ -1,0 +1,18 @@
+# Changes here will be overwritten by Copier
+_commit: 2.6.0
+_src_path: gh:DiamondLightSource/python-copier-template
+author_email: callum.forrester@diamond.ac.uk
+author_name: Callum Forrester
+component_lifecycle: experimental
+component_owner: group:default/daq
+component_type: library
+description: Plans and related scripts for running Bluesky on i19
+distribution_name: i19-bluesky
+docker: false
+docs_type: README
+git_platform: github.com
+github_org: DiamondLightSource
+package_name: i19_bluesky
+pypi: false
+repo_name: i19-bluesky
+type_checker: pyright

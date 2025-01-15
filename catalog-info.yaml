@@ -1,0 +1,10 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: i19-bluesky
+  title: i19-bluesky
+  description: Plans and related scripts for running Bluesky on i19
+spec:
+  type: library
+  lifecycle: experimental
+  owner: group:default/daq
