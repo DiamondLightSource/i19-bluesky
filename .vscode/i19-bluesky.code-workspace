@@ -1,0 +1,19 @@
+{
+	"folders": [
+		{
+			"path": ".."
+		},
+		{
+			"path": "../../dodal"
+		}
+	],
+	"settings": {
+		"python.languageServer": "Pylance",
+        "[python]": {
+            "editor.defaultFormatter": "ms-python.black-formatter"
+        },
+        "python.defaultInterpreterPath": ".venv/bin/python",
+        "terminal.integrated.gpuAcceleration": "off",
+        "esbonio.sphinx.confDir": ""
+	}
+}
