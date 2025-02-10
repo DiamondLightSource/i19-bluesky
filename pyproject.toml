@@ -24,7 +24,7 @@ dependencies = [
     # as by default pip-install will not upgrade to a pre-release.
     "blueapi >= 0.5.0",
     "bluesky >= 1.13",
-    "dls-dodal",        # @ git+https://github.com/DiamondLightSource/dodal.git@main"
+    "dls-dodal @ git+https://github.com/DiamondLightSource/dodal.git@main",
 ]
 dynamic = ["version"]
 license.file = "LICENSE"
