@@ -26,7 +26,9 @@ def active_device_factories() -> set[AnyDeviceFactory]:
 def expt_shutter(RE) -> HutchConditionalShutter:
     expt_shutter = i19_1.shutter(connect_immediately=True, mock=True)
     set_mock_value(expt_shutter.shutter.interlock.status, HUTCH_SAFE_FOR_OPERATIONS)
-    set_mock_value(expt_shutter.hutch_state, HutchState.EH1)
+    # set_mock_value(expt_shutter.hutch_state, HutchState.EH1)
+    # Set a starting state for :STA PV, otherwise it defaults to FAULT in mock
+    set_mock_value(expt_shutter.shutter.status, ShutterState.CLOSING)
 
     def set_status(value: ShutterDemand, *args, **kwargs):
         value_sta = ShutterState.OPEN if value == "Open" else ShutterState.CLOSED
@@ -50,7 +52,7 @@ async def test_if_wrong_hutch_shutter_does_not_move(
     expt_shutter: HutchConditionalShutter, RE: RunEngine
 ):
     set_mock_value(expt_shutter.hutch_state, HutchState.EH2)
-    set_mock_value(expt_shutter.shutter.status, ShutterState.CLOSED)
+    # set_mock_value(expt_shutter.shutter.status, ShutterState.CLOSED)
 
     RE(open_hutch_shutter(expt_shutter))
 

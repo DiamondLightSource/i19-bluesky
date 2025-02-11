@@ -8,9 +8,9 @@ from i19_bluesky.log import LOGGER
 
 def open_hutch_shutter(shutter: HutchConditionalShutter) -> MsgGenerator:
     LOGGER.info("Opening experiment shutter.")
-    yield from bps.abs_set(shutter, ShutterDemand.OPEN)
+    yield from bps.abs_set(shutter, ShutterDemand.OPEN, wait=True)
 
 
 def close_hutch_shutter(shutter: HutchConditionalShutter) -> MsgGenerator:
     LOGGER.info("Closing experiment shutter.")
-    yield from bps.abs_set(shutter, ShutterDemand.CLOSE)
+    yield from bps.abs_set(shutter, ShutterDemand.CLOSE, wait=True)
