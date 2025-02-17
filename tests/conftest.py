@@ -24,8 +24,5 @@ if os.getenv("PYTEST_RAISE", "0") == "1":
 
 
 def device_factories_for_beamline(beamline_module: ModuleType) -> set[AnyDeviceFactory]:
-    return {
-        f
-        for f in collect_factories(beamline_module, include_skipped=True).values()
-        if hasattr(f, "cache_clear")
-    }
+    device_factories = collect_factories(beamline_module, include_skipped=True).values()
+    return {f for f in device_factories if hasattr(f, "cache_clear")}

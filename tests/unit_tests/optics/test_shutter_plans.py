@@ -36,12 +36,14 @@ def expt_shutter(RE) -> HutchConditionalShutter:
     return expt_shutter
 
 
-async def test_open_and_close_hutch_shutter(
-    expt_shutter: HutchConditionalShutter, RE: RunEngine
-):
+async def test_open_hutch_shutter(expt_shutter: HutchConditionalShutter, RE: RunEngine):
     RE(open_hutch_shutter(expt_shutter))
     assert await expt_shutter.shutter.status.get_value() == ShutterState.OPEN
 
+
+async def test_close_hutch_shutter(
+    expt_shutter: HutchConditionalShutter, RE: RunEngine
+):
     RE(close_hutch_shutter(expt_shutter))
     assert await expt_shutter.shutter.status.get_value() == ShutterState.CLOSED
 
