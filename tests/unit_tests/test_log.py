@@ -113,6 +113,7 @@ def test_messages_logged_from_dodal_and_i19_bluesky_sent_to_graylog_and_file(
         assert "test_dodal" in handler_messages
 
 
+@pytest.mark.skip_log_setup
 @patch("i19_bluesky.log.integrate_bluesky_logs")
 @patch("i19_bluesky.log.do_default_logging_setup")
 def test_setup_log_config_does_default_setup_and_bluesky_integration(
