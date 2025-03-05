@@ -79,7 +79,11 @@ def do_default_logging_setup(
     __logger_handlers = handlers
 
 
-def setup_log_config(hutch: BeamlineHutch, dev_mode: bool = False):
+def setup_log_config(
+    hutch: BeamlineHutch,
+    graylog_port: int = DEFAULT_GRAYLOG_PORT,
+    dev_mode: bool = False,
+):
     """Configure the logging.
 
     Args:
@@ -90,7 +94,7 @@ def setup_log_config(hutch: BeamlineHutch, dev_mode: bool = False):
     do_default_logging_setup(
         "i19-bluesky.log",
         hutch,
-        DEFAULT_GRAYLOG_PORT,
+        graylog_port,
         dev_mode,
     )
     integrate_bluesky_logs(dodal_logger)

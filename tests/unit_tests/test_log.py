@@ -10,6 +10,7 @@ from i19_bluesky.log import (
     _get_logging_path,
     do_default_logging_setup,
     integrate_bluesky_logs,
+    setup_log_config,
 )
 
 TEST_GRAYLOG_PORT = 5555
@@ -110,3 +111,16 @@ def test_messages_logged_from_dodal_and_i19_bluesky_sent_to_graylog_and_file(
         assert "Dodal" in handler_names
         assert "test i19_Bluesky" in handler_messages
         assert "test_dodal" in handler_messages
+
+
+@patch("i19_bluesky.log.integrate_bluesky_logs")
+@patch("i19_bluesky.log.do_default_logging_setup")
+def test_setup_log_config_does_default_setup_and_bluesky_integration(
+    patch_default_setup, patch_integrate_logs
+):
+    setup_log_config(BeamlineHutch.EH2, TEST_GRAYLOG_PORT, dev_mode=True)
+
+    patch_integrate_logs.assert_called_once()
+    patch_default_setup.assert_called_once_with(
+        "i19-bluesky.log", BeamlineHutch.EH2, TEST_GRAYLOG_PORT, True
+    )
