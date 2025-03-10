@@ -17,22 +17,22 @@ Documentation is split into [four categories](https://diataxis.fr), also accessi
 ::::{grid} 2
 :gutter: 4
 
-:::{grid-item-card} {material-regular}`directions_walk;2em`
-```{toctree}
-:maxdepth: 2
-tutorials
-```
-+++
-Tutorials for installation and typical usage. New users start here.
-:::
-
 :::{grid-item-card} {material-regular}`directions;2em`
 ```{toctree}
 :maxdepth: 2
 how-to
 ```
 +++
-Practical step-by-step guides for the more experienced user.
+Practical step-by-step guides for installation and typical usage. New users start here.
+:::
+
+:::{grid-item-card} {material-regular}`code;2em`
+```{toctree}
+:maxdepth: 2
+developer
+```
++++
+Install, develop and contribute changes to I19_bluesky.
 :::
 
 :::{grid-item-card} {material-regular}`info;2em`
