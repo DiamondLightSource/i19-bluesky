@@ -96,6 +96,9 @@ graphviz_output_format = "svg"
 # role, that is, for text marked up `like this`
 default_role = "any"
 
+# The suffix of source filenames.
+source_suffix = {".rst": "restructuredtext", ".md": "markdown"}
+
 # The master toctree document.
 master_doc = "index"
 
@@ -128,7 +131,7 @@ copybutton_prompt_is_regexp = True
 # a list of builtin themes.
 #
 html_theme = "pydata_sphinx_theme"
-github_repo = "i19-bluesky"
+github_repo = project
 github_user = "DiamondLightSource"
 switcher_json = f"https://{github_user}.github.io/{github_repo}/switcher.json"
 switcher_exists = requests.get(switcher_json).ok
