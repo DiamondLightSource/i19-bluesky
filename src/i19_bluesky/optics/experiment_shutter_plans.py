@@ -10,7 +10,7 @@ from i19_bluesky.optics.check_access_control import HutchName, check_access_cont
 
 def operate_shutter_plan(
     from_hutch: HutchName,
-    shutter_request: ShutterDemand,
+    shutter_demand: ShutterDemand,
     shutter: HutchShutter = inject("shutter"),  # noqa: B008
     access_control: HutchAccessControl = inject("access_control"),  # noqa: B008
 ) -> MsgGenerator:
@@ -23,4 +23,4 @@ def operate_shutter_plan(
         LOGGER.info(f"Moving experiment shutter to {request}.")
         yield from bps.abs_set(shutter, request, wait=True)
 
-    yield from move_hutch_shutter(shutter, shutter_request)
+    yield from move_hutch_shutter(shutter, shutter_demand)
