@@ -5,16 +5,16 @@ from dodal.devices.hutch_shutter import HutchShutter, ShutterDemand
 from dodal.devices.i19.hutch_access import HutchAccessControl
 
 from i19_bluesky.log import LOGGER
-from i19_bluesky.optics.check_access_control import check_access_control
+from i19_bluesky.optics.check_access_control import HutchName, check_access_control
 
 
 def operate_shutter_plan(
-    from_hutch: str,
+    from_hutch: HutchName,
     shutter_request: ShutterDemand,
     shutter: HutchShutter = inject("shutter"),  # noqa: B008
     access_control: HutchAccessControl = inject("access_control"),  # noqa: B008
 ) -> MsgGenerator:
-    LOGGER.debug(f"Trying to operate the hutch shutter from {from_hutch}")
+    LOGGER.debug(f"Trying to operate the hutch shutter from {from_hutch.value}")
 
     @check_access_control(access_control, from_hutch)
     def move_hutch_shutter(
