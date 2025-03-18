@@ -5,7 +5,7 @@ from dodal.devices.hutch_shutter import HutchShutter, ShutterDemand
 from dodal.devices.i19.hutch_access import HutchAccessControl
 
 from i19_bluesky.log import LOGGER
-from i19_bluesky.optics.check_access_control import HutchName, check_access_control
+from i19_bluesky.optics.check_access_control import HutchName, check_access
 
 
 def operate_shutter_plan(
@@ -16,7 +16,7 @@ def operate_shutter_plan(
 ) -> MsgGenerator:
     LOGGER.debug(f"Trying to operate the hutch shutter from {from_hutch.value}")
 
-    @check_access_control(access_control, from_hutch)
+    @check_access(access_control, from_hutch)
     def move_hutch_shutter(
         shutter: HutchShutter, request: ShutterDemand
     ) -> MsgGenerator:

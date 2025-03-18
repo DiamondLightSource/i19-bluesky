@@ -12,7 +12,7 @@ class HutchName(str, Enum):
     EH2 = "EH2"
 
 
-def check_access_control_before_run_wrapper(
+def check_access_before_run_wrapper(
     plan: MsgGenerator,
     access_device: HutchAccessControl,
     experiment_hutch: HutchName,
@@ -29,4 +29,4 @@ def check_access_control_before_run_wrapper(
         yield from access_denied_plan()
 
 
-check_access_control = make_decorator(check_access_control_before_run_wrapper)
+check_access = make_decorator(check_access_before_run_wrapper)
