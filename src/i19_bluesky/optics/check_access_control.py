@@ -1,10 +1,15 @@
 from enum import Enum
+from functools import wraps
+from typing import Callable, ParamSpec, TypeVar
 
 import bluesky.plan_stubs as bps
-from bluesky.utils import MsgGenerator, make_decorator
+from bluesky.utils import MsgGenerator
 from dodal.devices.i19.hutch_access import HutchAccessControl
 
 from i19_bluesky.log import LOGGER
+
+P = ParamSpec("P")
+R = TypeVar("R")
 
 
 class HutchName(str, Enum):
@@ -12,21 +17,23 @@ class HutchName(str, Enum):
     EH2 = "EH2"
 
 
-def check_access_before_run_wrapper(
-    plan: MsgGenerator,
-    access_device: HutchAccessControl,
-    experiment_hutch: HutchName,
-):
-    active_hutch = yield from bps.rd(access_device.active_hutch)
+def check_access(wrapped_plan: Callable[P, MsgGenerator]):
+    @wraps(wrapped_plan)
+    def safe_plan(
+        experiment_hutch: HutchName,
+        access_device: HutchAccessControl,
+        *args: P.args,
+        **kwargs: P.kwargs,
+    ):
+        active_hutch = yield from bps.rd(access_device.active_hutch)
 
-    def access_denied_plan() -> MsgGenerator:
-        LOGGER.warning(f"Active hutch is {active_hutch}, plan will not run.")
-        yield from bps.null()
+        def access_denied_plan() -> MsgGenerator:
+            LOGGER.warning(f"Active hutch is {active_hutch}, plan will not run.")
+            yield from bps.null()
 
-    if active_hutch == experiment_hutch.value:
-        yield from plan
-    else:
-        yield from access_denied_plan()
+        if active_hutch == experiment_hutch.value:
+            yield from wrapped_plan(*args, **kwargs)
+        else:
+            yield from access_denied_plan()
 
-
-check_access = make_decorator(check_access_before_run_wrapper)
+    return safe_plan
