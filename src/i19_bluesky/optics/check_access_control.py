@@ -1,6 +1,6 @@
 from enum import Enum
 from functools import wraps
-from typing import Callable, ParamSpec, TypeVar
+from typing import Callable, Concatenate, ParamSpec, TypeVar
 
 import bluesky.plan_stubs as bps
 from bluesky.utils import MsgGenerator
@@ -17,7 +17,9 @@ class HutchName(str, Enum):
     EH2 = "EH2"
 
 
-def check_access(wrapped_plan: Callable[P, MsgGenerator]):
+def check_access(
+    wrapped_plan: Callable[P, MsgGenerator],
+) -> Callable[Concatenate[HutchName, HutchAccessControl, P], MsgGenerator]:
     @wraps(wrapped_plan)
     def safe_plan(
         experiment_hutch: HutchName,
