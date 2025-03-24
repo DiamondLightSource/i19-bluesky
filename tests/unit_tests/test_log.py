@@ -9,7 +9,7 @@ from i19_bluesky.log import (
     _get_logging_path,
     do_default_logging_setup,
     integrate_bluesky_logs,
-    setup_log_config,
+    setup_hutch_specific_log_config,
 )
 
 from ..conftest import clear_log_handlers
@@ -113,7 +113,7 @@ def test_messages_logged_from_dodal_and_i19_bluesky_sent_to_graylog_and_file(
 def test_setup_log_config_does_default_setup_and_bluesky_integration(
     patch_default_setup, patch_integrate_logs
 ):
-    setup_log_config(BeamlineHutch.EH2, TEST_GRAYLOG_PORT, dev_mode=True)
+    setup_hutch_specific_log_config(BeamlineHutch.EH2, TEST_GRAYLOG_PORT, dev_mode=True)
 
     patch_integrate_logs.assert_called_once()
     patch_default_setup.assert_called_once_with(

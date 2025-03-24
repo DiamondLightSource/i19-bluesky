@@ -79,7 +79,7 @@ def do_default_logging_setup(
     __logger_handlers = handlers
 
 
-def setup_log_config(
+def setup_hutch_specific_log_config(
     hutch: BeamlineHutch,
     graylog_port: int = DEFAULT_GRAYLOG_PORT,
     dev_mode: bool = False,
