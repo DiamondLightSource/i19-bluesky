@@ -1,4 +1,3 @@
-import logging
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -13,19 +12,14 @@ from i19_bluesky.log import (
     setup_log_config,
 )
 
+from ..conftest import clear_log_handlers
+
 TEST_GRAYLOG_PORT = 5555
-
-
-def _destroy_handlers(loggers: list[logging.Logger]):
-    for logger in loggers:
-        for handler in logger.handlers:
-            handler.close()
-        logger.handlers.clear()
 
 
 @pytest.fixture(scope="function")
 def clear_and_mock_loggers():
-    _destroy_handlers([LOGGER, dodal_logger])
+    clear_log_handlers([LOGGER, dodal_logger])
     mock_open_with_tell = MagicMock()
     mock_open_with_tell.tell.return_value = 0
     with (
@@ -36,7 +30,7 @@ def clear_and_mock_loggers():
         graylog_emit.reset_mock()
         filehandler_emit.reset_mock()
         yield filehandler_emit, graylog_emit
-    _destroy_handlers([LOGGER, dodal_logger])
+    clear_log_handlers([LOGGER, dodal_logger])
 
 
 @pytest.mark.skip_log_setup
