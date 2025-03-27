@@ -53,7 +53,7 @@ def check_access(
                 kind=Parameter.POSITIONAL_OR_KEYWORD,
                 annotation=HutchAccessControl,
             ),
-            *[p for p in sig.parameters.values()],  # noqa
+            *list(sig.parameters.values()),
         ]
     )
     safe_plan.__annotations__.update(
