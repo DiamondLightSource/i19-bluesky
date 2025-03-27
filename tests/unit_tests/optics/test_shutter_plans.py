@@ -89,7 +89,7 @@ async def test_hutch_shutter_opens_and_closes_if_run_by_active_hutch(
     set_mock_value(expt_shutter.status, start_state)
     RE(
         operate_shutter_plan(
-            request_hutch, shutter_demand, expt_shutter, access_control_device
+            request_hutch, access_control_device, shutter_demand, expt_shutter
         )
     )
 
@@ -143,7 +143,7 @@ async def test_hutch_shutter_does_not_operate_from_wrong_hutch(
     set_mock_value(expt_shutter.status, start_state)
     RE(
         operate_shutter_plan(
-            request_hutch, shutter_demand, expt_shutter, access_control_device
+            request_hutch, access_control_device, shutter_demand, expt_shutter
         )
     )
 
