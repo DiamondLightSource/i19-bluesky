@@ -1,7 +1,8 @@
+from collections.abc import Callable
 from enum import Enum
 from functools import wraps
 from inspect import Parameter, signature
-from typing import Callable, Concatenate, ParamSpec, TypeVar
+from typing import Concatenate, ParamSpec, TypeVar
 
 import bluesky.plan_stubs as bps
 from bluesky.utils import MsgGenerator
@@ -12,9 +13,11 @@ from i19_bluesky.log import LOGGER
 P = ParamSpec("P")
 R = TypeVar("R")
 
+
 class HutchName(str, Enum):
     EH1 = "EH1"
     EH2 = "EH2"
+
 
 def check_access(
     wrapped_plan: Callable[P, MsgGenerator[R]],
@@ -35,7 +38,7 @@ def check_access(
             LOGGER.warning(f"Active hutch is {active_hutch}, plan will not run.")
             yield from bps.null()
             return None
-        
+
     sig = signature(wrapped_plan)
 
     safe_plan.__signature__ = sig.replace(  # type: ignore
@@ -43,21 +46,18 @@ def check_access(
             Parameter(
                 name="experiment_hutch",
                 kind=Parameter.POSITIONAL_OR_KEYWORD,
-                annotation=HutchName
-                ),
+                annotation=HutchName,
+            ),
             Parameter(
                 name="access_device",
                 kind=Parameter.POSITIONAL_OR_KEYWORD,
-                annotation=HutchAccessControl
-                ),
-                p for p in sig.parameters.values()
-            ]
-        )
+                annotation=HutchAccessControl,
+            ),
+            *[p for p in sig.parameters.values()],  # noqa
+        ]
+    )
     safe_plan.__annotations__.update(
-        {
-            "experiment_hutch": HutchName,
-            "access_device": HutchAccessControl
-        }
+        {"experiment_hutch": HutchName, "access_device": HutchAccessControl}
     )
 
     return safe_plan
