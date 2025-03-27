@@ -7,7 +7,6 @@ from bluesky.log import logger as bluesky_logger
 from dodal.log import (
     DEFAULT_GRAYLOG_PORT,
     ERROR_LOG_BUFFER_LINES,
-    DodalLogHandlers,
     set_up_all_logging_handlers,
 )
 from dodal.log import LOGGER as dodal_logger
@@ -18,9 +17,6 @@ LOGGER.parent = dodal_logger
 
 # Temporarily duplicated https://github.com/bluesky/ophyd-async/issues/550
 ophyd_async_logger = logging.getLogger("ophyd_async")
-
-
-__logger_handlers: DodalLogHandlers | None = None
 
 
 class BeamlineHutch(str, Enum):
@@ -66,7 +62,7 @@ def do_default_logging_setup(
 ):
     """Configures dodal logger so that separate debug and info log files are created,
     info logs are sent to Graylog and streamed to sys.sterr."""
-    handlers = set_up_all_logging_handlers(
+    handlers = set_up_all_logging_handlers(  # noqa
         dodal_logger,
         _get_logging_path(hutch),
         filename,
@@ -74,9 +70,6 @@ def do_default_logging_setup(
         ERROR_LOG_BUFFER_LINES,
         graylog_port,
     )
-
-    global __logger_handlers
-    __logger_handlers = handlers
 
 
 def setup_hutch_specific_log_config(
