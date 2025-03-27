@@ -1,6 +1,8 @@
+from collections.abc import Callable
 from enum import Enum
 from functools import wraps
-from typing import Callable, Concatenate, ParamSpec, TypeVar
+from inspect import Parameter, signature
+from typing import Concatenate, ParamSpec, TypeVar
 
 import bluesky.plan_stubs as bps
 from bluesky.utils import MsgGenerator
@@ -18,24 +20,44 @@ class HutchName(str, Enum):
 
 
 def check_access(
-    wrapped_plan: Callable[P, MsgGenerator],
-) -> Callable[Concatenate[HutchName, HutchAccessControl, P], MsgGenerator]:
+    wrapped_plan: Callable[P, MsgGenerator[R]],
+) -> Callable[Concatenate[HutchName, HutchAccessControl, P], MsgGenerator[R | None]]:
     @wraps(wrapped_plan)
     def safe_plan(
         experiment_hutch: HutchName,
         access_device: HutchAccessControl,
         *args: P.args,
         **kwargs: P.kwargs,
-    ):
+    ) -> MsgGenerator[R | None]:
         active_hutch = yield from bps.rd(access_device.active_hutch)
 
-        def access_denied_plan() -> MsgGenerator:
+        if active_hutch == experiment_hutch.value:
+            r = yield from wrapped_plan(*args, **kwargs)
+            return r
+        else:
             LOGGER.warning(f"Active hutch is {active_hutch}, plan will not run.")
             yield from bps.null()
+            return None
 
-        if active_hutch == experiment_hutch.value:
-            yield from wrapped_plan(*args, **kwargs)
-        else:
-            yield from access_denied_plan()
+    sig = signature(wrapped_plan)
+
+    safe_plan.__signature__ = sig.replace(  # type: ignore
+        parameters=[
+            Parameter(
+                name="experiment_hutch",
+                kind=Parameter.POSITIONAL_OR_KEYWORD,
+                annotation=HutchName,
+            ),
+            Parameter(
+                name="access_device",
+                kind=Parameter.POSITIONAL_OR_KEYWORD,
+                annotation=HutchAccessControl,
+            ),
+            *list(sig.parameters.values()),
+        ]
+    )
+    safe_plan.__annotations__.update(
+        {"experiment_hutch": HutchName, "access_device": HutchAccessControl}
+    )
 
     return safe_plan
