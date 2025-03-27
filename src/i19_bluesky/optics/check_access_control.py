@@ -8,10 +8,14 @@ import bluesky.plan_stubs as bps
 from bluesky.utils import MsgGenerator
 from dodal.devices.i19.hutch_access import HutchAccessControl
 
+from i19_bluesky.exceptions import HutchInvalidError
 from i19_bluesky.log import LOGGER
 
 P = ParamSpec("P")
 R = TypeVar("R")
+
+
+HUTCH_INVALID_FLAG = "INVALID"
 
 
 class HutchName(str, Enum):
@@ -30,6 +34,13 @@ def check_access(
         **kwargs: P.kwargs,
     ) -> MsgGenerator[R | None]:
         active_hutch = yield from bps.rd(access_device.active_hutch)
+
+        if active_hutch == HUTCH_INVALID_FLAG:
+            LOGGER.error("Active hutch value set to invalid, plan will not run.")
+            raise HutchInvalidError(
+                """Active hutch is INVALID, please contact beamline scientist
+                to check for possible issue."""
+            )
 
         if active_hutch == experiment_hutch.value:
             r = yield from wrapped_plan(*args, **kwargs)

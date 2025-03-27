@@ -11,6 +11,7 @@ from dodal.devices.i19.hutch_access import HutchAccessControl
 from dodal.utils import AnyDeviceFactory
 from ophyd_async.testing import callback_on_mock_put, set_mock_value
 
+from i19_bluesky.exceptions import HutchInvalidError
 from i19_bluesky.optics.check_access_control import HutchName
 from i19_bluesky.optics.experiment_shutter_plans import (
     operate_shutter_plan,
@@ -132,9 +133,9 @@ async def test_hutch_shutter_opens_and_closes_if_run_by_active_hutch(
 async def test_hutch_shutter_does_not_operate_from_wrong_hutch(
     active_hutch: str,
     request_hutch: HutchName,
+    shutter_demand: ShutterDemand,
     start_state: ShutterState,
     expected_state: ShutterState,
-    shutter_demand: ShutterDemand,
     expt_shutter: HutchShutter,
     access_control_device: HutchAccessControl,
     RE: RunEngine,
@@ -143,8 +144,34 @@ async def test_hutch_shutter_does_not_operate_from_wrong_hutch(
     set_mock_value(expt_shutter.status, start_state)
     RE(
         operate_shutter_plan(
-            request_hutch, access_control_device, shutter_demand, expt_shutter
+            request_hutch,
+            access_control_device,
+            shutter_demand,
+            expt_shutter,
         )
     )
 
     assert await expt_shutter.status.get_value() == expected_state
+
+
+@pytest.mark.parametrize(
+    "request_hutch, shutter_demand",
+    [
+        (HutchName.EH1, ShutterDemand.OPEN),
+        (HutchName.EH2, ShutterDemand.CLOSE),
+    ],
+)
+def test_operate_hutch_shutter_raises_error_if_hutch_invalid(
+    request_hutch: HutchName,
+    shutter_demand: ShutterDemand,
+    expt_shutter: HutchShutter,
+    access_control_device: HutchAccessControl,
+    RE: RunEngine,
+):
+    set_mock_value(access_control_device.active_hutch, "INVALID")
+    with pytest.raises(HutchInvalidError):
+        RE(
+            operate_shutter_plan(
+                request_hutch, access_control_device, shutter_demand, expt_shutter
+            )
+        )
