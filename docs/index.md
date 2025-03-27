@@ -17,7 +17,7 @@ Documentation is split into [four categories](https://diataxis.fr), also accessi
 ::::{grid} 2
 :gutter: 4
 
-:::{grid-item-card} {material-regular}`code;2em`
+:::{grid-item-card} {material-regular}`directions_walk;2em`
 ```{toctree}
 :maxdepth: 2
 tutorials
@@ -26,7 +26,7 @@ tutorials
 Tutorials for installation and typical usage. New users start here.
 :::
 
-:::{grid-item-card} {material-regular}`directions;2em`
+:::{grid-item-card} {material-regular}`code;2em`
 ```{toctree}
 :maxdepth: 2
 how-to
