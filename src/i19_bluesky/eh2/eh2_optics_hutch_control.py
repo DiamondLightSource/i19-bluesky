@@ -16,4 +16,4 @@ def open_experiment_shutter(shutter: AccessControlledShutter = inject("shutter")
 
 def close_experiment_shutter(shutter: AccessControlledShutter = inject("shutter")):  # noqa: B008
     LOGGER.debug("Send command to close the shutter from eh2.")
-    yield from bps.abs_set(shutter, ShutterDemand.OPEN, wait=True)
+    yield from bps.abs_set(shutter, ShutterDemand.CLOSE, wait=True)
