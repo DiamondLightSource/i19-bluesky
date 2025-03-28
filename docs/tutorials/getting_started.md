@@ -5,7 +5,7 @@
 - Clone this repo: `git@github.com:DiamondLightSource/i19-bluesky.git`
 - To install a dev environment run `./dev_install.sh`. Note that this will also clone and install a local version of dodal, as the i19-bluesky package makes use of the devices instantiated there.
 
-The recommended IDE is vscode, and a workspace which includes dodal has been set up in the repo. This can be used on a DLS machine as follows:
+The recommended IDE is [vscode](https://code.visualstudio.com), and a workspace which includes [dodal](https://github.com/DiamondLightSource/dodal) has been set up in the repo. This can be used on a DLS machine as follows:
 
 ```bash
 cd /path/to/i19-bluesky
