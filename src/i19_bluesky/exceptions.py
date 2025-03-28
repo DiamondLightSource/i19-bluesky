@@ -1,0 +1,2 @@
+class HutchInvalidError(Exception):
+    pass
