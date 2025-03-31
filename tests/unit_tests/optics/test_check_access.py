@@ -1,6 +1,9 @@
+import bluesky.plan_stubs as bps
 import pytest
 from blueapi.core import BlueskyContext
+from bluesky.utils import MsgGenerator
 
+from i19_bluesky.optics.check_access_control import HutchName
 from i19_bluesky.optics.experiment_shutter_plans import operate_shutter_plan
 
 
@@ -32,3 +35,11 @@ def test_signature_of_plan_with_check_access(context: BlueskyContext):
         "access_device",
         "shutter_demand",
     ]
+
+
+def test_register_plan_with_enum(context: BlueskyContext):
+    def my_plan(hutch: HutchName) -> MsgGenerator:
+        yield from bps.sleep(0.5)
+
+    context.register_plan(my_plan)
+    assert my_plan.__name__ in context.plans
