@@ -37,7 +37,7 @@ def check_access(
     Args:
         wrapped_plan: the plan performing the run with its arguments plus:
             experiment_hutch (HutchName): The hutch requesting the plan to run
-            access_device (HutchAccessControl): The device checkign that the plan is \
+            access_device (HutchAccessControl): The device checking that the plan is \
                 allowed to run
 
     Example:
@@ -77,6 +77,9 @@ def check_access(
             yield from bps.null()
             return None
 
+    # NOTE For the pydantic model of the wrapped plan to be constructed correctly, it
+    # is necessery to modify the signature and explicitely add the extra arguments from
+    # the safe plan. This allows inspect to construct the correct Signature
     sig = signature(wrapped_plan)
 
     safe_plan.__signature__ = sig.replace(  # type: ignore
