@@ -26,6 +26,21 @@ class HutchName(str, Enum):
 def check_access(
     wrapped_plan: Callable[P, MsgGenerator[R]],
 ) -> Callable[Concatenate[HutchName, HutchAccessControl, P], MsgGenerator[R | None]]:
+    """ Decorates the wrapped plan so that a check is done beforehand to verify \
+    that the hutch making the request is the active hutch and that the plan can proceed.
+
+    It the request dosn't come from the active hutch, the plan doesn't run and a \
+    warning message is logged. This is useful for running tests without risking moving \
+    hardware while the other hutch has beamtime.
+    In case of the hutch state returning "INVALID", an error is raised.
+
+    Args:
+        wrapped_plan: the plan performing the run with its arguments plus:
+            experiment_hutch (HutchName): The hutch requesting the plan to run
+            access_device (HutchAccessControl): The device checkign that the plan is \
+                allowed to run
+    """
+
     @wraps(wrapped_plan)
     def safe_plan(
         experiment_hutch: HutchName,
