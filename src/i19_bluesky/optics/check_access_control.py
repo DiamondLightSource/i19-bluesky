@@ -39,6 +39,18 @@ def check_access(
             experiment_hutch (HutchName): The hutch requesting the plan to run
             access_device (HutchAccessControl): The device checkign that the plan is \
                 allowed to run
+
+    Example:
+    A plan like
+        @check_access
+        def my_plan(device) -> MsgGenerator:
+            yield from bps.trigger(...)
+            ...
+
+    will be run client side with:
+        blueapi controller run my_plan \
+            '{"device":"device", "experiment_hutch":"EH2", \
+                "access_device":"access_control"}'
     """
 
     @wraps(wrapped_plan)
