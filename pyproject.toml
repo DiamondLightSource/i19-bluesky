@@ -23,6 +23,8 @@ dependencies = [
     # These dependencies may be issued as pre-release versions and should have a pin constraint
     # as by default pip-install will not upgrade to a pre-release.
     "blueapi @ git+https://github.com/DiamondLightSource/blueapi.git@main",
+    # Blueapi pinned to main until a new release is made to get this fix
+    # https://github.com/DiamondLightSource/blueapi/pull/873
     "ophyd == 1.9.0",
     "ophyd-async >= 0.9.0a2",
     "bluesky >= 1.13",
