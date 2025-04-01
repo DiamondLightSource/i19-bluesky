@@ -70,12 +70,10 @@ def check_access(
             )
 
         if active_hutch == experiment_hutch.value:
-            r = yield from wrapped_plan(*args, **kwargs)
-            return r
+            return (yield from wrapped_plan(*args, **kwargs))
         else:
             LOGGER.warning(f"Active hutch is {active_hutch}, plan will not run.")
-            yield from bps.null()
-            return None
+            return (yield from bps.null())
 
     # NOTE For the pydantic model of the wrapped plan to be constructed correctly, it
     # is necessery to modify the signature and explicitely add the extra arguments from
