@@ -1,60 +1,203 @@
 import pytest
+from blueapi.core import BlueskyContext
 from bluesky.run_engine import RunEngine
-from dodal.beamlines import i19_1
+from dodal.beamlines import i19_optics
 from dodal.devices.hutch_shutter import (
     HUTCH_SAFE_FOR_OPERATIONS,
+    HutchShutter,
     ShutterDemand,
     ShutterState,
 )
-from dodal.devices.i19.shutter import HutchConditionalShutter, HutchState
+from dodal.devices.i19.hutch_access import HutchAccessControl
 from dodal.utils import AnyDeviceFactory
 from ophyd_async.testing import callback_on_mock_put, set_mock_value
 
+from i19_bluesky.exceptions import HutchInvalidError
+from i19_bluesky.optics.check_access_control import HutchName
 from i19_bluesky.optics.experiment_shutter_plans import (
-    close_hutch_shutter,
-    open_hutch_shutter,
+    operate_shutter_plan,
 )
 from tests.conftest import device_factories_for_beamline
 
 
 @pytest.fixture(scope="session")
 def active_device_factories() -> set[AnyDeviceFactory]:
-    return device_factories_for_beamline(i19_1)
+    return device_factories_for_beamline(i19_optics)
 
 
 @pytest.fixture
-def expt_shutter(RE) -> HutchConditionalShutter:
-    expt_shutter = i19_1.shutter(connect_immediately=True, mock=True)
-    set_mock_value(expt_shutter.shutter.interlock.status, HUTCH_SAFE_FOR_OPERATIONS)
-    set_mock_value(expt_shutter.hutch_state, HutchState.EH1.value)
+def expt_shutter(RE) -> HutchShutter:
+    expt_shutter = i19_optics.shutter(connect_immediately=True, mock=True)
+    set_mock_value(expt_shutter.interlock.status, HUTCH_SAFE_FOR_OPERATIONS)
 
     def set_status(value: ShutterDemand, *args, **kwargs):
         value_sta = ShutterState.OPEN if value == "Open" else ShutterState.CLOSED
-        set_mock_value(expt_shutter.shutter.status, value_sta)
+        set_mock_value(expt_shutter.status, value_sta)
 
-    callback_on_mock_put(expt_shutter.shutter.control, set_status)
+    callback_on_mock_put(expt_shutter.control, set_status)
     return expt_shutter
 
 
-async def test_open_hutch_shutter(expt_shutter: HutchConditionalShutter, RE: RunEngine):
-    RE(open_hutch_shutter(expt_shutter))
-    assert await expt_shutter.shutter.status.get_value() == ShutterState.OPEN
+@pytest.fixture
+def access_control_device(RE) -> HutchAccessControl:
+    access_control = i19_optics.access_control(connect_immediately=True, mock=True)
+    return access_control
 
 
-async def test_close_hutch_shutter(
-    expt_shutter: HutchConditionalShutter, RE: RunEngine
+@pytest.mark.parametrize(
+    "active_hutch, request_hutch, shutter_demand, start_state, expected_state",
+    [
+        (
+            "EH1",
+            HutchName.EH1,
+            ShutterDemand.OPEN,
+            ShutterState.CLOSED,
+            ShutterState.OPEN,
+        ),
+        (
+            "EH1",
+            HutchName.EH1,
+            ShutterDemand.CLOSE,
+            ShutterState.OPEN,
+            ShutterState.CLOSED,
+        ),
+        (
+            "EH2",
+            HutchName.EH2,
+            ShutterDemand.OPEN,
+            ShutterState.CLOSED,
+            ShutterState.OPEN,
+        ),
+        (
+            "EH2",
+            HutchName.EH2,
+            ShutterDemand.CLOSE,
+            ShutterState.OPEN,
+            ShutterState.CLOSED,
+        ),
+    ],
+)
+async def test_hutch_shutter_opens_and_closes_if_run_by_active_hutch(
+    active_hutch: str,
+    request_hutch: HutchName,
+    start_state: ShutterState,
+    expected_state: ShutterState,
+    shutter_demand: ShutterDemand,
+    expt_shutter: HutchShutter,
+    access_control_device: HutchAccessControl,
+    RE: RunEngine,
 ):
-    RE(close_hutch_shutter(expt_shutter))
-    assert await expt_shutter.shutter.status.get_value() == ShutterState.CLOSED
+    set_mock_value(access_control_device.active_hutch, active_hutch)
+    set_mock_value(expt_shutter.status, start_state)
+    RE(
+        operate_shutter_plan(
+            request_hutch, access_control_device, shutter_demand, expt_shutter
+        )
+    )
+
+    assert await expt_shutter.status.get_value() == expected_state
 
 
-async def test_if_wrong_hutch_shutter_does_not_move(
-    expt_shutter: HutchConditionalShutter, RE: RunEngine
+@pytest.mark.parametrize(
+    "active_hutch, request_hutch, shutter_demand, start_state, expected_state",
+    [
+        (
+            "EH1",
+            HutchName.EH2,
+            ShutterDemand.OPEN,
+            ShutterState.CLOSED,
+            ShutterState.CLOSED,
+        ),
+        (
+            "EH1",
+            HutchName.EH2,
+            ShutterDemand.CLOSE,
+            ShutterState.OPEN,
+            ShutterState.OPEN,
+        ),
+        (
+            "EH2",
+            HutchName.EH1,
+            ShutterDemand.OPEN,
+            ShutterState.CLOSED,
+            ShutterState.CLOSED,
+        ),
+        (
+            "EH2",
+            HutchName.EH1,
+            ShutterDemand.CLOSE,
+            ShutterState.OPEN,
+            ShutterState.OPEN,
+        ),
+    ],
+)
+async def test_hutch_shutter_does_not_operate_from_wrong_hutch(
+    active_hutch: str,
+    request_hutch: HutchName,
+    shutter_demand: ShutterDemand,
+    start_state: ShutterState,
+    expected_state: ShutterState,
+    expt_shutter: HutchShutter,
+    access_control_device: HutchAccessControl,
+    RE: RunEngine,
 ):
-    set_mock_value(expt_shutter.hutch_state, HutchState.EH2.value)
-    # Set the status, it won't change
-    set_mock_value(expt_shutter.shutter.status, ShutterState.CLOSED)
+    set_mock_value(access_control_device.active_hutch, active_hutch)
+    set_mock_value(expt_shutter.status, start_state)
+    RE(
+        operate_shutter_plan(
+            request_hutch,
+            access_control_device,
+            shutter_demand,
+            expt_shutter,
+        )
+    )
 
-    RE(open_hutch_shutter(expt_shutter))
+    assert await expt_shutter.status.get_value() == expected_state
 
-    assert await expt_shutter.shutter.status.get_value() == ShutterState.CLOSED
+
+@pytest.mark.parametrize(
+    "request_hutch, shutter_demand",
+    [
+        (HutchName.EH1, ShutterDemand.OPEN),
+        (HutchName.EH2, ShutterDemand.CLOSE),
+    ],
+)
+def test_operate_hutch_shutter_raises_error_if_hutch_invalid(
+    request_hutch: HutchName,
+    shutter_demand: ShutterDemand,
+    expt_shutter: HutchShutter,
+    access_control_device: HutchAccessControl,
+    RE: RunEngine,
+):
+    set_mock_value(access_control_device.active_hutch, "INVALID")
+    with pytest.raises(HutchInvalidError):
+        RE(
+            operate_shutter_plan(
+                request_hutch, access_control_device, shutter_demand, expt_shutter
+            )
+        )
+
+
+def test_signature_of_shutter_plan(context: BlueskyContext):
+    plan = operate_shutter_plan
+    context.register_plan(plan)
+    assert plan.__name__ in context.plans
+
+    schema = context.plans["operate_shutter_plan"].model.model_json_schema()
+
+    # Plan
+    assert schema["title"] == "operate_shutter_plan"
+
+    # Check arguments
+    assert "experiment_hutch" in schema["properties"].keys()
+    assert "access_device" in schema["properties"].keys()
+    assert "shutter_demand" in schema["properties"].keys()
+    assert "shutter" in schema["properties"].keys()
+
+    # Check required arguments - shutter missing because injected
+    assert "shutter" not in schema["required"]
+    assert schema["required"] == [
+        "experiment_hutch",
+        "access_device",
+        "shutter_demand",
+    ]

@@ -1,16 +1,16 @@
 import bluesky.plan_stubs as bps
 from bluesky.utils import MsgGenerator
-from dodal.devices.hutch_shutter import ShutterDemand
-from dodal.devices.i19.shutter import HutchConditionalShutter
+from dodal.common import inject
+from dodal.devices.hutch_shutter import HutchShutter, ShutterDemand
 
 from i19_bluesky.log import LOGGER
+from i19_bluesky.optics.check_access_control import check_access
 
 
-def open_hutch_shutter(shutter: HutchConditionalShutter) -> MsgGenerator:
-    LOGGER.info("Opening experiment shutter.")
-    yield from bps.abs_set(shutter, ShutterDemand.OPEN, wait=True)
-
-
-def close_hutch_shutter(shutter: HutchConditionalShutter) -> MsgGenerator:
-    LOGGER.info("Closing experiment shutter.")
-    yield from bps.abs_set(shutter, ShutterDemand.CLOSE, wait=True)
+@check_access
+def operate_shutter_plan(
+    shutter_demand: ShutterDemand,
+    shutter: HutchShutter = inject("shutter"),  # noqa: B008
+) -> MsgGenerator:
+    LOGGER.info(f"Moving experiment shutter to {shutter_demand}.")
+    yield from bps.abs_set(shutter, shutter_demand, wait=True)
