@@ -1,34 +1,28 @@
-import pytest
+import bluesky.plan_stubs as bps
 from blueapi.core import BlueskyContext
+from bluesky.utils import MsgGenerator
 
-from i19_bluesky.optics.experiment_shutter_plans import operate_shutter_plan
-
-
-@pytest.fixture
-def context() -> BlueskyContext:
-    return BlueskyContext()
+from i19_bluesky.optics.check_access_control import check_access
 
 
-def test_signature_of_plan_with_check_access(context: BlueskyContext):
-    plan = operate_shutter_plan
+def test_plan_signature_with_check_access(context: BlueskyContext):
+    @check_access
+    def dummy_plan(seconds: float) -> MsgGenerator:
+        yield from bps.sleep(seconds)
+
+    plan = dummy_plan
     context.register_plan(plan)
     assert plan.__name__ in context.plans
 
-    schema = context.plans["operate_shutter_plan"].model.model_json_schema()
-
-    # Plan
-    assert schema["title"] == "operate_shutter_plan"
+    schema = context.plans["dummy_plan"].model.model_json_schema()
 
     # Check arguments
-    assert "experiment_hutch" in schema["properties"].keys()
+    assert "seconds" in schema["properties"].keys()
     assert "access_device" in schema["properties"].keys()
-    assert "shutter_demand" in schema["properties"].keys()
-    assert "shutter" in schema["properties"].keys()
+    assert "experiment_hutch" in schema["properties"].keys()
 
-    # Check required arguments - shutter missing because injected
-    assert "shutter" not in schema["required"]
     assert schema["required"] == [
         "experiment_hutch",
         "access_device",
-        "shutter_demand",
+        "seconds",
     ]

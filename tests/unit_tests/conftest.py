@@ -2,6 +2,7 @@ import asyncio
 import time
 
 import pytest
+from blueapi.core import BlueskyContext
 from bluesky.run_engine import RunEngine
 
 
@@ -16,3 +17,8 @@ async def RE():
         if time.monotonic() > timeout:
             raise TimeoutError("This really shouldn't happen but just in case...")
     yield RE
+
+
+@pytest.fixture
+def context() -> BlueskyContext:
+    return BlueskyContext()
