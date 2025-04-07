@@ -25,7 +25,7 @@ dependencies = [
     "blueapi @ git+https://github.com/DiamondLightSource/blueapi.git@main",
     # Blueapi pinned to main until a new release is made to get this fix
     # https://github.com/DiamondLightSource/blueapi/pull/873
-    "ophyd == 1.9.0",
+    "ophyd == 1.10.5",
     "ophyd-async >= 0.9.0a2",
     "bluesky >= 1.13",
     "dls-dodal @ git+https://github.com/DiamondLightSource/dodal.git@main",
