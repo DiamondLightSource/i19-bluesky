@@ -1,0 +1,4 @@
+api:
+  host: testhost
+  port: 12345
+stomp: null
