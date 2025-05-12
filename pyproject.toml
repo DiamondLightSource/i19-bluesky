@@ -22,9 +22,7 @@ dependencies = [
     "fastapi[all]",
     # These dependencies may be issued as pre-release versions and should have a pin constraint
     # as by default pip-install will not upgrade to a pre-release.
-    "blueapi @ git+https://github.com/DiamondLightSource/blueapi.git@main",
-    # Blueapi pinned to main until a new release is made to get this fix
-    # https://github.com/DiamondLightSource/blueapi/pull/873
+    "blueapi >= 0.12.0",
     "ophyd == 1.9.0",
     "ophyd-async >= 0.9.0a2",
     "bluesky >= 1.13",
@@ -81,7 +79,7 @@ asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
 markers = [
     "skip_log_setup: marks tests so that loggers are not setup before the test.",
-    "system_test: marks test as other system test that requires infrastructure"
+    "system_test: marks test as other system test that requires infrastructure",
 ]
 # Run pytest with all our checkers, and don't spam us with massive tracebacks on error
 addopts = """
