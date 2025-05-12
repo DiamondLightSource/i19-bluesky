@@ -8,6 +8,7 @@ from dodal.devices.i19.blueapi_device import HutchState, OpticsBlueAPIDevice
 from dodal.devices.i19.hutch_access import HutchAccessControl
 from ophyd_async.core import AsyncStatus, StandardReadable
 from ophyd_async.sim import SimMotor
+from ophyd_async.testing import set_mock_value
 
 
 class MotorPosition(StrEnum):
@@ -39,7 +40,8 @@ async def optics_motors(name="optics_motors") -> FakeOpticsMotors:
 
 async def access_device(name="access_control") -> HutchAccessControl:
     device = HutchAccessControl(prefix="", name=name)
-    await device.connect()
+    await device.connect(mock=True)
+    set_mock_value(device.active_hutch, "EH1")
     return device
 
 
