@@ -5,6 +5,7 @@ from blueapi.core import MsgGenerator
 from bluesky.protocols import Movable
 from dodal.common import inject
 from dodal.devices.i19.blueapi_device import HutchState, OpticsBlueAPIDevice
+from dodal.devices.i19.hutch_access import HutchAccessControl
 from ophyd_async.core import AsyncStatus, StandardReadable
 from ophyd_async.sim import SimMotor
 
@@ -12,24 +13,6 @@ from ophyd_async.sim import SimMotor
 class MotorPosition(StrEnum):
     IN = "IN"
     OUT = "OUT"
-
-
-class AccessControlledOpticsMotors(OpticsBlueAPIDevice):
-    def __init__(self, name: str = "") -> None:
-        self.hutch = HutchState.EH2
-        super().__init__(name)
-
-    @AsyncStatus.wrap
-    async def set(self, value: MotorPosition):
-        request_params = {
-            "name": "move_motors",
-            "params": {
-                "experiment_hutch": self.hutch.value,
-                "access_device": "access_control",
-                "position": value.value,
-            },
-        }
-        await super().set(request_params)
 
 
 class FakeOpticsMotors(StandardReadable, Movable[MotorPosition]):
@@ -52,6 +35,30 @@ async def optics_motors(name="optics_motors") -> FakeOpticsMotors:
     motors = FakeOpticsMotors(name=name)
     await motors.connect()
     return motors
+
+
+async def access_device(name="access_control") -> HutchAccessControl:
+    device = HutchAccessControl(prefix="", name=name)
+    await device.connect()
+    return device
+
+
+class AccessControlledOpticsMotors(OpticsBlueAPIDevice):
+    def __init__(self, name: str = "") -> None:
+        self.hutch = HutchState.EH2
+        super().__init__(name)
+
+    @AsyncStatus.wrap
+    async def set(self, value: MotorPosition):
+        request_params = {
+            "name": "move_motors",
+            "params": {
+                "experiment_hutch": self.hutch.value,
+                "access_device": "access_control",
+                "position": value.value,
+            },
+        }
+        await super().set(request_params)
 
 
 MOTOR: FakeOpticsMotors = inject("optics_motors")
