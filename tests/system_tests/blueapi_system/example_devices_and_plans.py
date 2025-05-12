@@ -10,6 +10,8 @@ from ophyd_async.core import AsyncStatus, StandardReadable
 from ophyd_async.sim import SimMotor
 from ophyd_async.testing import set_mock_value
 
+from i19_bluesky.optics.check_access_control import check_access
+
 
 class MotorPosition(StrEnum):
     IN = "IN"
@@ -66,12 +68,8 @@ class AccessControlledOpticsMotors(OpticsBlueAPIDevice):
 MOTOR: FakeOpticsMotors = inject("optics_motors")
 
 
+@check_access
 def move_motors(
     position: MotorPosition, motors: FakeOpticsMotors = MOTOR
 ) -> MsgGenerator:
     yield from bps.abs_set(motors, position, wait=True)
-
-
-# NOTE. Yeah, without access control I can't do a thing
-# Need one fixture for access allowed and one for access denied
-# And some way to decorate the plan? r maybe a different plan?

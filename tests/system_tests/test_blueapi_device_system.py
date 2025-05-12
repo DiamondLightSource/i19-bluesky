@@ -14,7 +14,9 @@ import pytest
 from blueapi.client.client import BlueapiClient
 from blueapi.config import ApplicationConfig
 
-from .blueapi_system.example_devices_and_plans import AccessControlledOpticsMotors
+from .blueapi_system.example_devices_and_plans import (
+    AccessControlledOpticsMotors,  # , move_motors
+)
 
 
 @pytest.fixture(scope="module", autouse=True)
@@ -41,3 +43,13 @@ async def motors_with_blueapi() -> AccessControlledOpticsMotors:
     ac_motors = AccessControlledOpticsMotors(name="motors_with_blueapi")
     await ac_motors.connect()
     return ac_motors
+
+
+@pytest.mark.system_test
+def test_move_motors_plan_does_not_run_when_check_access_fails():
+    pass
+
+
+@pytest.mark.system_test
+def test_motors_move_when_hutch_check_passes():
+    pass
