@@ -45,11 +45,11 @@ async def motors_with_blueapi() -> AccessControlledOpticsMotors:
     return ac_motors
 
 
-@pytest.mark.system_test
-def test_move_motors_plan_does_not_run_when_check_access_fails():
-    pass
+# @pytest.mark.system_test
+# def test_move_motors_plan_does_not_run_when_check_access_fails():
+#     pass
 
 
-@pytest.mark.system_test
-def test_motors_move_when_hutch_check_passes():
-    pass
+# @pytest.mark.system_test
+# def test_motors_move_when_hutch_check_passes():
+#     pass
