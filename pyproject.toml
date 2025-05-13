@@ -107,7 +107,7 @@ legacy_tox_ini = """
 [tox]
 skipsdist=True
 
-[testenv:{pre-commit,type-checking,tests,docs}]
+[testenv:{pre-commit,type-checking,tests,docs,system-test}]
 # Don't create a virtualenv for the command, requires tox-direct plugin
 direct = True
 passenv = *
