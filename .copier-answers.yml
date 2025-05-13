@@ -1,6 +1,6 @@
 # Changes here will be overwritten by Copier
-_commit: 2.6.0
-_src_path: gh:DiamondLightSource/python-copier-template
+_commit: 3.0.0
+_src_path: https://github.com/DiamondLightSource/python-copier-template
 author_email: callum.forrester@diamond.ac.uk
 author_name: Callum Forrester
 component_lifecycle: experimental
@@ -15,4 +15,5 @@ github_org: DiamondLightSource
 package_name: i19_bluesky
 pypi: false
 repo_name: i19-bluesky
+strict_typing: true
 type_checker: pyright
