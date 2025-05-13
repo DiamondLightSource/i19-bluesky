@@ -1,0 +1,26 @@
+on:
+  workflow_call:
+
+env:
+  # https://github.com/pytest-dev/pytest/issues/2042
+  PY_IGNORE_IMPORTMISMATCH: "1"
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # Need this to get version number from last tag
+          fetch-depth: 0
+
+      - name: Install python packages
+        uses: ./.github/actions/install_requirements
+
+      - name: Start Blueapi Server
+        run: blueapi -c ${{ github.workspace }}/tests/system_tests/blueapi_system/config_without_stomp.yaml serve &
+
+      - name: Run tests
+        run: tox -e system-test
