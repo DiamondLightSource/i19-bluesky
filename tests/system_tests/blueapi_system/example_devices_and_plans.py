@@ -37,6 +37,7 @@ class FakeOpticsMotors(StandardReadable, Movable[MotorPosition]):
 async def optics_motors(name="optics_motors") -> FakeOpticsMotors:
     motors = FakeOpticsMotors(name=name)
     await motors.connect()
+    await motors.set(MotorPosition.OUT)
     return motors
 
 

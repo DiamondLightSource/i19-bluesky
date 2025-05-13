@@ -47,8 +47,10 @@ async def motors_with_blueapi() -> AccessControlledOpticsMotors:
 
 
 # @pytest.mark.system_test
-# def test_move_motors_plan_does_not_run_when_check_access_fails(client: BlueapiClient):
-#     pass
+# async def test_move_motors_plan_does_not_run_when_check_access_fails(
+#     motors_with_blueapi: AccessControlledOpticsMotors,
+# ):
+#     await motors_with_blueapi.set(MotorPosition.IN)
 
 
 # @pytest.mark.system_test
