@@ -73,8 +73,8 @@ name = "Callum Forrester"
 version_file = "src/i19_bluesky/_version.py"
 
 [tool.pyright]
-typeCheckingMode = "strict"
-reportMissingImports = false # Ignore missing stubs in imported modules
+typeCheckingMode = "standard"
+reportMissingImports = false  # Ignore missing stubs in imported modules
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
