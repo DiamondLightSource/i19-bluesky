@@ -78,7 +78,7 @@ asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
 markers = [
     "skip_log_setup: marks tests so that loggers are not setup before the test.",
-    "system_test: marks test as other system test that requires infrastructure",
+    "system_test: marks test as system test that requires additional infrastructure",
 ]
 # Run pytest with all our checkers, and don't spam us with massive tracebacks on error
 addopts = """

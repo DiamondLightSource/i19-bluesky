@@ -41,6 +41,7 @@ def blueapi_client() -> BlueapiClient:
 @pytest.fixture
 async def motors_with_blueapi() -> AccessControlledOpticsMotors:
     ac_motors = AccessControlledOpticsMotors(name="motors_with_blueapi")
+    ac_motors.url = "https://localhost:8080"
     await ac_motors.connect()
     return ac_motors
 
