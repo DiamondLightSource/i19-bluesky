@@ -1,0 +1,18 @@
+{
+    "devices": [
+        {
+            "name": "optics_motors",
+            "protocols": [
+                {
+                    "name": "Movable",
+                    "types": [
+                        "MotorPositions"
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "access_control"
+        }
+    ]
+}
