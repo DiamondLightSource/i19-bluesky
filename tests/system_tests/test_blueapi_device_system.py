@@ -13,9 +13,9 @@ from pathlib import Path
 
 import pytest
 from blueapi.client.client import BlueapiClient
-from blueapi.config import ApplicationConfig
+from blueapi.config import ApplicationConfig, RestConfig
 from blueapi.service.model import PlanResponse
-from pydantic import TypeAdapter
+from pydantic import HttpUrl, TypeAdapter
 
 from .blueapi_system.example_devices_and_plans import (
     AccessControlledOpticsMotors,  # , move_motors
@@ -38,7 +38,9 @@ def wait_for_server():
 
 @pytest.fixture
 def blueapi_client() -> BlueapiClient:
-    return BlueapiClient.from_config(config=ApplicationConfig())
+    return BlueapiClient.from_config(
+        config=ApplicationConfig(api=RestConfig(url=HttpUrl("https://testhost:12345")))
+    )
 
 
 @pytest.fixture
