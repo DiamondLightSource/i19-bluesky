@@ -49,8 +49,8 @@ async def access_device(name="access_control") -> HutchAccessControl:
 
 
 class AccessControlledOpticsMotors(OpticsBlueAPIDevice):
-    def __init__(self, name: str = "") -> None:
-        self.hutch = HutchState.EH2
+    def __init__(self, hutch: HutchState = HutchState.EH2, name: str = "") -> None:
+        self.hutch = hutch
         super().__init__(name)
 
     @AsyncStatus.wrap
