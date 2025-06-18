@@ -1,0 +1,4 @@
+api:
+  url: https://testhost:12345
+stomp:
+  enabled: false
