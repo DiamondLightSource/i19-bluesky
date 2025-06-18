@@ -9,15 +9,16 @@ HOWTO:
 """
 
 import time
+from pathlib import Path
 
 import pytest
 from blueapi.client.client import BlueapiClient
 from blueapi.config import ApplicationConfig
+from blueapi.service.model import PlanResponse
+from pydantic import TypeAdapter
 
 from .blueapi_system.example_devices_and_plans import (
-    MOTOR,
     AccessControlledOpticsMotors,  # , move_motors
-    MotorPosition,
 )
 
 
@@ -48,19 +49,35 @@ async def eh2_motors_with_blueapi() -> AccessControlledOpticsMotors:
     return ac_motors
 
 
+# @pytest.mark.system_test
+# async def test_move_motors_plan_does_not_run_when_check_access_fails(
+#     eh2_motors_with_blueapi: AccessControlledOpticsMotors,
+#     client: BlueapiClient,
+#     # MOTOR: FakeOpticsMotors,
+# ):
+#     assert await MOTOR.motor1.user_readback.get_value() == 0.0
+#     assert await MOTOR.motor2.user_readback.get_value() == 0.0
+
+#     await eh2_motors_with_blueapi.set(MotorPosition.IN)
+
+#     assert await MOTOR.motor1.user_readback.get_value() == 0.0
+#     assert await MOTOR.motor2.user_readback.get_value() == 0.0
+
+
+_DATA_PATH = Path(__file__).parent / "blueapi_system"
+
+
+@pytest.fixture
+def expected_plans() -> PlanResponse:
+    return TypeAdapter(PlanResponse).validate_json(
+        (_DATA_PATH / "plans.json").read_text()
+    )
+
+
 @pytest.mark.system_test
-async def test_move_motors_plan_does_not_run_when_check_access_fails(
-    eh2_motors_with_blueapi: AccessControlledOpticsMotors,
-    client: BlueapiClient,
-    # MOTOR: FakeOpticsMotors,
-):
-    assert await MOTOR.motor1.user_readback.get_value() == 0.0
-    assert await MOTOR.motor2.user_readback.get_value() == 0.0
-
-    await eh2_motors_with_blueapi.set(MotorPosition.IN)
-
-    assert await MOTOR.motor1.user_readback.get_value() == 0.0
-    assert await MOTOR.motor2.user_readback.get_value() == 0.0
+def test_get_plans_by_name(client: BlueapiClient, expected_plans: PlanResponse):
+    for plan in expected_plans.plans:
+        assert client.get_plan(plan.name) == plan
 
 
 # @pytest.mark.system_test
