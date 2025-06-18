@@ -21,7 +21,7 @@ dependencies = [
     "fastapi[all]",
     # These dependencies may be issued as pre-release versions and should have a pin constraint
     # as by default pip-install will not upgrade to a pre-release.
-    "blueapi >= 0.8.0",
+    "blueapi >= 0.12.0",
     # Blueapi pinned to main until a new release is made to get this fix
     # https://github.com/DiamondLightSource/blueapi/pull/873
     "ophyd == 1.9.0",
