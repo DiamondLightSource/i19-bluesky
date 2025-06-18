@@ -1,5 +1,4 @@
 api:
-  host: testhost
-  port: 12345
+  url: http://testhost:12345
 stomp:
   enabled: false
