@@ -21,9 +21,6 @@ jobs:
 
       - name: Start Blueapi Server
         run: blueapi -c ${{ github.workspace }}/tests/system_tests/blueapi_system/config_optics_blueapi.yaml serve &
-      
-      - name: Sanity Check
-        run: curl http://localhost:12345/
 
       - name: Run tests
         run: tox -e system-test
