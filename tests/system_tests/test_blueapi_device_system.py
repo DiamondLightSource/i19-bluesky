@@ -77,9 +77,9 @@ def expected_plans() -> PlanResponse:
 
 
 @pytest.mark.system_test
-def test_get_plans_by_name(client: BlueapiClient, expected_plans: PlanResponse):
+def test_get_plans_by_name(blueapi_client: BlueapiClient, expected_plans: PlanResponse):
     for plan in expected_plans.plans:
-        assert client.get_plan(plan.name) == plan
+        assert blueapi_client.get_plan(plan.name) == plan
 
 
 # @pytest.mark.system_test
