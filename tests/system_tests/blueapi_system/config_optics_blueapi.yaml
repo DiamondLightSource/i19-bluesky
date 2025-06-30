@@ -4,5 +4,7 @@ env:
   sources:
     - kind: planFunctions
       module: example_devices_and_plans
+    - kind: dodal
+      module: example_devices_and_plans
 stomp:
   enabled: false
