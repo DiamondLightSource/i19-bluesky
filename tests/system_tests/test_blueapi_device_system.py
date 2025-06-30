@@ -21,8 +21,8 @@ from .blueapi_system.example_devices_and_plans import (
     AccessControlledOpticsMotors,  # , move_motors
 )
 
-# CONFIG = ApplicationConfig(api=RestConfig(url=HttpUrl("https://testhost:12345")))
-CONFIG = ApplicationConfig(api=RestConfig(url=HttpUrl("http://0.0.0.0:8000")))
+# CONFIG = ApplicationConfig()
+CONFIG = ApplicationConfig(api=RestConfig(url=HttpUrl("https://testhost:12345")))
 
 
 @pytest.fixture
