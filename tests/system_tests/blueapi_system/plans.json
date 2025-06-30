@@ -34,7 +34,7 @@
                     "position": {
                         "$ref": "#/$defs/MotorPosition"
                     },
-                    "motor": {
+                    "motors": {
                         "title": "Motors",
                         "type": "example_devices_and_plans.FakeOpticsMotors"
                     }
