@@ -5,10 +5,18 @@
             "description": null,
             "schema": {
                 "$defs": {
+                    "HutchName": {
+                        "enum": [
+                            "EH1",
+                            "EH2"
+                        ],
+                        "title": "HutchName",
+                        "type": "string"
+                    },
                     "MotorPosition": {
                         "enum": [
-                        "IN",
-                        "OUT"
+                            "IN",
+                            "OUT"
                         ],
                         "title": "MotorPosition",
                         "type": "string"
@@ -16,18 +24,24 @@
                 },
                 "additionalProperties": false,
                 "properties": {
+                    "experiment_hutch": {
+                        "$ref": "#/$defs/HutchName"
+                    },
+                    "access_device": {
+                        "title": "Access Device",
+                        "type": "dodal.devices.i19.hutch_access.HutchAccessControl"
+                    },
                     "position": {
                         "$ref": "#/$defs/MotorPosition"
                     },
                     "motor": {
                         "title": "Motor",
-                        "type": "bluesky.protocols.Movable",
-                        "types": [
-                            "MotorPosition"
-                        ]
+                        "type": "example_devices_and_plans.FakeOpticsMotors"
                     }
                 },
                 "required": [
+                    "experiment_hutch",
+                    "access_device",
                     "position"
                 ],
                 "title": "move_motors",
