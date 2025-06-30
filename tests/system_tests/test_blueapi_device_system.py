@@ -21,10 +21,17 @@ from .blueapi_system.example_devices_and_plans import (
     AccessControlledOpticsMotors,  # , move_motors
 )
 
+CONFIG = ApplicationConfig(api=RestConfig(url=HttpUrl("https://testhost:12345")))
+
+
+@pytest.fixture
+def blueapi_client() -> BlueapiClient:
+    return BlueapiClient.from_config(config=CONFIG)
+
 
 @pytest.fixture(scope="module", autouse=True)
 def wait_for_server():
-    client = BlueapiClient.from_config(config=ApplicationConfig())
+    client = BlueapiClient.from_config(config=CONFIG)
 
     for _ in range(20):
         try:
@@ -34,13 +41,6 @@ def wait_for_server():
             ...
         time.sleep(0.5)
     raise TimeoutError("No connection to blueapi server")
-
-
-@pytest.fixture
-def blueapi_client() -> BlueapiClient:
-    return BlueapiClient.from_config(
-        config=ApplicationConfig(api=RestConfig(url=HttpUrl("https://testhost:12345")))
-    )
 
 
 @pytest.fixture
