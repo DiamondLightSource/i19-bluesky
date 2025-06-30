@@ -20,7 +20,7 @@ jobs:
         uses: ./.github/actions/install_requirements
 
       - name: Start Blueapi Server
-        run: blueapi -c ${{ github.workspace }}/tests/system_tests/blueapi_system/config_optics_blueapi.yaml serve &
+        run: blueapi -c ${{ github.workspace }}/tests/system_tests/blueapi_system/config_optics_blueapi.yaml serve 
 
       - name: Run tests
         run: tox -e system-test
