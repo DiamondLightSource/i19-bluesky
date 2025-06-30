@@ -22,7 +22,7 @@ from .blueapi_system.example_devices_and_plans import (
 )
 
 # CONFIG = ApplicationConfig()
-CONFIG = ApplicationConfig(api=RestConfig(url=HttpUrl("https://testhost:12345")))
+CONFIG = ApplicationConfig(api=RestConfig(url=HttpUrl("http://localhost:12345")))
 
 
 @pytest.fixture
