@@ -1,4 +1,8 @@
 api:
   url: http://0.0.0.0:12345 # https://testhost:12345
+env:
+  sources:
+    - kind: planFunctions
+      module: example_devices_and_plans
 stomp:
   enabled: false

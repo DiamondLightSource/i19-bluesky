@@ -18,9 +18,15 @@ jobs:
 
       - name: Install python packages
         uses: ./.github/actions/install_requirements
+      
+      - name: Set PythonPath
+        id: set-path
+        run: echo "PYTHONPATH=${{ github.workspace }}/tests/system_tests/blueapi_system" >> $GITHUB_ENV
 
       - name: Start Blueapi Server
-        run: blueapi -c ${{ github.workspace }}/tests/system_tests/blueapi_system/config_optics_blueapi.yaml serve &
+        run: |
+          echo "PYTHONPATH: ${{ steps.set-path.outputs.PYTHONPATH }}"
+          blueapi -c ${{ github.workspace }}/tests/system_tests/blueapi_system/config_optics_blueapi.yaml serve &
 
       - name: Run tests
         run: tox -e system-test
