@@ -13,16 +13,16 @@ from pathlib import Path
 
 import pytest
 from blueapi.client.client import BlueapiClient
-from blueapi.config import ApplicationConfig  # , RestConfig
+from blueapi.config import ApplicationConfig, RestConfig
 from blueapi.service.model import PlanResponse
-from pydantic import TypeAdapter  # HttpUrl
+from pydantic import HttpUrl, TypeAdapter
 
 from .blueapi_system.example_devices_and_plans import (
     AccessControlledOpticsMotors,  # , move_motors
 )
 
 # CONFIG = ApplicationConfig(api=RestConfig(url=HttpUrl("https://testhost:12345")))
-CONFIG = ApplicationConfig()
+CONFIG = ApplicationConfig(api=RestConfig(url=HttpUrl("http://0.0.0.0:8000")))
 
 
 @pytest.fixture
