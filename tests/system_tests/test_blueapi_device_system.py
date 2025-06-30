@@ -22,7 +22,6 @@ from .blueapi_system.example_devices_and_plans import (
     AccessControlledOpticsMotors,  # , move_motors
 )
 
-# CONFIG = ApplicationConfig()
 CONFIG = ApplicationConfig(api=RestConfig(url=HttpUrl("http://localhost:12345")))
 
 
@@ -48,7 +47,7 @@ def wait_for_server():
 @pytest.fixture
 async def eh2_motors_with_blueapi() -> AccessControlledOpticsMotors:
     ac_motors = AccessControlledOpticsMotors(name="motors_with_blueapi")
-    ac_motors.url = "https://testhost:12345"  # "https://localhost:8080"
+    ac_motors.url = "https://testhost:12345"
     await ac_motors.connect()
     return ac_motors
 
