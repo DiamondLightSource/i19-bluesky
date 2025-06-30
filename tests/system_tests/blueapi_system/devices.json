@@ -12,7 +12,17 @@
             ]
         },
         {
-            "name": "access_control"
+            "name": "access_control",
+            "protocols": [
+                {
+                    "name": "Device",
+                    "types": []
+                },
+                {
+                    "name": "Readable",
+                    "types": []
+                }
+            ]
         }
     ]
 }
