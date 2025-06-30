@@ -1,4 +1,4 @@
 api:
-  url: https://testhost:12345 # https://testhost:12345
+  url: http://0.0.0.0:12345 # https://testhost:12345
 stomp:
   enabled: false
