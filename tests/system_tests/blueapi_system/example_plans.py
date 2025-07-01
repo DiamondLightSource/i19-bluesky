@@ -1,10 +1,9 @@
 import bluesky.plan_stubs as bps
 from blueapi.core import MsgGenerator
 from dodal.common import inject
+from example_devices import FakeOpticsMotors, MotorPosition
 
 from i19_bluesky.optics.check_access_control import check_access
-
-from .example_devices import FakeOpticsMotors, MotorPosition
 
 MOTOR: FakeOpticsMotors = inject("optics_motors")
 
