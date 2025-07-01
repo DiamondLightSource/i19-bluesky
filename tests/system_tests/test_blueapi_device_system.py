@@ -99,6 +99,7 @@ def expected_devices() -> DeviceResponse:
     )
 
 
+@pytest.mark.system_test
 def test_get_devices(blueapi_client: BlueapiClient, expected_devices: DeviceResponse):
     retrieved_devices = blueapi_client.get_devices()
     retrieved_devices.devices.sort(key=lambda x: x.name)
