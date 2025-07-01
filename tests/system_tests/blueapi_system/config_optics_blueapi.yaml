@@ -3,8 +3,8 @@ api:
 env:
   sources:
     - kind: planFunctions
-      module: example_devices_and_plans
+      module: example_plans
     - kind: dodal
-      module: example_devices_and_plans
+      module: example_devices
 stomp:
   enabled: false

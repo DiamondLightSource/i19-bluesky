@@ -18,7 +18,7 @@ from blueapi.service.model import DeviceResponse, PlanResponse
 from pydantic import HttpUrl, TypeAdapter
 from requests.exceptions import ConnectionError
 
-from .blueapi_system.example_devices_and_plans import (
+from .blueapi_system.example_devices import (
     AccessControlledOpticsMotors,
     # FakeOpticsMotors,
     # MotorPosition,  # , move_motors

@@ -1,16 +1,14 @@
 from enum import StrEnum
 
-import bluesky.plan_stubs as bps
-from blueapi.core import MsgGenerator
 from bluesky.protocols import Movable
-from dodal.common import inject
+from dodal.common.beamlines.beamline_utils import (
+    device_factory,
+)
 from dodal.devices.i19.blueapi_device import HutchState, OpticsBlueAPIDevice
 from dodal.devices.i19.hutch_access import HutchAccessControl
 from ophyd_async.core import AsyncStatus, StandardReadable
 from ophyd_async.sim import SimMotor
 from ophyd_async.testing import set_mock_value
-
-from i19_bluesky.optics.check_access_control import check_access
 
 
 class MotorPosition(StrEnum):
@@ -34,18 +32,30 @@ class FakeOpticsMotors(StandardReadable, Movable[MotorPosition]):
             await self.motor2.set(0.0)
 
 
-async def optics_motors(name="optics_motors") -> FakeOpticsMotors:
-    motors = FakeOpticsMotors(name=name)
-    await motors.connect()
-    await motors.set(MotorPosition.OUT)
-    return motors
+@device_factory()
+def optics_motors() -> FakeOpticsMotors:
+    return FakeOpticsMotors(name="optics_motors")
 
 
-async def access_device(name="access_control") -> HutchAccessControl:
-    device = HutchAccessControl(prefix="", name=name)
-    await device.connect(mock=True)
+@device_factory(mock=True)
+def access_device() -> HutchAccessControl:
+    device = HutchAccessControl(prefix="", name="access_control")
     set_mock_value(device.active_hutch, "EH1")
     return device
+
+
+# async def optics_motors(name="optics_motors") -> FakeOpticsMotors:
+#     motors = FakeOpticsMotors(name=name)
+#     await motors.connect()
+#     await motors.set(MotorPosition.OUT)
+#     return motors
+
+
+# async def access_device(name="access_control") -> HutchAccessControl:
+#     device = HutchAccessControl(prefix="", name=name)
+#     await device.connect(mock=True)
+#     set_mock_value(device.active_hutch, "EH1")
+#     return device
 
 
 class AccessControlledOpticsMotors(OpticsBlueAPIDevice):
@@ -64,13 +74,3 @@ class AccessControlledOpticsMotors(OpticsBlueAPIDevice):
             },
         }
         await super().set(request_params)
-
-
-MOTOR: FakeOpticsMotors = inject("optics_motors")
-
-
-@check_access
-def move_motors(
-    position: MotorPosition, motors: FakeOpticsMotors = MOTOR
-) -> MsgGenerator:
-    yield from bps.abs_set(motors, position, wait=True)
