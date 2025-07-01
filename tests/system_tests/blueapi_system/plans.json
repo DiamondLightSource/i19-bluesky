@@ -36,7 +36,7 @@
                     },
                     "motors": {
                         "title": "Motors",
-                        "type": "example_devices_and_plans.FakeOpticsMotors"
+                        "type": "example_devices.FakeOpticsMotors"
                     }
                 },
                 "required": [
