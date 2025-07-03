@@ -8,6 +8,22 @@
                     "types": [
                         "MotorPositions"
                     ]
+                },
+                {
+                    "name": "Device",
+                    "types": []
+                },
+                {
+                    "name": "Readable",
+                    "types": []
+                },
+                {
+                    "name": "Stageable",
+                    "types": []
+                },
+                {
+                    "name": "Configurable",
+                    "types": []
                 }
             ]
         },
@@ -20,6 +36,14 @@
                 },
                 {
                     "name": "Readable",
+                    "types": []
+                },
+                {
+                    "name": "Stageable",
+                    "types": []
+                },
+                {
+                    "name": "Configurable",
                     "types": []
                 }
             ]
