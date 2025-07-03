@@ -10,10 +10,6 @@
                     ]
                 },
                 {
-                    "name": "Device",
-                    "types": []
-                },
-                {
                     "name": "Readable",
                     "types": []
                 },
@@ -23,6 +19,10 @@
                 },
                 {
                     "name": "Configurable",
+                    "types": []
+                },
+                {
+                    "name": "Device",
                     "types": []
                 }
             ]
@@ -31,10 +31,6 @@
             "name": "access_control",
             "protocols": [
                 {
-                    "name": "Device",
-                    "types": []
-                },
-                {
                     "name": "Readable",
                     "types": []
                 },
@@ -44,6 +40,10 @@
                 },
                 {
                     "name": "Configurable",
+                    "types": []
+                },
+                {
+                    "name": "Device",
                     "types": []
                 }
             ]
