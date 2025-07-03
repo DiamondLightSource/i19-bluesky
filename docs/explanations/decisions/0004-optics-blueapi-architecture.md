@@ -1,4 +1,4 @@
-# 3. Optics hutch BlueAPI architecture
+# 4. Optics hutch BlueAPI architecture
 
 ## Status
 
@@ -10,4 +10,17 @@ Beamline I19 is made up by two Experimental Hutches in series which use a shared
 
 ## Decision
 
+TODO Put this into better words
+
+
 There is an EHStatus PV which records which hutch is currently in use for beamtime.
+Hutch access device reading this PV in i19-optics.
+
+For any device in the optics hutch:
+- actual device + plan operating it (decorated with check_access) in i19-optics
+- AccessControlledDevice inheriting the OpticsBlueAPIDevice implementation in i19-{1,2}
+- This device has a rest call with the plan name and devices to i19-blueapi (optics)
+- ch
+
+
+TBD Add diagram with shutter example
