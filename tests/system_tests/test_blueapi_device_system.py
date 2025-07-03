@@ -20,9 +20,9 @@ from requests.exceptions import ConnectionError
 
 from .blueapi_system.example_devices import (
     AccessControlledOpticsMotors,
-    FakeOpticsMotors,
     MotorPosition,
 )
+from .blueapi_system.example_plans import MOTOR
 
 # from .blueapi_system.example_plans import move_motors
 
@@ -67,7 +67,7 @@ async def eh2_motors_with_blueapi() -> AccessControlledOpticsMotors:
 async def test_move_motors_plan_does_not_run_when_check_access_fails(
     eh2_motors_with_blueapi: AccessControlledOpticsMotors,
     blueapi_client: BlueapiClient,
-    MOTOR: FakeOpticsMotors,
+    # MOTOR: FakeOpticsMotors,
 ):
     assert await MOTOR.motor1.user_readback.get_value() == 0.0
     assert await MOTOR.motor2.user_readback.get_value() == 0.0
