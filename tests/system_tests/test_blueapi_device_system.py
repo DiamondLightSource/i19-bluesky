@@ -20,9 +20,11 @@ from requests.exceptions import ConnectionError
 
 from .blueapi_system.example_devices import (
     AccessControlledOpticsMotors,
-    # FakeOpticsMotors,
-    # MotorPosition,  # , move_motors
+    FakeOpticsMotors,
+    MotorPosition,
 )
+
+# from .blueapi_system.example_plans import move_motors
 
 CONFIG = ApplicationConfig(api=RestConfig(url=HttpUrl("http://localhost:12345")))
 
@@ -61,19 +63,19 @@ async def eh2_motors_with_blueapi() -> AccessControlledOpticsMotors:
     return ac_motors
 
 
-# @pytest.mark.system_test
-# async def test_move_motors_plan_does_not_run_when_check_access_fails(
-#     eh2_motors_with_blueapi: AccessControlledOpticsMotors,
-#     blueapi_client: BlueapiClient,
-#     MOTOR: FakeOpticsMotors,
-# ):
-#     assert await MOTOR.motor1.user_readback.get_value() == 0.0
-#     assert await MOTOR.motor2.user_readback.get_value() == 0.0
+@pytest.mark.system_test
+async def test_move_motors_plan_does_not_run_when_check_access_fails(
+    eh2_motors_with_blueapi: AccessControlledOpticsMotors,
+    blueapi_client: BlueapiClient,
+    MOTOR: FakeOpticsMotors,
+):
+    assert await MOTOR.motor1.user_readback.get_value() == 0.0
+    assert await MOTOR.motor2.user_readback.get_value() == 0.0
 
-#     await eh2_motors_with_blueapi.set(MotorPosition.IN)
+    await eh2_motors_with_blueapi.set(MotorPosition.IN)
 
-#     assert await MOTOR.motor1.user_readback.get_value() == 0.0
-#     assert await MOTOR.motor2.user_readback.get_value() == 0.0
+    assert await MOTOR.motor1.user_readback.get_value() == 0.0
+    assert await MOTOR.motor2.user_readback.get_value() == 0.0
 
 
 _DATA_PATH = Path(__file__).parent / "blueapi_system"
