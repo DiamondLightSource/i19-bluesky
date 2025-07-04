@@ -53,16 +53,16 @@ def clean_existing_tasks(blueapi_client: BlueapiClient):
     yield
 
 
-# @pytest.mark.system_test
-# async def test_blueapi_device_creates_and_runs_task(
-#     eh2_motors_with_blueapi: AccessControlledOpticsMotors,
-#     blueapi_client: BlueapiClient,
-# ):
-#     await eh2_motors_with_blueapi.set(MotorPosition.IN)
+@pytest.mark.system_test
+async def test_blueapi_device_creates_and_runs_task(
+    eh2_motors_with_blueapi: AccessControlledOpticsMotors,
+    blueapi_client: BlueapiClient,
+):
+    await eh2_motors_with_blueapi.set(MotorPosition.IN)
 
-#     task_list = blueapi_client.get_all_tasks()
+    task_list = blueapi_client.get_all_tasks()
 
-#     assert task_list[0].is_complete()
+    assert task_list.tasks[0].is_complete
 
 
 @pytest.mark.system_test

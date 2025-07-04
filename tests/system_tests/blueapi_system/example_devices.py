@@ -38,7 +38,7 @@ def optics_motors() -> FakeOpticsMotors:
 
 @device_factory()
 def access_device() -> HutchAccessControl:
-    device = HutchAccessControl(prefix="MOCK-ACCESS-CONTROL", name="access_control")
+    device = HutchAccessControl(prefix="MOCK-ACCESS-CONTROL:", name="access_control")
     return device
 
 
