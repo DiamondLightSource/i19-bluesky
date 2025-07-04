@@ -36,9 +36,9 @@ def optics_motors() -> FakeOpticsMotors:
     return FakeOpticsMotors(name="optics_motors")
 
 
-@device_factory(mock=True)
+@device_factory()
 def access_device() -> HutchAccessControl:
-    device = HutchAccessControl(prefix="", name="access_control")
+    device = HutchAccessControl(prefix="MOCK-ACCESS-CONTROL", name="access_control")
     # set_mock_value(device.active_hutch, "EH1")
     return device
 
