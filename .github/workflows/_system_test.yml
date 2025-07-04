@@ -24,7 +24,7 @@ jobs:
         run: echo "PYTHONPATH=${{ github.workspace }}/tests/system_tests/blueapi_system" >> $GITHUB_ENV
       
       - name: Start soft IOC for access device
-        run: python -m ${{ github.workspace }}/tests/system_tests/blueapi_system/fake_access_ioc.py
+        run: python ${{ github.workspace }}/tests/system_tests/blueapi_system/fake_access_ioc.py
 
       - name: Start Blueapi Server
         run: |
