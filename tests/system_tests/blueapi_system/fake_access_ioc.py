@@ -11,8 +11,8 @@ if __name__ == "__main__":
     builder.SetDeviceName("MOCK-ACCESS-CONTROL")
 
     # Create some records
-    ai = builder.aIn("EHStatus.VALB", initial_value="EH1")
-    ao = builder.aOut(
+    ai = builder.stringIn("EHStatus.VALB", initial_value="EH1")
+    ao = builder.stringOut(
         "EHstatus.VALA",
         initial_value="EH1",
         always_update=True,
