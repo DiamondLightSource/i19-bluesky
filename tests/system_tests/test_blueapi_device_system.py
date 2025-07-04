@@ -53,12 +53,16 @@ def clean_existing_tasks(blueapi_client: BlueapiClient):
     yield
 
 
-# @pytest.fixture
-# async def eh2_motors_with_blueapi() -> AccessControlledOpticsMotors:
-#     ac_motors = AccessControlledOpticsMotors(name="motors_with_blueapi")
-#     ac_motors.url = "https://localhost:12345"
-#     await ac_motors.connect()
-#     return ac_motors
+# @pytest.mark.system_test
+# async def test_blueapi_device_creates_and_runs_task(
+#     eh2_motors_with_blueapi: AccessControlledOpticsMotors,
+#     blueapi_client: BlueapiClient,
+# ):
+#     await eh2_motors_with_blueapi.set(MotorPosition.IN)
+
+#     task_list = blueapi_client.get_all_tasks()
+
+#     assert task_list[0].is_complete()
 
 
 @pytest.mark.system_test
@@ -66,11 +70,7 @@ async def test_move_motors_plan_does_not_run_when_check_access_fails(
     eh2_motors_with_blueapi: AccessControlledOpticsMotors,
     blueapi_client: BlueapiClient,
     sim_motors: FakeOpticsMotors,
-    # MOTOR: FakeOpticsMotors,
 ):
-    assert await sim_motors.motor1.user_readback.get_value() == 0.0
-    assert await sim_motors.motor2.user_readback.get_value() == 0.0
-
     await eh2_motors_with_blueapi.set(MotorPosition.IN)
 
     assert await sim_motors.motor1.user_readback.get_value() == 0.0

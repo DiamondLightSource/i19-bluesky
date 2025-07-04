@@ -37,7 +37,7 @@ async def sim_motors(RE) -> FakeOpticsMotors:
 @pytest.fixture
 async def eh2_motors_with_blueapi(RE) -> AccessControlledOpticsMotors:
     ac_motors = AccessControlledOpticsMotors(name="motors_with_blueapi")
-    ac_motors.url = "https://localhost:12345"
+    ac_motors.url = "http://localhost:12345"
     await ac_motors.connect()
     return ac_motors
 
