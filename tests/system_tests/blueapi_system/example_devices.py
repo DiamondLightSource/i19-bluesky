@@ -39,22 +39,7 @@ def optics_motors() -> FakeOpticsMotors:
 @device_factory()
 def access_device() -> HutchAccessControl:
     device = HutchAccessControl(prefix="MOCK-ACCESS-CONTROL", name="access_control")
-    # set_mock_value(device.active_hutch, "EH1")
     return device
-
-
-# async def optics_motors(name="optics_motors") -> FakeOpticsMotors:
-#     motors = FakeOpticsMotors(name=name)
-#     await motors.connect()
-#     await motors.set(MotorPosition.OUT)
-#     return motors
-
-
-# async def access_device(name="access_control") -> HutchAccessControl:
-#     device = HutchAccessControl(prefix="", name=name)
-#     await device.connect(mock=True)
-#     set_mock_value(device.active_hutch, "EH1")
-#     return device
 
 
 class AccessControlledOpticsMotors(OpticsBlueAPIDevice):

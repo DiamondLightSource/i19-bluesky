@@ -20,11 +20,9 @@ from requests.exceptions import ConnectionError
 
 from .blueapi_system.example_devices import (
     AccessControlledOpticsMotors,
+    FakeOpticsMotors,
     MotorPosition,
 )
-from .blueapi_system.example_plans import MOTOR
-
-# from .blueapi_system.example_plans import move_motors
 
 CONFIG = ApplicationConfig(api=RestConfig(url=HttpUrl("http://localhost:12345")))
 
@@ -55,27 +53,28 @@ def clean_existing_tasks(blueapi_client: BlueapiClient):
     yield
 
 
-@pytest.fixture
-async def eh2_motors_with_blueapi() -> AccessControlledOpticsMotors:
-    ac_motors = AccessControlledOpticsMotors(name="motors_with_blueapi")
-    ac_motors.url = "https://localhost:12345"
-    await ac_motors.connect()
-    return ac_motors
+# @pytest.fixture
+# async def eh2_motors_with_blueapi() -> AccessControlledOpticsMotors:
+#     ac_motors = AccessControlledOpticsMotors(name="motors_with_blueapi")
+#     ac_motors.url = "https://localhost:12345"
+#     await ac_motors.connect()
+#     return ac_motors
 
 
 @pytest.mark.system_test
 async def test_move_motors_plan_does_not_run_when_check_access_fails(
     eh2_motors_with_blueapi: AccessControlledOpticsMotors,
     blueapi_client: BlueapiClient,
+    sim_motors: FakeOpticsMotors,
     # MOTOR: FakeOpticsMotors,
 ):
-    assert await MOTOR.motor1.user_readback.get_value() == 0.0
-    assert await MOTOR.motor2.user_readback.get_value() == 0.0
+    assert await sim_motors.motor1.user_readback.get_value() == 0.0
+    assert await sim_motors.motor2.user_readback.get_value() == 0.0
 
     await eh2_motors_with_blueapi.set(MotorPosition.IN)
 
-    assert await MOTOR.motor1.user_readback.get_value() == 0.0
-    assert await MOTOR.motor2.user_readback.get_value() == 0.0
+    assert await sim_motors.motor1.user_readback.get_value() == 0.0
+    assert await sim_motors.motor2.user_readback.get_value() == 0.0
 
 
 _DATA_PATH = Path(__file__).parent / "blueapi_system"
