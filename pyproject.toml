@@ -53,6 +53,7 @@ dev = [
     "tox-direct",
     "types-mock",
     "types-requests",
+    "softioc",
 ]
 
 [project.scripts]
