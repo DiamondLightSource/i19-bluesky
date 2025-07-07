@@ -54,7 +54,7 @@ def clean_existing_tasks(blueapi_client: BlueapiClient):
 
 
 @pytest.mark.system_test
-async def test_blueapi_device_creates_and_runs_task(
+async def test_blueapi_device_creates_and_completes_task_without_errors(
     eh2_motors_with_blueapi: AccessControlledOpticsMotors,
     blueapi_client: BlueapiClient,
 ):
@@ -63,6 +63,7 @@ async def test_blueapi_device_creates_and_runs_task(
     task_list = blueapi_client.get_all_tasks()
 
     assert task_list.tasks[0].is_complete
+    assert len(task_list.tasks[0].errors) == 0
 
 
 @pytest.mark.system_test
@@ -75,6 +76,18 @@ async def test_move_motors_plan_does_not_run_when_check_access_fails(
 
     assert await sim_motors.motor1.user_readback.get_value() == 0.0
     assert await sim_motors.motor2.user_readback.get_value() == 0.0
+
+
+# @pytest.mark.system_test
+# async def test_motors_move_when_hutch_check_passes(
+#     eh1_motors_with_blueapi: AccessControlledOpticsMotors,
+#     blueapi_client: BlueapiClient,
+#     sim_motors: FakeOpticsMotors,
+# ):
+#     await eh1_motors_with_blueapi.set(MotorPosition.IN)
+
+#     assert await sim_motors.motor1.user_readback.get_value() == 1.0
+#     assert await sim_motors.motor2.user_readback.get_value() == 1.8
 
 
 _DATA_PATH = Path(__file__).parent / "blueapi_system"
@@ -107,8 +120,3 @@ def test_get_devices(blueapi_client: BlueapiClient, expected_devices: DeviceResp
     expected_devices.devices.sort(key=lambda x: x.name)
 
     assert retrieved_devices == expected_devices
-
-
-# @pytest.mark.system_test
-# def test_motors_move_when_hutch_check_passes():
-#     pass

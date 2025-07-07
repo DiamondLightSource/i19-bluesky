@@ -1,5 +1,4 @@
 # Create softIOC for mock access control
-
 from softioc import asyncio_dispatcher, builder, softioc
 
 if __name__ == "__main__":
@@ -15,6 +14,7 @@ if __name__ == "__main__":
         initial_value="EH1",
         always_update=True,
     )
+    # ao.add_alias("MOCK-ACCESS-CONTROL:EHStatus.VALA")
 
     # Boilerplate get the IOC started
     builder.LoadDatabase()
