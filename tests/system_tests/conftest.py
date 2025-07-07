@@ -2,15 +2,47 @@ import asyncio
 import time
 
 import pytest
+from blueapi.client.client import BlueapiClient
+from blueapi.config import ApplicationConfig, RestConfig
 from bluesky.run_engine import RunEngine
 from dodal.devices.i19.blueapi_device import HutchState
 from ophyd_async.testing import set_mock_value
+from pydantic import HttpUrl
+from requests.exceptions import ConnectionError
 
 from .blueapi_system.example_devices import (
     AccessControlledOpticsMotors,
     FakeOpticsMotors,
     optics_motors,
 )
+
+CONFIG = ApplicationConfig(api=RestConfig(url=HttpUrl("http://localhost:12345")))
+
+
+@pytest.fixture
+def blueapi_client() -> BlueapiClient:
+    return BlueapiClient.from_config(config=CONFIG)
+
+
+@pytest.fixture(scope="module", autouse=True)
+def wait_for_server():
+    client = BlueapiClient.from_config(config=CONFIG)
+
+    for _ in range(20):
+        try:
+            client.get_environment()
+            return
+        except ConnectionError:
+            ...
+        time.sleep(0.5)
+    raise TimeoutError("No connection to blueapi server")
+
+
+@pytest.fixture(autouse=True)
+def clean_existing_tasks(blueapi_client: BlueapiClient):
+    for task in blueapi_client.get_all_tasks().tasks:
+        blueapi_client.clear_task(task.task_id)
+    yield
 
 
 @pytest.fixture

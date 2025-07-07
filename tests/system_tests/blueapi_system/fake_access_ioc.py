@@ -28,5 +28,5 @@ if __name__ == "__main__":
     softioc.iocInit(dispatcher)
     softioc.dbpf("MOCK-ACCESS-CONTROL:EHStatus.VALA", ao.get())  # type: ignore
 
-    # Finally leave the IOC running with an interactive shell.
-    softioc.non_interactive_ioc()  # globals())
+    # Finally leave the IOC running with an non-interactive shell.
+    softioc.non_interactive_ioc()
