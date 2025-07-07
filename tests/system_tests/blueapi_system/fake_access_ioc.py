@@ -17,7 +17,7 @@ if __name__ == "__main__":
         always_update=True,
     )
 
-    asub = records.aSub(
+    asub = records.aSub(  # type: ignore
         "EHStatus",
         FTA="STRING",
         FTVA="STRING",
@@ -26,7 +26,7 @@ if __name__ == "__main__":
     # Boilerplate get the IOC started
     builder.LoadDatabase()
     softioc.iocInit(dispatcher)
-    softioc.dbpf("MOCK-ACCESS-CONTROL:EHStatus.VALA", ao.get())
+    softioc.dbpf("MOCK-ACCESS-CONTROL:EHStatus.VALA", ao.get())  # type: ignore
 
     # Finally leave the IOC running with an interactive shell.
     softioc.non_interactive_ioc()  # globals())
