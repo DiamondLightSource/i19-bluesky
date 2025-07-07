@@ -1,5 +1,7 @@
 # Create softIOC for mock access control
+
 from softioc import asyncio_dispatcher, builder, softioc
+from softioc.builder import records
 
 if __name__ == "__main__":
     # Create an asyncio dispatcher, the event loop is now running
@@ -10,15 +12,21 @@ if __name__ == "__main__":
 
     # Create some records
     ao = builder.stringOut(
-        "EHStatus",
+        "HutchStatus",
         initial_value="EH1",
         always_update=True,
     )
-    # ao.add_alias("MOCK-ACCESS-CONTROL:EHStatus.VALA")
+
+    asub = records.aSub(
+        "EHStatus",
+        FTA="STRING",  # , SNAM=update_sub
+        FTVA="STRING",
+    )
 
     # Boilerplate get the IOC started
     builder.LoadDatabase()
     softioc.iocInit(dispatcher)
+    softioc.dbpf("MOCK-ACCESS-CONTROL:EHStatus.VALA", ao.get())
 
     # Finally leave the IOC running with an interactive shell.
     softioc.interactive_ioc(globals())
