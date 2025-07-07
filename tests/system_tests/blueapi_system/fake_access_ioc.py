@@ -12,14 +12,14 @@ if __name__ == "__main__":
 
     # Create some records
     ao = builder.stringOut(
-        "HutchStatus",
+        "hatchStatus",
         initial_value="EH1",
         always_update=True,
     )
 
     asub = records.aSub(
         "EHStatus",
-        FTA="STRING",  # , SNAM=update_sub
+        FTA="STRING",
         FTVA="STRING",
     )
 
