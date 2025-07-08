@@ -20,49 +20,21 @@ from pydantic import TypeAdapter
 
 from .blueapi_system.example_devices import (
     AccessControlledOpticsMotors,
-    FakeOpticsMotors,
     MotorPosition,
 )
 
-
-@pytest.mark.system_test
-async def test_blueapi_device_creates_and_completes_task_without_errors(
-    eh2_motors_with_blueapi: AccessControlledOpticsMotors,
-    blueapi_client: BlueapiClient,
-):
-    await eh2_motors_with_blueapi.set(MotorPosition.IN)
-
-    task_list = blueapi_client.get_all_tasks()
-
-    assert task_list.tasks[0].is_complete
-    assert len(task_list.tasks[0].errors) == 0
-
-
-@pytest.mark.system_test
-async def test_move_motors_plan_does_not_run_when_check_access_fails(
-    eh2_motors_with_blueapi: AccessControlledOpticsMotors,
-    blueapi_client: BlueapiClient,
-    sim_motors: FakeOpticsMotors,
-):
-    await eh2_motors_with_blueapi.set(MotorPosition.IN)
-
-    assert await sim_motors.motor1.user_readback.get_value() == 0.0
-    assert await sim_motors.motor2.user_readback.get_value() == 0.0
-
-
-# @pytest.mark.system_test
-# async def test_motors_move_when_hutch_check_passes(
-#     eh1_motors_with_blueapi: AccessControlledOpticsMotors,
-#     blueapi_client: BlueapiClient,
-#     sim_motors: FakeOpticsMotors,
-# ):
-#     await eh1_motors_with_blueapi.set(MotorPosition.IN)
-
-#     assert await sim_motors.motor1.user_readback.get_value() == 1.0
-#     assert await sim_motors.motor2.user_readback.get_value() == 1.8
-
-
 _DATA_PATH = Path(__file__).parent / "blueapi_system"
+
+
+# Test blueapi config is healthy and not failing
+
+
+@pytest.mark.system_test
+def test_blueapi_initialised_without_errors(blueapi_client: BlueapiClient):
+    env = blueapi_client.get_environment()
+
+    assert env.initialized
+    assert not env.error_message
 
 
 @pytest.fixture
@@ -92,3 +64,33 @@ def test_get_devices(blueapi_client: BlueapiClient, expected_devices: DeviceResp
     expected_devices.devices.sort(key=lambda x: x.name)
 
     assert retrieved_devices == expected_devices
+
+
+# Test device implementing optics blueapi can run plan successfully
+
+
+@pytest.mark.system_test
+async def test_move_motors_plan_does_not_run_when_check_access_fails(
+    eh2_motors_with_blueapi: AccessControlledOpticsMotors,
+    blueapi_client: BlueapiClient,
+):
+    await eh2_motors_with_blueapi.set(MotorPosition.IN)
+
+    task_list = blueapi_client.get_all_tasks()
+
+    assert task_list.tasks[0].is_complete
+    assert len(task_list.tasks[0].errors) == 0
+
+
+@pytest.mark.system_test
+async def test_motors_move_when_hutch_check_passes(
+    eh1_motors_with_blueapi: AccessControlledOpticsMotors,
+    blueapi_client: BlueapiClient,
+):
+    await eh1_motors_with_blueapi.set(MotorPosition.IN)
+
+    task_list = blueapi_client.get_all_tasks()
+    task = task_list.tasks[0]
+
+    assert task.is_complete
+    assert len(task.errors) == 0

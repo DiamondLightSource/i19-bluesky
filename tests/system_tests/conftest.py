@@ -6,14 +6,11 @@ from blueapi.client.client import BlueapiClient
 from blueapi.config import ApplicationConfig, RestConfig
 from bluesky.run_engine import RunEngine
 from dodal.devices.i19.blueapi_device import HutchState
-from ophyd_async.testing import set_mock_value
 from pydantic import HttpUrl
 from requests.exceptions import ConnectionError
 
 from .blueapi_system.example_devices import (
     AccessControlledOpticsMotors,
-    FakeOpticsMotors,
-    optics_motors,
 )
 
 CONFIG = ApplicationConfig(api=RestConfig(url=HttpUrl("http://localhost:12345")))
@@ -56,14 +53,6 @@ async def RE():
         if time.monotonic() > timeout:
             raise TimeoutError("This really shouldn't happen but just in case...")
     yield RE
-
-
-@pytest.fixture
-async def sim_motors(RE) -> FakeOpticsMotors:
-    sim_motors = optics_motors(connect_immediately=True)
-    set_mock_value(sim_motors.motor1.user_setpoint, 0.0)
-    set_mock_value(sim_motors.motor2.user_setpoint, 0.0)
-    return sim_motors
 
 
 @pytest.fixture
