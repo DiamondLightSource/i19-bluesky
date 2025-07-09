@@ -31,7 +31,7 @@ class FakeOpticsMotors(StandardReadable, Movable[MotorPosition]):
             await self.motor2.set(0.0)
 
 
-@device_factory(mock=True)
+@device_factory()
 def optics_motors() -> FakeOpticsMotors:
     return FakeOpticsMotors(name="optics_motors")
 
