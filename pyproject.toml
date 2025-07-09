@@ -153,7 +153,7 @@ root_package = "i19_bluesky"
 [[tool.importlinter.contracts]]
 name = "EH modules do not import from each other"
 type = "independence"
-modules = "i19_bluesky.eh*"
+modules = ["i19_bluesky.eh1", "i19_bluesky.eh2"]
 
 [[tool.importlinter.contracts]]
 name = "EH modules do not import from the optics module"
