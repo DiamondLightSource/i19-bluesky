@@ -10,20 +10,18 @@ Beamline I19 is made up by two Experimental Hutches in series which use a shared
 
 ## Decision
 
-On I19 each experimental hutch has its own control machine, activeMQ instance and GDA deployment. It follows that each hutch should have its own blueapi instance running on the i19 cluster, with ad-hoc plans and devices. However, the optics hutch is shared and the hardware can be controlled by both hutches, which can lead to
+On I19 each experimental hutch has its own control machine, activeMQ instance and GDA deployment. It follows that each hutch should have its own blueapi instance running on the i19 cluster, with ad-hoc plans and devices. However, the optics hutch is shared and the hardware can be controlled by both hutches, which needs to be considered when writing plans. In order to be able to control the access to the devices in the optics, a third blueAPI has been set up to run on the cluster.
 
-There is an EHStatus PV which records which hutch is currently in use for beamtime. This PV is read by the `HutchAccessControl` device defined in the
-Hutch access device reading this PV in i19-optics.
+For all hardware in the shared optics hutch, the architecture should follow this structure:
 
-For any device in the optics hutch:
-- actual device + plan operating it (decorated with check_access) in i19-optics
-- AccessControlledDevice inheriting the OpticsBlueAPIDevice implementation in i19-{1,2}
-- This device has a rest call with the plan name and devices to i19-blueapi (optics)
-- ch
+- There is an ``OpticsBlueAPIDevice`` in dodal that can send a REST call to the optics blueapi with the plan name and devices. The optics devices defined in ``i19-1-blueapi`` and ``i19-2-blueapi`` inherit from this device and set up the request parameters for the rest call. The actual devices for the optics should never be called directly by the single EH.
+
+- The optics blueapi instance has a ``HutchAccessControl`` device that reads the EHStatus PV, which records which hutch is currently in use for beamtime. Every plan in the optics blueapi should be wrapped with the ``@check_access`` decorator defined in ``i19_bluesky.optics`` which checks the EHStatus PV against the EH making the request and only allows the plan to run if the values match.
+
 
 
 ```{raw} html
-:file: ../../images/I19blueapiArchitecture2.svg
+:file: ../../images/I19blueapiArchitectureSmall.svg
 ```
 
 
