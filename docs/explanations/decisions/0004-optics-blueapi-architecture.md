@@ -10,10 +10,9 @@ Beamline I19 is made up by two Experimental Hutches in series which use a shared
 
 ## Decision
 
-TODO Put this into better words
+On I19 each experimental hutch has its own control machine, activeMQ instance and GDA deployment. It follows that each hutch should have its own blueapi instance running on the i19 cluster, with ad-hoc plans and devices. However, the optics hutch is shared and the hardware can be controlled by both hutches, which can lead to
 
-
-There is an EHStatus PV which records which hutch is currently in use for beamtime.
+There is an EHStatus PV which records which hutch is currently in use for beamtime. This PV is read by the `HutchAccessControl` device defined in the
 Hutch access device reading this PV in i19-optics.
 
 For any device in the optics hutch:
@@ -24,11 +23,9 @@ For any device in the optics hutch:
 
 
 ```{raw} html
-:file: ../../images/I19blueapiArchitectureVert.svg
+:file: ../../images/I19blueapiArchitecture2.svg
 ```
 
-
-TBD Add diagram with shutter example
 
 
 ### Example of an access controlled device: the experiment shutter
