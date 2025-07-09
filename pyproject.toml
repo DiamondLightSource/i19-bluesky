@@ -39,6 +39,7 @@ dev = [
     "build",
     "copier",
     "ipython",
+    "import-linter",
     "myst-parser",
     "pipdeptree",
     "pre-commit",
