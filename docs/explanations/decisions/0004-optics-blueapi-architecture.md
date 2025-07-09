@@ -24,7 +24,7 @@ For any device in the optics hutch:
 
 
 ```{raw} html
-:file: ../../images/I19blueapiArchitecture.svg
+:file: ../../images/I19blueapiArchitectureVert.svg
 ```
 
 
