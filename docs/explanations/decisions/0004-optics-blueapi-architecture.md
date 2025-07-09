@@ -23,6 +23,11 @@ For any device in the optics hutch:
 - ch
 
 
+```{raw} html
+:file: ../../images/I19blueapiArchitecture.svg
+```
+
+
 TBD Add diagram with shutter example
 
 
@@ -33,6 +38,7 @@ The device in i19-{1,2}-blueapi never uses directly the actual shutter device bu
 ```{raw} html
 :file: ../../images/EHDevices.svg
 ```
+
 
 The optics blueapi has a plan with uses the real shutter device if access is allowed.
 
