@@ -24,3 +24,11 @@ For any device in the optics hutch:
 
 
 TBD Add diagram with shutter example
+
+
+#### Example of an access controlled device: experiment shutter
+
+
+```{raw} html
+:file: ../../images/EHDevices.svg
+```
