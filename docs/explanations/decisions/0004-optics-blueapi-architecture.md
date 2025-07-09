@@ -26,9 +26,16 @@ For any device in the optics hutch:
 TBD Add diagram with shutter example
 
 
-#### Example of an access controlled device: experiment shutter
+### Example of an access controlled device: the experiment shutter
 
+The device in i19-{1,2}-blueapi never uses directly the actual shutter device but implements an access controlled one that makes a rest call to the ``operate_shutter_plan`` in the optics blueapi.
 
 ```{raw} html
 :file: ../../images/EHDevices.svg
+```
+
+The optics blueapi has a plan with uses the real shutter device if access is allowed.
+
+```{raw} html
+:file: ../../images/OpticsDevice.svg
 ```
