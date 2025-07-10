@@ -35,4 +35,4 @@ Plans that we want included in blueapi should be in the relevant hutch module:
     - i19-blueapi (optics) looks for plans in `i19_bluesky.optics`
 
 Code from a specific EH may import from `i19_bluesky.plans` or `i19_bluesky.serial` in order to make it available to blueapi.
-Under any circumstances should the experiment hutches import plans directly from the optics hutch module, or from each other's modules. This should be enforced in CI.
+Under no circumstances should the experiment hutches import plans directly from the optics hutch module, or from each other's modules. This should be enforced in CI.
