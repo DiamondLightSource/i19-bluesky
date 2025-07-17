@@ -33,6 +33,11 @@ jobs:
       python-version: ${{ matrix.python-version }}
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+  
+  system-test:
+    needs: check
+    if: needs.check.outputs.branch-pr == ''
+    uses: ./.github/workflows/_system_test.yml
 
   docs:
     needs: check

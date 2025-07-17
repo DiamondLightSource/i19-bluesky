@@ -1,0 +1,10 @@
+api:
+  url: http://0.0.0.0:12345
+env:
+  sources:
+    - kind: planFunctions
+      module: example_plans
+    - kind: dodal
+      module: example_devices
+stomp:
+  enabled: false
