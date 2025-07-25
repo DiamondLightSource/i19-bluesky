@@ -17,3 +17,5 @@ pypi: false
 repo_name: i19-bluesky
 strict_typing: true
 type_checker: pyright
+
+#copier updated
