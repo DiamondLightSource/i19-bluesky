@@ -62,10 +62,13 @@ i19-bluesky = "i19_bluesky.__main__:main"
 [project.urls]
 GitHub = "https://github.com/DiamondLightSource/i19-bluesky"
 
-[[project.authors]] # Further authors may be added by duplicating this section
+[[project.authors]]
+email = "noemi.frisina@diamond.ac.uk"
+name = "Noemi Frisina"
+
+[[project.authors]]
 email = "callum.forrester@diamond.ac.uk"
 name = "Callum Forrester"
-
 
 [tool.setuptools_scm]
 version_file = "src/i19_bluesky/_version.py"
