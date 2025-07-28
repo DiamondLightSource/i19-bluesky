@@ -27,4 +27,4 @@ fi
 pip install -e ../dodal[dev]
 
 pre-commit run --all-files
-pytest tests/
+pytest tests/unit_tests

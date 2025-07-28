@@ -21,9 +21,8 @@ dependencies = [
     "fastapi[all]",
     # These dependencies may be issued as pre-release versions and should have a pin constraint
     # as by default pip-install will not upgrade to a pre-release.
-    "blueapi >= 0.12.0",
-    # Blueapi pinned to main until a new release is made to get this fix
-    # https://github.com/DiamondLightSource/blueapi/pull/873
+    # Blueapi pinned until GDA can be updated on the beamline to use latest version
+    "blueapi == 0.18.0",
     "ophyd == 1.9.0",
     "ophyd-async >= 0.9.0a2",
     "bluesky >= 1.13",
@@ -39,6 +38,7 @@ dev = [
     "build",
     "copier",
     "ipython",
+    "import-linter",
     "myst-parser",
     "pipdeptree",
     "pre-commit",
@@ -55,6 +55,7 @@ dev = [
     "tox-direct",
     "types-mock",
     "types-requests",
+    "softioc",
 ]
 
 [project.scripts]
@@ -80,6 +81,7 @@ asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
 markers = [
     "skip_log_setup: marks tests so that loggers are not setup before the test.",
+    "system_test: marks test as system test that requires additional infrastructure",
 ]
 # Run pytest with all our checkers, and don't spam us with massive tracebacks on error
 addopts = """
@@ -108,7 +110,7 @@ legacy_tox_ini = """
 [tox]
 skipsdist=True
 
-[testenv:{pre-commit,type-checking,tests,docs}]
+[testenv:{pre-commit,type-checking,tests,docs,system-test}]
 # Don't create a virtualenv for the command, requires tox-direct plugin
 direct = True
 passenv = *
@@ -121,8 +123,9 @@ allowlist_externals =
 commands =
     pre-commit: pre-commit run --all-files --show-diff-on-failure {posargs}
     type-checking: pyright src tests {posargs}
-    tests: pytest --cov=i19_bluesky --cov-report term --cov-report xml:cov.xml {posargs}
+    tests: pytest --cov=i19_bluesky --cov-report term --cov-report xml:cov.xml tests/unit_tests {posargs}
     docs: sphinx-{posargs:build -EW --keep-going} -T docs build/html
+    system-test: pytest tests/system_tests {posargs}
 """
 
 [tool.ruff]
@@ -144,3 +147,35 @@ lint.select = [
 # See https://github.com/DiamondLightSource/python-copier-template/issues/154
 # Remove this line to forbid private member access in tests
 "tests/**/*" = ["SLF001"]
+
+
+[tool.importlinter]
+root_package = "i19_bluesky"
+
+[[tool.importlinter.contracts]]
+name = "EH modules do not import from each other"
+type = "independence"
+modules = ["i19_bluesky.eh1", "i19_bluesky.eh2"]
+
+[[tool.importlinter.contracts]]
+name = "EH modules do not import from the optics module"
+type = "forbidden"
+source_modules = ["i19_bluesky.eh1", "i19_bluesky.eh2"]
+forbidden_modules = "i19_bluesky.optics"
+
+[[tool.importlinter.contracts]]
+name = "Common plans module does not import from apps"
+type = "forbidden"
+source_modules = "i19_bluesky.plans"
+forbidden_modules = [
+    "i19_bluesky.eh1",
+    "i19_bluesky.eh2",
+    "i19_bluesky.serial",
+    "i19_bluesky.optics",
+]
+
+[[tool.importlinter.contracts]]
+name = "Common modules do not import from the optics module"
+type = "forbidden"
+source_modules = ["i19_bluesky.serial", "i19_bluesky.plans"]
+forbidden_modules = "i19_bluesky.optics"

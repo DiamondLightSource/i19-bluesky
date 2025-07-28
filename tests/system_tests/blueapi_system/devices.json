@@ -1,0 +1,52 @@
+{
+    "devices": [
+        {
+            "name": "optics_motors",
+            "protocols": [
+                {
+                    "name": "Movable",
+                    "types": [
+                        "MotorPosition"
+                    ]
+                },
+                {
+                    "name": "Readable",
+                    "types": []
+                },
+                {
+                    "name": "Stageable",
+                    "types": []
+                },
+                {
+                    "name": "Configurable",
+                    "types": []
+                },
+                {
+                    "name": "Device",
+                    "types": []
+                }
+            ]
+        },
+        {
+            "name": "access_control",
+            "protocols": [
+                {
+                    "name": "Readable",
+                    "types": []
+                },
+                {
+                    "name": "Stageable",
+                    "types": []
+                },
+                {
+                    "name": "Configurable",
+                    "types": []
+                },
+                {
+                    "name": "Device",
+                    "types": []
+                }
+            ]
+        }
+    ]
+}
