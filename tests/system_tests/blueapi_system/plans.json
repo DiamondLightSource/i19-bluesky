@@ -36,7 +36,7 @@
                         "$ref": "#/$defs/MotorPosition"
                     },
                     "motors": {
-                        "enum": "optics_motors",
+                        "enum": ["optics_motors"],
                         "title": "Motors",
                         "type": "example_devices.FakeOpticsMotors"
                     }
