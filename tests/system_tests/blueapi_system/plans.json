@@ -28,6 +28,7 @@
                         "$ref": "#/$defs/HutchName"
                     },
                     "access_device": {
+                        "enum": ["access_control"],
                         "title": "Access Device",
                         "type": "dodal.devices.i19.hutch_access.HutchAccessControl"
                     },
@@ -35,6 +36,7 @@
                         "$ref": "#/$defs/MotorPosition"
                     },
                     "motors": {
+                        "enum": ["optics_motors"],
                         "title": "Motors",
                         "type": "example_devices.FakeOpticsMotors"
                     }

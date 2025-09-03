@@ -43,8 +43,14 @@ def access_device() -> HutchAccessControl:
 
 
 class AccessControlledOpticsMotors(OpticsBlueAPIDevice):
-    def __init__(self, hutch: HutchState = HutchState.EH2, name: str = "") -> None:
+    def __init__(
+        self,
+        hutch: HutchState = HutchState.EH2,
+        instrument_session: str = "cm12345-1",
+        name: str = "",
+    ) -> None:
         self.hutch = hutch
+        self.instrument = instrument_session
         super().__init__(name)
 
     @AsyncStatus.wrap
@@ -56,5 +62,6 @@ class AccessControlledOpticsMotors(OpticsBlueAPIDevice):
                 "access_device": "access_control",
                 "position": value.value,
             },
+            "instrument_session": "self.instrument",
         }
         await super().set(request_params)
