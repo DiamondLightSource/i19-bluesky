@@ -10,8 +10,8 @@ def move_pin_col_out_of_beam(
     colx_out = yield from bps.rd(pincol.config.col_x_out)
 
     # TODO check is move can be used, as long as it moves motors in the right order
-    yield from bps.abs_set(pincol.collimator.x, colx_out, group=group)
-    yield from bps.abs_set(pincol.pinhole.x, pinx_out, group=group)
+    yield from bps.mv(pincol.collimator.x, colx_out, group=group)
+    yield from bps.mv(pincol.pinhole.x, pinx_out, group=group)
 
     if wait:
         yield from bps.wait(group=group)
