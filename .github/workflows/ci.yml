@@ -2,22 +2,20 @@ name: CI
 
 on:
   push:
+    branches:
+      - main
+    tags:
+      - '*'
   pull_request:
 
 jobs:
-  check:
-    uses: ./.github/workflows/_check.yml
 
   lint:
-    needs: check
-    if: needs.check.outputs.branch-pr == ''
     uses: ./.github/workflows/_tox.yml
     with:
       tox: pre-commit,type-checking
 
   test:
-    needs: check
-    if: needs.check.outputs.branch-pr == ''
     strategy:
       matrix:
         runs-on: ["ubuntu-latest"] # can add windows-latest, macos-latest
@@ -40,18 +38,15 @@ jobs:
     uses: ./.github/workflows/_system_test.yml
 
   docs:
-    needs: check
-    if: needs.check.outputs.branch-pr == ''
     uses: ./.github/workflows/_docs.yml
 
+
   dist:
-    needs: check
-    if: needs.check.outputs.branch-pr == ''
     uses: ./.github/workflows/_dist.yml
   
   release:
+    needs: [dist, test, docs]
     if: github.ref_type == 'tag'
-    needs: [dist, docs]
     uses: ./.github/workflows/_release.yml
     permissions:
       contents: write
