@@ -1,5 +1,6 @@
 import pytest
 from bluesky.run_engine import RunEngine
+from dodal.devices.i19.pin_col_stages import PinholeCollimatorControl
 from dodal.devices.i19.shutter import AccessControlledShutter, HutchState
 
 
@@ -10,3 +11,10 @@ async def eh2_shutter(RE: RunEngine) -> AccessControlledShutter:
 
     shutter.url = "http://test-blueapi.url"
     return shutter
+
+
+@pytest.fixture
+async def pincol(RE: RunEngine) -> PinholeCollimatorControl:
+    pincol = PinholeCollimatorControl("", "mock_pincol")
+    await pincol.connect(mock=True)
+    return pincol
