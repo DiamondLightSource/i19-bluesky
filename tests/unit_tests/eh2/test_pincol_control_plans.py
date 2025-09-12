@@ -15,7 +15,7 @@ async def test_move_pincol_out(
 ):
     RE(move_pin_col_out_of_beam(pincol))
 
-    mock_set.assert_called_once_with(pincol, wait=True)
+    mock_set.assert_called_once_with(pincol, "OUT", wait=True)
 
 
 @patch("i19_bluesky.eh2.pincol_control_plans.bps.abs_set")
