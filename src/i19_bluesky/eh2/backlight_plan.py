@@ -17,5 +17,5 @@ def backlight_in(
 def backlight_out(
     backlight: BacklightPosition = inject("backlight"),  # noqa: B008
 ) -> MsgGenerator[None]:
-    LOGGER.debug("Send command to move the backlight in.")
+    LOGGER.debug("Send command to move the backlight out.")
     yield from bps.abs_set(backlight, InOutUpper.OUT, wait=True)
