@@ -1,6 +1,7 @@
 import pytest
 from bluesky.run_engine import RunEngine
 from dodal.devices.i19.shutter import AccessControlledShutter, HutchState
+from dodal.devices.zebra.zebra import ArmingDevice
 
 
 @pytest.fixture
@@ -10,3 +11,10 @@ async def eh2_shutter(RE: RunEngine) -> AccessControlledShutter:
 
     shutter.url = "http://test-blueapi.url"
     return shutter
+
+
+@pytest.fixture
+async def eh2_zebra(RE: RunEngine) -> ArmingDevice:
+    zebra = ArmingDevice("", name="mock_zebra")
+    await zebra.connect(mock=True)
+    return zebra
