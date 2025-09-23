@@ -1,4 +1,3 @@
-import pytest
 from bluesky.run_engine import RunEngine
 from dodal.devices.zebra.zebra import ArmDemand, Zebra
 
@@ -8,7 +7,6 @@ from i19_bluesky.eh2.zebra_arming_plan import (
 )
 
 
-@pytest.fixture
 async def test_zebra_arm(eh2_zebra: Zebra, RE: RunEngine):
     RE(arm_zebra(eh2_zebra))
     assert await eh2_zebra.pc.arm.armed.get_value() == ArmDemand.ARM.value
