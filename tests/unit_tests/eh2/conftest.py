@@ -1,6 +1,7 @@
 import pytest
 from bluesky.run_engine import RunEngine
 from dodal.beamlines import i19_2
+from dodal.devices.i19.backlight import BacklightPosition
 from dodal.devices.i19.shutter import AccessControlledShutter, HutchState
 from dodal.devices.zebra.zebra import Zebra
 from ophyd_async.testing import get_mock_put, set_mock_value
@@ -28,3 +29,10 @@ def eh2_zebra(RE: RunEngine) -> Zebra:
     get_mock_put(zebra.pc.arm.arm_set).side_effect = mock_arm
     get_mock_put(zebra.pc.arm.disarm_set).side_effect = mock_disarm
     return zebra
+
+
+@pytest.fixture
+async def eh2_backlight(RE: RunEngine) -> BacklightPosition:
+    backlight = BacklightPosition("", name="mock_backlight")
+    await backlight.connect(mock=True)
+    return backlight
