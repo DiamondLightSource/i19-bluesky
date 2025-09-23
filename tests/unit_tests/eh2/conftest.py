@@ -1,7 +1,9 @@
 import pytest
 from bluesky.run_engine import RunEngine
+from dodal.beamlines import i19_2
 from dodal.devices.i19.shutter import AccessControlledShutter, HutchState
-from dodal.devices.zebra.zebra import ArmingDevice
+from dodal.devices.zebra.zebra import Zebra
+from ophyd_async.testing import get_mock_put, set_mock_value
 
 
 @pytest.fixture
@@ -14,7 +16,15 @@ async def eh2_shutter(RE: RunEngine) -> AccessControlledShutter:
 
 
 @pytest.fixture
-async def eh2_zebra(RE: RunEngine) -> ArmingDevice:
-    zebra = ArmingDevice("", name="mock_zebra")
-    await zebra.connect(mock=True)
+def eh2_zebra(RE: RunEngine) -> Zebra:
+    zebra = i19_2.zebra(connect_immediately=True, mock=True)
+
+    def mock_disarm(_, wait):
+        set_mock_value(zebra.pc.arm.armed, 0)
+
+    def mock_arm(_, wait):
+        set_mock_value(zebra.pc.arm.armed, 1)
+
+    get_mock_put(zebra.pc.arm.arm_set).side_effect = mock_arm
+    get_mock_put(zebra.pc.arm.disarm_set).side_effect = mock_disarm
     return zebra
