@@ -37,5 +37,4 @@ async def test_backlight_position_plan(
     eh2_backlight: BacklightPosition, RE: RunEngine, position, specific_plan
 ):
     RE(specific_plan(eh2_backlight))
-    await eh2_backlight.set(position)
     assert await eh2_backlight.position.get_value() == position
