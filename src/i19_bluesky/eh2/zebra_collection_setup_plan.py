@@ -16,7 +16,7 @@ from dodal.devices.zebra.zebra import (
 
 from i19_bluesky.log import LOGGER
 
-pulse_width: float = 0.00002
+PULSE_WIDTH: float = 0.00002
 
 
 def setup_zebra_for_collection(
@@ -36,12 +36,12 @@ def setup_zebra_for_collection(
     yield from bps.abs_set(zebra.pc.num_gates, num_images, group=group)
 
     yield from bps.abs_set(zebra.pc.pulse_start, pulse_start, group=group)
-    yield from bps.abs_set(zebra.pc.pulse_width, pulse_width, group=group)
+    yield from bps.abs_set(zebra.pc.pulse_width, PULSE_WIDTH, group=group)
 
     yield from bps.abs_set(zebra.pc.dir, direction, group=group)
 
     yield from bps.abs_set(
-        zebra.output.out_pvs[zebra.mapping.outputs.OUT1_TTL], group=group
+        zebra.output.out_pvs[1], zebra.mapping.sources.OR1, group=group
     )
 
     if wait:
@@ -53,6 +53,10 @@ def setup_zebra_for_triggering(
     group: str = "setup_zebra_for_triggering",
     wait: bool = True,
 ):
+    LOGGER.debug(
+        "Setup ZEBRA to trigger the gate and pulse signals and specify the"
+        "encoder in use."
+    )
     yield from bps.abs_set(zebra.pc.gate_source, "Position", group=group)
     yield from bps.abs_set(zebra.pc.gate_trigger, "Enc1", group=group)
     yield from bps.abs_set(zebra.pc.pulse_source, "Time", group=group)
