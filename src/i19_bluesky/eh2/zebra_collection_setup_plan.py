@@ -10,13 +10,15 @@ cannot go from high to low without disarming and resetting it.
 
 import bluesky.plan_stubs as bps
 from dodal.devices.zebra.zebra import (
+    EncEnum,
     RotationDirection,
+    TrigSource,
     Zebra,
 )
 
 from i19_bluesky.log import LOGGER
 
-PULSE_WIDTH: float = 0.00002
+PULSE_WIDTH: float = 0.002
 
 
 def setup_zebra_for_collection(
@@ -44,6 +46,8 @@ def setup_zebra_for_collection(
         zebra.output.out_pvs[1], zebra.mapping.sources.OR1, group=group
     )
 
+    yield from setup_zebra_for_triggering(zebra)
+
     if wait:
         yield from bps.wait(group)
 
@@ -57,9 +61,9 @@ def setup_zebra_for_triggering(
         "Setup ZEBRA to trigger the gate and pulse signals and specify the"
         "encoder in use."
     )
-    yield from bps.abs_set(zebra.pc.gate_source, "Position", group=group)
-    yield from bps.abs_set(zebra.pc.gate_trigger, "Enc1", group=group)
-    yield from bps.abs_set(zebra.pc.pulse_source, "Time", group=group)
+    yield from bps.abs_set(zebra.pc.gate_source, TrigSource.POSITION, group=group)
+    yield from bps.abs_set(zebra.pc.gate_trigger, EncEnum.ENC1, group=group)
+    yield from bps.abs_set(zebra.pc.pulse_source, TrigSource.TIME, group=group)
 
     if wait:
         yield from bps.wait(group)
