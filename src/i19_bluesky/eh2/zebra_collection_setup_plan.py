@@ -24,7 +24,6 @@ PULSE_WIDTH: float = 0.002
 def setup_zebra_for_collection(
     zebra: Zebra,
     direction: RotationDirection,
-    num_images: int,
     gate_start: float,
     gate_width: float,
     group: str = "setup_zebra_for_collection",
@@ -35,18 +34,31 @@ def setup_zebra_for_collection(
 
     yield from bps.abs_set(zebra.pc.gate_start, gate_start, group=group)
     yield from bps.abs_set(zebra.pc.gate_width, gate_width, group=group)
-    yield from bps.abs_set(zebra.pc.num_gates, num_images, group=group)
+    yield from bps.abs_set(zebra.pc.num_gates, 1, group=group)
 
     yield from bps.abs_set(zebra.pc.pulse_start, pulse_start, group=group)
     yield from bps.abs_set(zebra.pc.pulse_width, PULSE_WIDTH, group=group)
 
     yield from bps.abs_set(zebra.pc.dir, direction, group=group)
 
+    yield from setup_zebra_for_triggering(zebra)
+    yield from setup_out_triggers(zebra)
+
+    if wait:
+        yield from bps.wait(group)
+
+
+def setup_out_triggers(
+    zebra: Zebra,
+    group: str = "setup_out_triggers",
+    wait: bool = True,
+):
     yield from bps.abs_set(
         zebra.output.out_pvs[1], zebra.mapping.sources.OR1, group=group
     )
-
-    yield from setup_zebra_for_triggering(zebra)
+    yield from bps.abs_set(
+        zebra.output.out_pvs[2], zebra.mapping.sources.PC_PULSE, group=group
+    )
 
     if wait:
         yield from bps.wait(group)
