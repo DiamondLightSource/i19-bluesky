@@ -18,7 +18,7 @@ from dodal.devices.zebra.zebra import (
 
 from i19_bluesky.log import LOGGER
 
-PULSE_WIDTH: float = 0.002
+PULSE_START: float = 0.02
 
 
 def setup_zebra_for_collection(
@@ -26,18 +26,20 @@ def setup_zebra_for_collection(
     direction: RotationDirection,
     gate_start: float,
     gate_width: float,
+    pulse_width: float,  # value from: change in degrees of scan/velocity
     group: str = "setup_zebra_for_collection",
     wait: bool = True,
 ):
     LOGGER.debug("Setup ZEBRA for collection.")
-    pulse_start = gate_start + 0.02
+    pulse_step = pulse_width + 0.1
 
     yield from bps.abs_set(zebra.pc.gate_start, gate_start, group=group)
     yield from bps.abs_set(zebra.pc.gate_width, gate_width, group=group)
     yield from bps.abs_set(zebra.pc.num_gates, 1, group=group)
 
-    yield from bps.abs_set(zebra.pc.pulse_start, pulse_start, group=group)
-    yield from bps.abs_set(zebra.pc.pulse_width, PULSE_WIDTH, group=group)
+    yield from bps.abs_set(zebra.pc.pulse_start, PULSE_START, group=group)
+    yield from bps.abs_set(zebra.pc.pulse_width, pulse_width, group=group)
+    yield from bps.abs_set(zebra.pc.pulse_step, pulse_step, group=group)
 
     yield from bps.abs_set(zebra.pc.dir, direction, group=group)
 

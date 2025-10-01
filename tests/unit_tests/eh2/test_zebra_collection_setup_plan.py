@@ -5,7 +5,7 @@ from bluesky.run_engine import RunEngine
 from dodal.devices.zebra.zebra import RotationDirection, Zebra
 
 from i19_bluesky.eh2.zebra_collection_setup_plan import (
-    PULSE_WIDTH,
+    PULSE_START,
     setup_out_triggers,
     setup_zebra_for_collection,
     setup_zebra_for_triggering,
@@ -24,17 +24,17 @@ async def test_zebra_collection_setup(
     eh2_zebra: Zebra,
     RE: RunEngine,
 ):
-    inputs_list = (rotation_direction, 0.2, 5.04)
-    direction, gate_start, gate_width = inputs_list
+    inputs_list = (rotation_direction, 100.02, 5.04, 5.0)
     RE(setup_zebra_for_collection(eh2_zebra, *inputs_list, wait=True))
-    assert await eh2_zebra.pc.gate_start.get_value() == gate_start
-    assert await eh2_zebra.pc.gate_width.get_value() == gate_width
+    assert await eh2_zebra.pc.gate_start.get_value() == inputs_list[1]
+    assert await eh2_zebra.pc.gate_width.get_value() == inputs_list[2]
     assert await eh2_zebra.pc.num_gates.get_value() == 1
 
-    assert await eh2_zebra.pc.pulse_start.get_value() == gate_start + 0.02
-    assert await eh2_zebra.pc.pulse_width.get_value() == PULSE_WIDTH
+    assert await eh2_zebra.pc.pulse_start.get_value() == PULSE_START
+    assert await eh2_zebra.pc.pulse_width.get_value() == inputs_list[3]
+    assert await eh2_zebra.pc.pulse_step.get_value() == inputs_list[3] + 0.1
 
-    assert await eh2_zebra.pc.dir.get_value() == direction
+    assert await eh2_zebra.pc.dir.get_value() == inputs_list[0]
 
     mock_setup_zebra_for_triggering.assert_called_once_with(eh2_zebra)
     mock_setup_out_triggers.assert_called_once_with(eh2_zebra)
