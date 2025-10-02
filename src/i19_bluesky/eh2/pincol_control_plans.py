@@ -13,7 +13,7 @@ def move_pin_col_out_of_beam(
     pincol: PinholeCollimatorControl = inject("pincol"),  # noqa: B008
 ) -> MsgGenerator:
     LOGGER.info("Moving Pinhole and Collimator stages out")
-    yield from bps.abs_set(pincol, "OUT", wait=True)
+    yield from bps.abs_set(pincol, PinColRequest.OUT, wait=True)
 
 
 def move_pin_col_to_requested_in_position(
