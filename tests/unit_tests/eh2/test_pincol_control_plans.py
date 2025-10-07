@@ -33,14 +33,14 @@ async def test_when_moving_pincol_out_stage_x_motors_actually_move(
     pincol: PinholeCollimatorControl, RE: RunEngine
 ):
     expected_out_position = [30.0, 20.0]
-    set_mock_value(pincol.pinhole.x.user_readback, 20.3)
-    set_mock_value(pincol.collimator.x.user_readback, 15)
+    set_mock_value(pincol._pinhole.x.user_readback, 20.3)
+    set_mock_value(pincol._collimator.x.user_readback, 15)
 
     RE(move_pin_col_out_of_beam(pincol))
 
-    assert await pincol.pinhole.x.user_readback.get_value() == expected_out_position[0]
+    assert await pincol._pinhole.x.user_readback.get_value() == expected_out_position[0]
     assert (
-        await pincol.collimator.x.user_readback.get_value() == expected_out_position[1]
+        await pincol._collimator.x.user_readback.get_value() == expected_out_position[1]
     )
 
 
@@ -67,7 +67,7 @@ async def test_when_moving_pincol_to_requested_aperture_all_motors_move_to_posit
 
     RE(move_pin_col_to_requested_in_position(aperture_request, pincol))
 
-    assert await pincol.pinhole.x.user_readback.get_value() == in_positions[0]
-    assert await pincol.pinhole.y.user_readback.get_value() == in_positions[1]
-    assert await pincol.collimator.x.user_readback.get_value() == in_positions[2]
-    assert await pincol.collimator.y.user_readback.get_value() == in_positions[3]
+    assert await pincol._pinhole.x.user_readback.get_value() == in_positions[0]
+    assert await pincol._pinhole.y.user_readback.get_value() == in_positions[1]
+    assert await pincol._collimator.x.user_readback.get_value() == in_positions[2]
+    assert await pincol._collimator.y.user_readback.get_value() == in_positions[3]
