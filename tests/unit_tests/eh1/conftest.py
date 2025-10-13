@@ -1,6 +1,9 @@
 import pytest
 from bluesky.run_engine import RunEngine
-from dodal.devices.i19.shutter import AccessControlledShutter, HutchState
+from dodal.devices.i19.access_controlled.shutter import (
+    AccessControlledShutter,
+    HutchState,
+)
 
 
 @pytest.fixture
