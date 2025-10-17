@@ -8,7 +8,7 @@ from dodal.devices.hutch_shutter import (
     ShutterDemand,
     ShutterState,
 )
-from dodal.devices.i19.hutch_access import HutchAccessControl
+from dodal.devices.i19.access_controlled.hutch_access import HutchAccessControl
 from dodal.utils import AnyDeviceFactory
 from ophyd_async.testing import callback_on_mock_put, set_mock_value
 

@@ -1,8 +1,11 @@
 import pytest
 from bluesky.run_engine import RunEngine
 from dodal.beamlines import i19_2
+from dodal.devices.i19.access_controlled.shutter import (
+    AccessControlledShutter,
+    HutchState,
+)
 from dodal.devices.i19.backlight import BacklightPosition
-from dodal.devices.i19.shutter import AccessControlledShutter, HutchState
 from dodal.devices.zebra.zebra import Zebra
 from ophyd_async.testing import get_mock_put, set_mock_value
 
