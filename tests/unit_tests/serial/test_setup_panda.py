@@ -6,14 +6,21 @@ from i19_bluesky.serial.setup_panda import (
     disarm_panda,
 )
 
-
-async def test_panda_arm(serial_panda: HDFPanda, RE: RunEngine):
-    RE(arm_panda(serial_panda))
-    assert await serial_panda.seq[1].enable.get_value() == PandaBitMux.ONE
-    assert await serial_panda.pulse[1].enable.get_value() == PandaBitMux.ONE
+# could parameterise with the two values of input as pandabitmux.one and pandabitmux.
+# zero??
 
 
-async def test_panda_disarm(serial_panda: HDFPanda, RE: RunEngine):
-    RE(disarm_panda(serial_panda))
-    assert await serial_panda.seq[1].enable.get_value() == PandaBitMux.ZERO
-    assert await serial_panda.pulse[1].enable.get_value() == PandaBitMux.ZERO
+async def test_panda_arm(panda: HDFPanda, RE: RunEngine):
+    await panda.seq[1].enable.set(PandaBitMux.ZERO)
+    await panda.pulse[1].enable.set(PandaBitMux.ZERO)
+    RE(arm_panda(panda))
+    assert await panda.seq[1].enable.get_value() == PandaBitMux.ONE
+    assert await panda.pulse[1].enable.get_value() == PandaBitMux.ONE
+
+
+async def test_panda_disarm(panda: HDFPanda, RE: RunEngine):
+    await panda.seq[1].enable.set(PandaBitMux.ONE)
+    await panda.pulse[1].enable.set(PandaBitMux.ONE)
+    RE(disarm_panda(panda))
+    assert await panda.seq[1].enable.get_value() == PandaBitMux.ZERO
+    assert await panda.pulse[1].enable.get_value() == PandaBitMux.ZERO
