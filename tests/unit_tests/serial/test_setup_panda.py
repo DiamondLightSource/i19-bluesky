@@ -6,9 +6,6 @@ from i19_bluesky.serial.setup_panda import (
     disarm_panda,
 )
 
-# could parameterise with the two values of input as pandabitmux.one and pandabitmux.
-# zero??
-
 
 async def test_panda_arm(panda: HDFPanda, RE: RunEngine):
     await panda.seq[1].enable.set(PandaBitMux.ZERO)
