@@ -10,6 +10,6 @@ async def test_tables_are_same():
 
     assert table_from_func.trigger == [SeqTrigger.POSA_GT, SeqTrigger.POSA_LT]
     assert table_from_func.repeats == pytest.approx([10, 10])
-    assert table_from_func.position == pytest.approx([5, 6])
+    assert table_from_func.position == pytest.approx([5600, 6700])
     assert table_from_func.time1 == pytest.approx([5, 5])
     assert table_from_func.outa1 == pytest.approx([True, True])

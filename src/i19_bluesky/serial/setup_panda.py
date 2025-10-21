@@ -1,5 +1,7 @@
 from ophyd_async.fastcs.panda._table import SeqTable, SeqTrigger
 
+DEG_TO_ENC_COUNTS = 1000
+
 
 def generate_panda_seq_table(
     phi_start: float,
@@ -11,7 +13,7 @@ def generate_panda_seq_table(
 
     rows += SeqTable.row(
         trigger=SeqTrigger.POSA_GT,
-        position=int(phi_start),
+        position=int(phi_start * DEG_TO_ENC_COUNTS),
         repeats=phi_steps,
         time1=time_between_images,
         outa1=True,
@@ -19,7 +21,7 @@ def generate_panda_seq_table(
 
     rows += SeqTable.row(
         trigger=SeqTrigger.POSA_LT,
-        position=int(phi_end),
+        position=int(phi_end * DEG_TO_ENC_COUNTS),
         repeats=phi_steps,
         time1=time_between_images,
         outa1=True,
