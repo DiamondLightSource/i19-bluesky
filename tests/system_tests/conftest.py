@@ -5,7 +5,7 @@ import pytest
 from blueapi.client.client import BlueapiClient
 from blueapi.config import ApplicationConfig, RestConfig
 from bluesky.run_engine import RunEngine
-from dodal.devices.i19.blueapi_device import HutchState
+from dodal.devices.i19.access_controlled.blueapi_device import HutchState
 from pydantic import HttpUrl
 from requests.exceptions import ConnectionError
 

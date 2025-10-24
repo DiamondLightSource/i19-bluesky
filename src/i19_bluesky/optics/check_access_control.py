@@ -6,7 +6,7 @@ from typing import Concatenate, ParamSpec, TypeVar
 
 import bluesky.plan_stubs as bps
 from bluesky.utils import MsgGenerator
-from dodal.devices.i19.hutch_access import HutchAccessControl
+from dodal.devices.i19.access_controlled.hutch_access import HutchAccessControl
 
 from i19_bluesky.exceptions import HutchInvalidError
 from i19_bluesky.log import LOGGER

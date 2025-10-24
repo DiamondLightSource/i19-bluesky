@@ -2,7 +2,7 @@ from unittest.mock import MagicMock, patch
 
 from bluesky.run_engine import RunEngine
 from dodal.devices.hutch_shutter import ShutterDemand
-from dodal.devices.i19.shutter import AccessControlledShutter
+from dodal.devices.i19.access_controlled.shutter import AccessControlledShutter
 
 from i19_bluesky.eh1 import (
     close_experiment_shutter,
