@@ -3,9 +3,12 @@ from collections.abc import AsyncGenerator
 import pytest
 from bluesky.run_engine import RunEngine
 from dodal.beamlines import i19_2
+from dodal.devices.i19.access_controlled.shutter import (
+    AccessControlledShutter,
+    HutchState,
+)
 from dodal.devices.i19.backlight import BacklightPosition
 from dodal.devices.i19.pin_col_stages import PinholeCollimatorControl
-from dodal.devices.i19.shutter import AccessControlledShutter, HutchState
 from dodal.devices.zebra.zebra import Zebra
 from dodal.testing import patch_all_motors
 from ophyd_async.testing import get_mock_put, set_mock_value

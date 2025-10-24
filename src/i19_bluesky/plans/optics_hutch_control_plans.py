@@ -5,7 +5,7 @@ import bluesky.plan_stubs as bps
 from bluesky.utils import MsgGenerator
 from dodal.common import inject
 from dodal.devices.hutch_shutter import ShutterDemand
-from dodal.devices.i19.shutter import AccessControlledShutter
+from dodal.devices.i19.access_controlled.shutter import AccessControlledShutter
 
 from i19_bluesky.log import LOGGER
 
