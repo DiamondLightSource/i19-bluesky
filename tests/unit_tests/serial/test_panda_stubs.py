@@ -7,10 +7,10 @@ from i19_bluesky.serial.panda_stubs import (
     # reset_panda,
     setup_panda_for_rotation,
 )
-from i19_bluesky.serial.setup_panda import panda
+from i19_bluesky.serial.setup_panda import CustomPanda
 
 
-async def test_arm_panda_for_rotation(panda: panda, RE: RunEngine):
+async def test_setup_panda_for_rotation(panda: CustomPanda, RE: RunEngine):
     bps_wait_done = False
     RE(setup_panda_for_rotation(panda, 5, 4, 3, 2, 1))
     assert await panda.inenc[1].val.get_value() == 5000
