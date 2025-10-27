@@ -1,6 +1,23 @@
+import bluesky.plan_stubs as bps
+from bluesky.utils import MsgGenerator
+from ophyd_async.fastcs.panda import HDFPanda, PandaBitMux
 from ophyd_async.fastcs.panda._table import SeqTable, SeqTrigger
 
+from i19_bluesky.log import LOGGER
+
 DEG_TO_ENC_COUNTS = 1000
+
+
+def arm_panda(panda: HDFPanda) -> MsgGenerator[None]:
+    LOGGER.debug("Send command to arm the PandA.")
+    yield from bps.abs_set(panda.seq[1].enable, PandaBitMux.ONE, wait=True)  # type: ignore
+    yield from bps.abs_set(panda.pulse[1].enable, PandaBitMux.ONE, wait=True)  # type:ignore
+
+
+def disarm_panda(panda: HDFPanda) -> MsgGenerator[None]:
+    LOGGER.debug("Send command to disarm the PandA.")
+    yield from bps.abs_set(panda.seq[1].enable, PandaBitMux.ZERO, wait=True)  # type: ignore
+    yield from bps.abs_set(panda.pulse[1].enable, PandaBitMux.ZERO, wait=True)  # type: ignore
 
 
 def generate_panda_seq_table(
