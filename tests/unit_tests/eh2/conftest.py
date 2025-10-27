@@ -1,3 +1,5 @@
+from collections.abc import AsyncGenerator
+
 import pytest
 from bluesky.run_engine import RunEngine
 from dodal.beamlines import i19_2
@@ -6,7 +8,9 @@ from dodal.devices.i19.access_controlled.shutter import (
     HutchState,
 )
 from dodal.devices.i19.backlight import BacklightPosition
+from dodal.devices.i19.pin_col_stages import PinholeCollimatorControl
 from dodal.devices.zebra.zebra import Zebra
+from dodal.testing import patch_all_motors
 from ophyd_async.testing import get_mock_put, set_mock_value
 
 
@@ -17,6 +21,15 @@ async def eh2_shutter(RE: RunEngine) -> AccessControlledShutter:
 
     shutter.url = "http://test-blueapi.url"
     return shutter
+
+
+@pytest.fixture
+async def pincol(RE: RunEngine) -> AsyncGenerator[PinholeCollimatorControl]:
+    pincol = i19_2.pinhole_and_collimator(connect_immediately=True, mock=True)
+    set_mock_value(pincol.mapt.pin_x_out, 30.0)
+    set_mock_value(pincol.mapt.col_x_out, 20.0)
+    with patch_all_motors(pincol):
+        yield pincol
 
 
 @pytest.fixture
