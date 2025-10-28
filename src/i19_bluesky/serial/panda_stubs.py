@@ -1,66 +1,56 @@
 import bluesky.plan_stubs as bps
 from bluesky.utils import MsgGenerator
-from ophyd_async.fastcs.panda import PandaBitMux
+from ophyd_async.fastcs.panda import (
+    HDFPanda,
+    PandaBitMux,
+    SeqTable,
+    SeqTrigger,
+)
 
 from i19_bluesky.log import LOGGER
 
-# from i19_bluesky.serial.setup_panda import load_panda_from_yaml (issue 91 still to do
-# owing to beamline poweroff)
-from i19_bluesky.serial.setup_panda import (
-    CustomPanda,
-    arm_panda,
-    disarm_panda,
-    generate_panda_seq_table,
-)
-
 DEG_TO_ENC_COUNTS = 1000
-GENERAL_TIMEOUT = 60
 
 
-def setup_panda_for_rotation(
-    panda: CustomPanda,
-    phi_ramp_start,
-    phi_start,
-    phi_end,
-    phi_steps,
-    time_between_images,
-) -> MsgGenerator:
-    """Configures the PandA device for phi forward and backward rotation"""
+def arm_panda(panda: HDFPanda) -> MsgGenerator[None]:
+    LOGGER.debug("Send command to arm the PandA.")
+    yield from bps.abs_set(panda.seq[1].enable, PandaBitMux.ONE, wait=True)  # type: ignore
+    yield from bps.abs_set(panda.pulse[1].enable, PandaBitMux.ONE, wait=True)  # type:ignore
 
-    # yield from bps.stage(panda, group="panda-setup")
-    # yield from load_panda_from_yaml(panda) (issue 91)
 
-    # Home the input encoder
-    yield from bps.abs_set(
-        panda.inenc[1].val,
-        phi_ramp_start * DEG_TO_ENC_COUNTS,
-        wait=True,
+def disarm_panda(panda: HDFPanda) -> MsgGenerator[None]:
+    LOGGER.debug("Send command to disarm the PandA.")
+    yield from bps.abs_set(panda.seq[1].enable, PandaBitMux.ZERO, wait=True)  # type: ignore
+    yield from bps.abs_set(panda.pulse[1].enable, PandaBitMux.ZERO, wait=True)  # type: ignore
+
+
+def generate_panda_seq_table(
+    phi_start: float,
+    phi_end: float,
+    phi_steps: int,  # no. of images to take
+    time_between_images: int,
+) -> SeqTable:
+    rows = SeqTable()  # type: ignore
+
+    rows += SeqTable.row(
+        trigger=SeqTrigger.POSA_GT,
+        position=int(phi_start * DEG_TO_ENC_COUNTS),
+        repeats=phi_steps,
+        time1=time_between_images,
+        outa1=True,
     )
 
-    seq_table = generate_panda_seq_table(
-        phi_start, phi_end, phi_steps, time_between_images
+    rows += SeqTable.row(
+        trigger=SeqTrigger.POSA_LT,
+        position=int(phi_end * DEG_TO_ENC_COUNTS),
+        repeats=phi_steps,
+        time1=time_between_images,
+        outa1=True,
     )
 
-    yield from bps.abs_set(panda.seq[1].table, seq_table, group="panda-setup")
-
-    # Values need to be set before blocks are enabled, so wait here
-    yield from bps.wait(group="panda-setup", timeout=GENERAL_TIMEOUT)
-
-    LOGGER.info(f"PandA sequencer table has been set to: {str(seq_table)}")
-    seq_table_readback = yield from bps.rd(panda.seq[1].table)
-    LOGGER.debug(f"PandA sequencer table readback is: {str(seq_table_readback)}")
-
-    yield from arm_and_disarm_panda(panda)
-    yield from reset_panda(panda)
+    return rows
 
 
-def arm_and_disarm_panda(panda: CustomPanda, group="arm_panda_rotation"):
-    yield from arm_panda(panda)
-    yield from bps.abs_set(panda.outenc[1].val, PandaBitMux.ZERO, group=group)
-    yield from bps.abs_set(panda.outenc[2].val, panda.inenc[1].val, group=group)
-    yield from disarm_panda(panda)
-
-
-def reset_panda(panda: CustomPanda, group="reset_panda"):
-    yield from bps.abs_set(panda.outenc[1].val, panda.inenc[1].val, group=group)
-    yield from bps.abs_set(panda.outenc[2].val, panda.inenc[2].val, group=group)
+def setup_outenc_vals(panda: HDFPanda, group="setup_outenc_vals"):
+    yield from bps.abs_set(panda.outenc[1].val, PandaBitMux.ZERO, group=group)  # type: ignore
+    yield from bps.abs_set(panda.outenc[2].val, "INENC1.VAL", group=group)  # type: ignore

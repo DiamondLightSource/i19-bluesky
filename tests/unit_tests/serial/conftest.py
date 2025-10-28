@@ -1,10 +1,10 @@
 import pytest
-
-from i19_bluesky.serial.setup_panda import CustomPanda
+from dodal.beamlines.i19_2 import panda
+from ophyd_async.fastcs.panda import HDFPanda
 
 
 @pytest.fixture
-async def panda():
-    mock_panda = CustomPanda("PANDA")
-    await mock_panda.connect(mock=True)
-    return mock_panda
+async def mock_panda() -> HDFPanda:
+    mocked_panda = panda()
+    await mocked_panda.connect(mock=True)
+    return mocked_panda
