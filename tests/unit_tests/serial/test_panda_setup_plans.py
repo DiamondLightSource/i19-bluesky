@@ -39,9 +39,9 @@ async def test_reset_panda(mock_panda: HDFPanda, RE: RunEngine):
     RE(reset_panda(mock_panda, group="reset panda"))
     assert (
         await mock_panda.outenc[1].val.get_value()  # type: ignore
-        == await mock_panda.inenc[1].val.get_value()  # type: ignore
+        == "INENC1.VAL"
     )
     assert (
         await mock_panda.outenc[2].val.get_value()  # type: ignore
-        == await mock_panda.inenc[2].val.get_value()  # type: ignore
+        == "INENC2.VAL"
     )
