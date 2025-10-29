@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 from bluesky.run_engine import RunEngine
 from ophyd_async.fastcs.panda import HDFPanda, SeqTable, SeqTrigger
 
@@ -6,11 +8,17 @@ from i19_bluesky.serial.panda_setup_plans import (
     setup_panda_for_rotation,
 )
 
-# async def test_wait_between_setting_table_and_arming
+
+async def test_wait_between_setting_table_and_arming(
+    mock_panda: HDFPanda, RE: RunEngine
+):
+    bps_wait_done = False
+    with patch("i19_bluesky.serial.panda_setup_plans.setup_panda_for_rotation"):
+        RE(setup_panda_for_rotation(mock_panda, 5, 4, 3, 2, 1))
+    assert bps_wait_done
 
 
 async def test_setup_panda_for_rotation(mock_panda: HDFPanda, RE: RunEngine):
-    bps_wait_done = False
     RE(setup_panda_for_rotation(mock_panda, 5, 4, 3, 2, 1))
     assert await mock_panda.inenc[1].val.get_value() == 5000  # type: ignore
 
@@ -31,8 +39,6 @@ async def test_setup_panda_for_rotation(mock_panda: HDFPanda, RE: RunEngine):
     )
 
     assert mock_panda.seq[1].table == expected_seq_table
-
-    assert bps_wait_done
 
 
 async def test_reset_panda(mock_panda: HDFPanda, RE: RunEngine):
