@@ -51,6 +51,6 @@ def generate_panda_seq_table(
     return rows
 
 
-def setup_outenc_vals(panda: HDFPanda, group="setup_outenc_vals"):
-    yield from bps.abs_set(panda.outenc[1].val, PandaBitMux.ZERO, group=group)  # type: ignore
+def setup_outenc_vals(panda: HDFPanda, group="setup_outencs"):
+    yield from bps.abs_set(panda.outenc[1].val, "ZERO", group=group)  # type: ignore
     yield from bps.abs_set(panda.outenc[2].val, "INENC1.VAL", group=group)  # type: ignore

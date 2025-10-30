@@ -1,5 +1,6 @@
 from unittest.mock import patch
 
+import bluesky.plan_stubs as bps
 from bluesky.run_engine import RunEngine
 from ophyd_async.fastcs.panda import HDFPanda, SeqTable, SeqTrigger
 
@@ -51,3 +52,15 @@ async def test_reset_panda(mock_panda: HDFPanda, RE: RunEngine):
         await mock_panda.outenc[2].val.get_value()  # type: ignore
         == "INENC2.VAL"
     )
+
+
+def test_set_inenc(mock_panda: HDFPanda, RE: RunEngine):
+    def plan():
+        set_val = 1
+
+        yield from bps.abs_set(mock_panda.inenc[1].val, set_val)  # type: ignore
+        val_readback = yield from bps.rd(mock_panda.inenc[1].val)  # type: ignore
+
+        assert set_val == val_readback
+
+    RE(plan())

@@ -10,21 +10,25 @@ from i19_bluesky.serial.panda_stubs import (
     setup_outenc_vals,
 )
 
+# ignores added because not included in HDFPanda but we have added in the mock panda
+# can remove for pulse once https://github.com/bluesky/ophyd-async/pull/1115 has been
+# closed
+
 
 async def test_panda_arm(mock_panda: HDFPanda, RE: RunEngine):
     set_mock_value(mock_panda.seq[1].enable, PandaBitMux.ZERO)
-    set_mock_value(mock_panda.pulse[1].enable, PandaBitMux.ZERO)
+    set_mock_value(mock_panda.pulse[1].enable, PandaBitMux.ZERO)  # type: ignore
     RE(arm_panda(mock_panda))
     assert await mock_panda.seq[1].enable.get_value() == PandaBitMux.ONE
-    assert await mock_panda.pulse[1].enable.get_value() == PandaBitMux.ONE
+    assert await mock_panda.pulse[1].enable.get_value() == PandaBitMux.ONE  # type: ignore
 
 
 async def test_panda_disarm(mock_panda: HDFPanda, RE: RunEngine):
     set_mock_value(mock_panda.seq[1].enable, PandaBitMux.ONE)
-    set_mock_value(mock_panda.pulse[1].enable, PandaBitMux.ONE)
+    set_mock_value(mock_panda.pulse[1].enable, PandaBitMux.ONE)  # type: ignore
     RE(disarm_panda(mock_panda))
     assert await mock_panda.seq[1].enable.get_value() == PandaBitMux.ZERO
-    assert await mock_panda.pulse[1].enable.get_value() == PandaBitMux.ZERO
+    assert await mock_panda.pulse[1].enable.get_value() == PandaBitMux.ZERO  # type: ignore
 
 
 async def test_tables_are_same():
@@ -40,8 +44,6 @@ async def test_tables_are_same():
 
 async def test_setup_outenc_vals(mock_panda: HDFPanda, RE: RunEngine):
     RE(setup_outenc_vals(mock_panda, group="setup_outenc_vals"))
+
     assert await mock_panda.outenc[1].val.get_value() == PandaBitMux.ZERO  # type: ignore
-    assert (
-        await mock_panda.outenc[2].val.get_value()  # type: ignore
-        == "INENC1.VAL"()  # type: ignore
-    )
+    assert await mock_panda.outenc[2].val.get_value() == "INENC1.VAL"  # type: ignore
