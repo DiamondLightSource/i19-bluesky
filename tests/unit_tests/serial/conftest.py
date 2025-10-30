@@ -3,8 +3,6 @@ from pathlib import Path
 from typing import Any
 
 import pytest
-
-# from dodal.beamlines.i19_2 import panda
 from dodal.common.beamlines.beamline_utils import get_path_provider, set_path_provider
 from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitPathProvider
 from ophyd_async.core import Device, DeviceVector, init_devices
@@ -18,18 +16,6 @@ set_path_provider(
         client=LocalDirectoryServiceClient(),
     )
 )
-
-# @pytest.fixture
-# async def mock_panda() -> HDFPanda:
-#    mocked_panda = panda()
-#    await mocked_panda.connect(mock=True)
-#    return mocked_panda
-
-# @pytest.fixture
-# async def mock_panda():
-#    class MockBlock(Device):
-#        def __init__(self, prefix: str, name: str = ""
-#            super().__init__(name)
 
 
 @pytest.fixture
@@ -78,7 +64,6 @@ async def mock_panda() -> HDFPanda:
         {
             "inenc": (8, {"val": float, "setp": float}),
             "outenc": (8, {"val": str}),
-            "fakeblock": (8, {"val": str}),
         },
     )
 
