@@ -20,8 +20,8 @@ async def test_wait_between_setting_table_and_arming(
 
 
 async def test_setup_panda_for_rotation(mock_panda: HDFPanda, RE: RunEngine):
-    RE(setup_panda_for_rotation(mock_panda, 5, 4, 3, 2, 1))
-    assert await mock_panda.inenc[1].val.get_value() == 5000  # type: ignore
+    RE(setup_panda_for_rotation(mock_panda, 5, 4, 3, 2, 1), group="panda-setup")
+    assert await mock_panda.inenc[1].setp.get_value() == 5000  # type: ignore
 
     # need to write test for yaml stuff
 
