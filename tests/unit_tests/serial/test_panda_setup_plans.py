@@ -1,8 +1,8 @@
 from unittest.mock import patch
 
 import bluesky.plan_stubs as bps
-import numpy as np
 from bluesky.run_engine import RunEngine
+from numpy.testing import assert_array_equal
 from ophyd_async.fastcs.panda import HDFPanda, SeqTable, SeqTrigger
 
 from i19_bluesky.serial.panda_setup_plans import (
@@ -15,11 +15,9 @@ async def test_wait_between_setting_table_and_arming(
     mock_panda: HDFPanda, RE: RunEngine
 ):
     # bps_wait_done = False
-    with patch(
-        "i19_bluesky.serial.panda_setup_plans.setup_panda_for_rotation.bps.wait"
-    ):
+    with patch("i19_bluesky.serial.panda_setup_plans.bps.wait") as patch_wait:
         RE(setup_panda_for_rotation(mock_panda, 5, 4, 3, 2, 1))
-    mock_panda.assert_called_once_with(group="panda-setup")
+        patch_wait.assert_called_once_with(group="panda-setup", timeout=60)
 
 
 async def test_setup_panda_for_rotation(mock_panda: HDFPanda, RE: RunEngine):
@@ -43,11 +41,11 @@ async def test_setup_panda_for_rotation(mock_panda: HDFPanda, RE: RunEngine):
     )
 
     test_table = await mock_panda.seq[1].table.get_value()
-    np.testing.assert_array_equal(test_table.trigger, expected_seq_table.trigger)
-    np.testing.assert_array_equal(test_table.repeats, expected_seq_table.repeats)
-    np.testing.assert_array_equal(test_table.position, expected_seq_table.position)
-    np.testing.assert_array_equal(test_table.time1, expected_seq_table.time1)
-    np.testing.assert_array_equal(test_table.outa1, expected_seq_table.outa1)
+    assert_array_equal(test_table.trigger, expected_seq_table.trigger)
+    assert_array_equal(test_table.repeats, expected_seq_table.repeats)
+    assert_array_equal(test_table.position, expected_seq_table.position)
+    assert_array_equal(test_table.time1, expected_seq_table.time1)
+    assert_array_equal(test_table.outa1, expected_seq_table.outa1)
 
 
 async def test_reset_panda(mock_panda: HDFPanda, RE: RunEngine):

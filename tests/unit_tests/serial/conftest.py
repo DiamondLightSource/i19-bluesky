@@ -57,8 +57,6 @@ async def mock_panda() -> HDFPanda:
                 await sig.connect(mock=True)
                 setattr(device, name, sig)
 
-    #########################
-
     await set_mock_blocks(
         mock_panda,
         {
