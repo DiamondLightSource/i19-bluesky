@@ -1,7 +1,11 @@
 import bluesky.plan_stubs as bps
 from bluesky.utils import MsgGenerator
-from ophyd_async.fastcs.panda import HDFPanda, PandaBitMux
-from ophyd_async.fastcs.panda._table import SeqTable, SeqTrigger
+from ophyd_async.fastcs.panda import (
+    HDFPanda,
+    PandaBitMux,
+    SeqTable,
+    SeqTrigger,
+)
 
 from i19_bluesky.log import LOGGER
 
@@ -45,3 +49,8 @@ def generate_panda_seq_table(
     )
 
     return rows
+
+
+def setup_outenc_vals(panda: HDFPanda, group="setup_outenc_vals"):
+    yield from bps.abs_set(panda.outenc[1].val, "ZERO", group=group)  # type: ignore
+    yield from bps.abs_set(panda.outenc[2].val, "INENC1.VAL", group=group)  # type: ignore
