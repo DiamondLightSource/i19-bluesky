@@ -37,8 +37,9 @@ def setup_panda_for_rotation(
     yield from bps.abs_set(
         panda.inenc[1].setp,  # type: ignore
         phi_ramp_start * DEG_TO_ENC_COUNTS,
-        wait=True,  # type: ignore
+        group="panda-setup",
     )
+    yield from setup_outenc_vals(panda)
 
     seq_table = generate_panda_seq_table(
         phi_start, phi_end, phi_steps, time_between_images
@@ -54,7 +55,6 @@ def setup_panda_for_rotation(
     LOGGER.debug(f"PandA sequencer table readback is: {str(seq_table_readback)}")
 
     yield from arm_panda(panda)
-    yield from setup_outenc_vals(panda)
 
 
 def reset_panda(panda: HDFPanda, group="reset_panda"):
