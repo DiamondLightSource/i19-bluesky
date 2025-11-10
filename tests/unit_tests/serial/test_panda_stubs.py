@@ -10,10 +10,6 @@ from i19_bluesky.serial.panda_stubs import (
     setup_outenc_vals,
 )
 
-# ignores added because not included in HDFPanda but we have added in the mock panda
-# can remove for pulse once https://github.com/bluesky/ophyd-async/pull/1115 has been
-# closed
-
 
 async def test_panda_arm(mock_panda: HDFPanda, RE: RunEngine):
     set_mock_value(mock_panda.seq[1].enable, PandaBitMux.ZERO)
@@ -31,7 +27,7 @@ async def test_panda_disarm(mock_panda: HDFPanda, RE: RunEngine):
     assert await mock_panda.pulse[1].enable.get_value() == PandaBitMux.ZERO  # type: ignore
 
 
-async def test_tables_are_same():
+async def test_seq_table_generated_correctly():
     inputs = (5.6, 6.7, 10, 5)
     table_from_func = generate_panda_seq_table(*inputs)
 
