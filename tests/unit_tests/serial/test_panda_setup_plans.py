@@ -1,6 +1,5 @@
-from unittest.mock import patch
+from unittest.mock import call, patch
 
-import bluesky.plan_stubs as bps
 from bluesky.run_engine import RunEngine
 from numpy.testing import assert_array_equal
 from ophyd_async.fastcs.panda import HDFPanda, SeqTable, SeqTrigger
@@ -9,6 +8,7 @@ from i19_bluesky.serial.panda_setup_plans import (
     reset_panda,
     setup_panda_for_rotation,
 )
+from i19_bluesky.serial.panda_stubs import DeviceSettingsConstants
 
 
 async def test_wait_between_setting_table_and_arming(
@@ -20,10 +20,20 @@ async def test_wait_between_setting_table_and_arming(
 
 
 async def test_setup_panda_for_rotation(mock_panda: HDFPanda, RE: RunEngine):
-    RE(setup_panda_for_rotation(mock_panda, 4, 5, 10, 2, 1), group="panda-setup")
-    assert await mock_panda.inenc[1].setp.get_value() == 4000  # type: ignore
-
-    # need to write test for yaml stuff
+    with patch(
+        "i19_bluesky.serial.panda_setup_plans.load_panda_from_yaml"
+    ) as patch_wait:
+        RE(setup_panda_for_rotation(mock_panda, 4, 5, 10, 2, 1), group="panda-setup")
+        directory = str(DeviceSettingsConstants.PANDA_DIR)
+        patch_wait.assert_has_calls(
+            [
+                call(directory, DeviceSettingsConstants.PANDA_PC_FILENAME, mock_panda),
+                call(
+                    directory, DeviceSettingsConstants.PANDA_THROUGH_ZEBRA, mock_panda
+                ),
+            ]
+        )
+        assert await mock_panda.inenc[1].setp.get_value() == 4000  # type: ignore
 
     expected_seq_table: SeqTable = SeqTable.row(
         trigger=SeqTrigger.POSA_GT,
@@ -57,15 +67,3 @@ async def test_reset_panda(mock_panda: HDFPanda, RE: RunEngine):
         await mock_panda.outenc[2].val.get_value()  # type: ignore
         == "INENC2.VAL"
     )
-
-
-def test_set_inenc(mock_panda: HDFPanda, RE: RunEngine):
-    def plan():
-        set_val = 1
-
-        yield from bps.abs_set(mock_panda.inenc[1].val, set_val)  # type: ignore
-        val_readback = yield from bps.rd(mock_panda.inenc[1].val)  # type: ignore
-
-        assert set_val == val_readback
-
-    RE(plan())

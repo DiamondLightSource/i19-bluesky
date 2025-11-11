@@ -30,7 +30,6 @@ def setup_panda_for_rotation(
     yield from load_panda_from_yaml(
         str(DeviceSettingsConstants.PANDA_DIR),
         DeviceSettingsConstants.PANDA_PC_FILENAME,
-        # DeviceSettingsConstants.PANDA_THROUGH_ZEBRA,
         panda,
     )
 
