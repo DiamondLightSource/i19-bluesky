@@ -26,10 +26,17 @@ def setup_panda_for_rotation(
     """Configures the PandA device for phi forward and backward rotation"""
 
     yield from bps.stage(panda, group="panda-setup")
+
     yield from load_panda_from_yaml(
-        DeviceSettingsConstants.PANDA_DIR,
+        str(DeviceSettingsConstants.PANDA_DIR),
         DeviceSettingsConstants.PANDA_PC_FILENAME,
         # DeviceSettingsConstants.PANDA_THROUGH_ZEBRA,
+        panda,
+    )
+
+    yield from load_panda_from_yaml(
+        str(DeviceSettingsConstants.PANDA_DIR),
+        DeviceSettingsConstants.PANDA_THROUGH_ZEBRA,
         panda,
     )
 

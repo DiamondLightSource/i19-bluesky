@@ -1,4 +1,4 @@
-import os
+from pathlib import Path
 
 import bluesky.plan_stubs as bps
 from bluesky.utils import MsgGenerator
@@ -21,7 +21,7 @@ DEG_TO_ENC_COUNTS = 1000
 class DeviceSettingsConstants:
     PANDA_PC_FILENAME = "panda-pc"
     PANDA_THROUGH_ZEBRA = "panda-through-zebra"
-    PANDA_DIR = os.path.abspath("i19-bluesky/src/i19_bluesky/panda_config_files")
+    PANDA_DIR = Path("i19-bluesky/src/i19_bluesky/panda_config_files").absolute()
 
 
 def arm_panda(panda: HDFPanda) -> MsgGenerator[None]:
