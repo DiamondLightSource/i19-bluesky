@@ -9,6 +9,11 @@ class HutchName(StrEnum):
     EH2 = "EH2"
 
 
+class RotationAxis(StrEnum):
+    PHI = "phi"
+    OMEGA = "omega"
+
+
 class VisitParameters(BaseModel):
     hutch: HutchName
     visit: Path
