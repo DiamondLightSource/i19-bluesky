@@ -13,10 +13,10 @@ from dodal.utils import AnyDeviceFactory
 from ophyd_async.testing import callback_on_mock_put, set_mock_value
 
 from i19_bluesky.exceptions import HutchInvalidError
-from i19_bluesky.optics.check_access_control import HutchName
 from i19_bluesky.optics.experiment_shutter_plans import (
     operate_shutter_plan,
 )
+from i19_bluesky.parameters.components import HutchName
 from tests.conftest import device_factories_for_beamline
 
 
