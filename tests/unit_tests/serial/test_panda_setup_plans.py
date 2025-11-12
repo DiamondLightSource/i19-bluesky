@@ -24,13 +24,13 @@ async def test_setup_panda_for_rotation(mock_panda: HDFPanda, RE: RunEngine):
 
     expected_seq_table: SeqTable = SeqTable.row(
         trigger=SeqTrigger.POSA_GT,
-        repeats=25,
+        repeats=25000,
         position=5000,
         time1=100,
         outa1=True,
     ) + SeqTable.row(
         trigger=SeqTrigger.POSA_LT,
-        repeats=25,
+        repeats=25000,
         position=10000,
         time1=100,
         outa1=True,
