@@ -47,7 +47,7 @@ def generate_panda_seq_table(
     rows += SeqTable.row(
         trigger=SeqTrigger.POSA_GT,
         position=int(phi_start * DEG_TO_ENC_COUNTS),
-        repeats=phi_steps,
+        repeats=phi_steps * DEG_TO_ENC_COUNTS,
         time1=int(time_between_images * DEG_TO_ENC_COUNTS),
         outa1=True,
     )
@@ -55,7 +55,7 @@ def generate_panda_seq_table(
     rows += SeqTable.row(
         trigger=SeqTrigger.POSA_LT,
         position=int(phi_end * DEG_TO_ENC_COUNTS),
-        repeats=phi_steps,
+        repeats=phi_steps * DEG_TO_ENC_COUNTS,
         time1=int(time_between_images * DEG_TO_ENC_COUNTS),
         outa1=True,
     )

@@ -28,13 +28,13 @@ async def test_panda_disarm(mock_panda: HDFPanda, RE: RunEngine):
 
 
 async def test_seq_table_generated_correctly():
-    inputs = (5.6, 6.7, 10, 5)
+    inputs = (5.6, 6.7, 25, 0.1)
     table_from_func = generate_panda_seq_table(*inputs)
 
     assert table_from_func.trigger == [SeqTrigger.POSA_GT, SeqTrigger.POSA_LT]
-    assert table_from_func.repeats == pytest.approx([10, 10])
+    assert table_from_func.repeats == pytest.approx([25000, 25000])
     assert table_from_func.position == pytest.approx([5600, 6700])
-    assert table_from_func.time1 == pytest.approx([5, 5])
+    assert table_from_func.time1 == pytest.approx([100, 100])
     assert table_from_func.outa1 == pytest.approx([True, True])
 
 
