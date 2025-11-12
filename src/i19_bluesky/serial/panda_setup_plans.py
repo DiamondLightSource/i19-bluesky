@@ -4,10 +4,8 @@ from ophyd_async.fastcs.panda import HDFPanda
 
 from i19_bluesky.log import LOGGER
 from i19_bluesky.serial.panda_stubs import (
-    # DeviceSettingsConstants,
     arm_panda,
     generate_panda_seq_table,
-    # load_panda_from_yaml,
     setup_outenc_vals,
 )
 
@@ -26,12 +24,6 @@ def setup_panda_for_rotation(
     """Configures the PandA device for phi forward and backward rotation"""
 
     yield from bps.stage(panda, group="panda-setup")
-    # yield from load_panda_from_yaml(
-    # DeviceSettingsConstants.PANDA_DIR,
-    # DeviceSettingsConstants.PANDA_PC_FILENAME,
-    # DeviceSettingsConstants.PANDA_THROUGH_ZEBRA,
-    # panda,
-    # )
 
     # Home the input encoder
     yield from bps.abs_set(

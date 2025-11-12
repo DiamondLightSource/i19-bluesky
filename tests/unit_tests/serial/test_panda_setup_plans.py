@@ -14,27 +14,25 @@ async def test_wait_between_setting_table_and_arming(
     mock_panda: HDFPanda, RE: RunEngine
 ):
     with patch("i19_bluesky.serial.panda_setup_plans.bps.wait") as patch_wait:
-        RE(setup_panda_for_rotation(mock_panda, 4, 5, 10, 2, 1))
+        RE(setup_panda_for_rotation(mock_panda, 4, 5, 10, 25, 0.1))
         patch_wait.assert_called_once_with(group="panda-setup", timeout=60)
 
 
 async def test_setup_panda_for_rotation(mock_panda: HDFPanda, RE: RunEngine):
-    RE(setup_panda_for_rotation(mock_panda, 4, 5, 10, 2, 1), group="panda-setup")
+    RE(setup_panda_for_rotation(mock_panda, 4, 5, 10, 25, 0.1), group="panda-setup")
     assert await mock_panda.inenc[1].setp.get_value() == 4000  # type: ignore
-
-    # need to write test for yaml stuff
 
     expected_seq_table: SeqTable = SeqTable.row(
         trigger=SeqTrigger.POSA_GT,
-        repeats=2,
+        repeats=25,
         position=5000,
-        time1=1,
+        time1=100,
         outa1=True,
     ) + SeqTable.row(
         trigger=SeqTrigger.POSA_LT,
-        repeats=2,
+        repeats=25,
         position=10000,
-        time1=1,
+        time1=100,
         outa1=True,
     )
 
