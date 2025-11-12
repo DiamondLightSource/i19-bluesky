@@ -33,12 +33,6 @@ def setup_panda_for_rotation(
         panda,
     )
 
-    yield from load_panda_from_yaml(
-        str(DeviceSettingsConstants.PANDA_DIR),
-        DeviceSettingsConstants.PANDA_THROUGH_ZEBRA,
-        panda,
-    )
-
     # Home the input encoder
     yield from bps.abs_set(
         panda.inenc[1].setp,  # type: ignore
@@ -64,5 +58,10 @@ def setup_panda_for_rotation(
 
 
 def reset_panda(panda: HDFPanda, group="reset_panda"):
+    yield from load_panda_from_yaml(
+        str(DeviceSettingsConstants.PANDA_DIR),
+        DeviceSettingsConstants.PANDA_THROUGH_ZEBRA,
+        panda,
+    )
     yield from bps.abs_set(panda.outenc[1].val, "INENC1.VAL", group=group)  # type: ignore
     yield from bps.abs_set(panda.outenc[2].val, "INENC2.VAL", group=group)  # type: ignore
