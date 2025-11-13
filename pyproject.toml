@@ -44,7 +44,7 @@ dev = [
     "pre-commit",
     "pydata-sphinx-theme>=0.12",
     # Pin pyright until https://github.com/microsoft/pyright/issues/11060 is fixed
-    "pyright==1.1.406",
+    "pyright==1.1.407",
     "pytest",
     "pytest-asyncio",
     "pytest-cov",
