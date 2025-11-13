@@ -28,7 +28,7 @@ def setup_panda_for_rotation(
     yield from bps.stage(panda, group="panda-setup")
 
     yield from load_panda_from_yaml(
-        str(DeviceSettingsConstants.PANDA_DIR),
+        DeviceSettingsConstants.PANDA_DIR.as_posix(),
         DeviceSettingsConstants.PANDA_PC_FILENAME,
         panda,
     )
@@ -59,7 +59,7 @@ def setup_panda_for_rotation(
 
 def reset_panda(panda: HDFPanda, group="reset_panda"):
     yield from load_panda_from_yaml(
-        str(DeviceSettingsConstants.PANDA_DIR),
+        DeviceSettingsConstants.PANDA_DIR.as_posix(),
         DeviceSettingsConstants.PANDA_THROUGH_ZEBRA,
         panda,
     )
