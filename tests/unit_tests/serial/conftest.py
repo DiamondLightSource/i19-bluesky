@@ -1,21 +1,75 @@
+import os
+from pathlib import Path
+from typing import Any
+
 import pytest
-from ophyd_async.core import Device, DeviceVector, SignalRW
-from ophyd_async.fastcs.core import fastcs_connector
-from ophyd_async.fastcs.panda import PandaBitMux, PulseBlock
+from dodal.common.beamlines.beamline_utils import get_path_provider, set_path_provider
+from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitPathProvider
+from ophyd_async.core import Device, DeviceVector, init_devices
+from ophyd_async.epics.core import epics_signal_rw
+from ophyd_async.fastcs.panda import HDFPanda
+
+set_path_provider(
+    StaticVisitPathProvider(
+        "ixx",
+        Path(os.path.dirname(__file__)),
+        client=LocalDirectoryServiceClient(),
+    )
+)
 
 
 @pytest.fixture
-async def panda():
-    class PulseBlockWithEnable(PulseBlock):
-        enable: SignalRW[PandaBitMux]
+async def mock_panda() -> HDFPanda:
+    async with init_devices(connect=True, mock=True):
+        mock_panda = HDFPanda(
+            prefix="ixx-test-panda", path_provider=get_path_provider()
+        )
 
-    class TestPanda(Device):
-        pulse: DeviceVector[PulseBlockWithEnable]
-        seq: DeviceVector[PulseBlockWithEnable]
+    class MockBlock(Device):
+        def __init__(
+            self,
+            prefix: str,
+            name: str = "",
+            attributes: dict[str, Any] = {},  # noqa
+        ):
+            for name, dtype in attributes.items():
+                setattr(self, name, epics_signal_rw(dtype, "", ""))
+            super().__init__(name)
 
-        def __init__(self, uri: str, name: str = ""):
-            super().__init__(name=name, connector=fastcs_connector(self, uri))
+    async def set_mock_blocks(
+        panda, mock_blocks: dict[str, tuple[int, dict[str, Any]]]
+    ):
+        for name, block in mock_blocks.items():
+            n, attrs = block
+            block = mock_vector_block(n, attrs)
+            await block.connect(mock=True)
+            setattr(panda, name, block)
 
-    mock_panda = TestPanda("PANDA")
-    await mock_panda.connect(mock=True)
+    def mock_vector_block(n, attributes):
+        return DeviceVector(
+            {i: MockBlock(f"{i}", f"{i}", attributes) for i in range(n)}
+        )
+
+    async def create_mock_signals(devices_and_signals: dict[Device, dict[str, Any]]):
+        for device, signals in devices_and_signals.items():
+            for name, dtype in signals.items():
+                sig = epics_signal_rw(dtype, name, name)
+                await sig.connect(mock=True)
+                setattr(device, name, sig)
+
+    await set_mock_blocks(
+        mock_panda,
+        {
+            "inenc": (8, {"val": float, "setp": float}),
+            "outenc": (8, {"val": str}),
+        },
+    )
+
+    await create_mock_signals(
+        {
+            mock_panda.pcap: {"enable": str},
+            **{mock_panda.pulse[i]: {"enable": str} for i in mock_panda.pulse.keys()},
+        }
+    )
+
     return mock_panda
