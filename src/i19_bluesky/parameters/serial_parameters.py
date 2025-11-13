@@ -1,10 +1,14 @@
-from abc import abstractmethod
+# from abc import abstractmethod
 from enum import StrEnum
 
-from dodal.devices.zebra.zebra import RotationDirection
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, computed_field
 
-from i19_bluesky.parameters.components import RotationAxis, VisitParameters
+from i19_bluesky.parameters.components import (
+    PandaRotationParams,
+    RotationAxis,
+    VisitParameters,
+    ZebraRotationParams,
+)
 
 
 class GridType(StrEnum):
@@ -12,17 +16,6 @@ class GridType(StrEnum):
     SILICON = "silicon"
     KAPTON400 = "kapton"
     FILM = "film"
-
-
-class RotationParameters(BaseModel):
-    # This might need adjusting to account for successive backwards and forwards
-    # Essentially: for eh1/zebra only in pne direction, for eh2/panda need a series of
-    # both. Or something
-    rotation_axis: RotationAxis = Field(default=RotationAxis.PHI)
-    scan_start_deg: float = Field(default=0)
-    scan_increment_deg: float = Field(default=0.1, gt=0)
-    scan_width_deg: float = Field(default=0, gt=0)
-    rotation_direction: RotationDirection = Field(default=RotationDirection.POSITIVE)
 
 
 class GridParameters(BaseModel):
@@ -64,17 +57,72 @@ class GridParameters(BaseModel):
         return self.x_steps * self.z_steps
 
 
+class WellsSelection(BaseModel):
+    first: int
+    last: int
+    selected: list[int]  # NOTE this is 1-indexed
+    series_length: int
+    manual_selection_enabled: bool = False
+
+    @computed_field
+    @property
+    def num_series(self):
+        if len(self.selected) % self.series_length == 0:
+            return len(self.selected) // self.series_length
+        else:
+            return len(self.selected) // self.series_length + 1
+
+    @property
+    def wells_to_collect(self) -> int:
+        return len(self.selected)
+
+
 class SerialExperiment(VisitParameters):
     """General, for both hutches"""
 
-    grid: GridParameters
+    images_per_well: int
+    exposure_time_s: float
+    image_width_deg: float
+    detector_distance_mm: float
+    two_theta_deg: float
     transmission_fraction: float
+    grid: GridParameters
+    wells: WellsSelection
+    # Missing: detector_name, pinhole_size, sample_stage, also axes values
+    rot_axis_start: float
+    rot_axis_increment: float
+    rotation_axis: RotationAxis = RotationAxis.PHI
+    # The other positions can be read from device for now and then set to detector
+
+    @computed_field
+    @property
+    def tot_num_images(self) -> int:
+        return self.images_per_well * self.wells.wells_to_collect
+
+    # @property
+    # @abstractmethod
+    # def detector_params(self): ...
+    # TODO
+
+
+class SerialExperimentEh2(SerialExperiment):
+    @property
+    def zebra_rotation_params(self) -> ZebraRotationParams:
+        return ZebraRotationParams(
+            rotation_axis=self.rotation_axis,
+            scan_start_deg=self.rot_axis_start,
+            scan_increment_deg=self.rot_axis_increment,
+            scan_steps=self.images_per_well,
+            exposure_time_s=self.exposure_time_s,
+            # Assumes rotation starts positive
+        )
 
     @property
-    @abstractmethod
-    def detector_params(self):
-        pass
-
-
-class SerialExperimentInEh2(SerialExperiment):
-    pass
+    def panda_rotation_params(self) -> PandaRotationParams:
+        return PandaRotationParams(
+            rotation_axis=self.rotation_axis,
+            scan_start_deg=self.rot_axis_start,
+            scan_increment_deg=self.rot_axis_increment,
+            scan_steps=self.images_per_well,
+            exposure_time_s=self.exposure_time_s,
+        )
