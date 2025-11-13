@@ -1,4 +1,5 @@
 import bluesky.plan_stubs as bps
+from dodal.devices.i19.diffractometer import FourCircleDiffractometer
 from ophyd_async.fastcs.panda import HDFPanda
 
 from i19_bluesky.serial.diffractometer_setup import setup_diffractometer
@@ -6,7 +7,11 @@ from i19_bluesky.serial.panda_setup_plans import setup_panda_for_rotation
 from i19_bluesky.serial.panda_stubs import arm_panda, disarm_panda
 
 setup_diffractometer(
-    phi_start=0, phi_steps=0, exposure_time=0, phi_value=0, phi_velocity=0
+    phi_start=0,
+    phi_steps=0,
+    exposure_time=0,
+    phi_velocity=0,
+    diffractometer=FourCircleDiffractometer,
 )
 
 
