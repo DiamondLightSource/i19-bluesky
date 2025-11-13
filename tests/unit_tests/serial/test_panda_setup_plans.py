@@ -13,13 +13,21 @@ from i19_bluesky.serial.panda_setup_plans import (
 async def test_wait_between_setting_table_and_arming(
     mock_panda: HDFPanda, RE: RunEngine
 ):
-    with patch("i19_bluesky.serial.panda_setup_plans.bps.wait") as patch_wait:
+    with (
+        patch("i19_bluesky.serial.panda_setup_plans.load_panda_from_yaml"),
+        patch("i19_bluesky.serial.panda_setup_plans.bps.wait") as patch_wait,
+    ):
         RE(setup_panda_for_rotation(mock_panda, 4, 5, 10, 25, 0.1))
         patch_wait.assert_called_once_with(group="panda-setup", timeout=60)
 
 
 async def test_setup_panda_for_rotation(mock_panda: HDFPanda, RE: RunEngine):
-    RE(setup_panda_for_rotation(mock_panda, 4, 5, 10, 25, 0.1), group="panda-setup")
+    with patch(
+        "i19_bluesky.serial.panda_setup_plans.load_panda_from_yaml"
+    ) as patch_load:
+        RE(setup_panda_for_rotation(mock_panda, 4, 5, 10, 25, 0.1), group="panda-setup")
+        patch_load.assert_called_once()
+
     assert await mock_panda.inenc[1].setp.get_value() == 4000  # type: ignore
 
     expected_seq_table: SeqTable = SeqTable.row(
@@ -45,7 +53,12 @@ async def test_setup_panda_for_rotation(mock_panda: HDFPanda, RE: RunEngine):
 
 
 async def test_reset_panda(mock_panda: HDFPanda, RE: RunEngine):
-    RE(reset_panda(mock_panda, group="reset panda"))
+    with patch(
+        "i19_bluesky.serial.panda_setup_plans.load_panda_from_yaml"
+    ) as patch_load:
+        RE(reset_panda(mock_panda, group="reset panda"))
+        patch_load.assert_called_once()
+
     assert (
         await mock_panda.outenc[1].val.get_value()  # type: ignore
         == "INENC1.VAL"
