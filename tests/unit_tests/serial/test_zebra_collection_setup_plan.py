@@ -12,8 +12,8 @@ from i19_bluesky.serial.zebra_collection_setup_plan import (
 )
 
 
-@patch("i19_bluesky.eh2.zebra_collection_setup_plan.setup_zebra_for_triggering")
-@patch("i19_bluesky.eh2.zebra_collection_setup_plan.setup_out_triggers")
+@patch("i19_bluesky.serial.zebra_collection_setup_plan.setup_zebra_for_triggering")
+@patch("i19_bluesky.serial.zebra_collection_setup_plan.setup_out_triggers")
 @pytest.mark.parametrize(
     "rotation_direction", [RotationDirection.POSITIVE, RotationDirection.NEGATIVE]
 )
