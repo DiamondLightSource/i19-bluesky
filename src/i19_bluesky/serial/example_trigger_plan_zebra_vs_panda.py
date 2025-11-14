@@ -63,6 +63,6 @@ def trigger_panda(
     yield from setup_panda_for_rotation(panda, 0, 0, 0, 0, 0)
     yield from arm_panda(panda)
     yield from bps.abs_set(diffractometer.phi, phi_end)
-    yield from bps.wait()
+    yield from bps.sleep(2.0)
     yield from bps.abs_set(diffractometer.phi, phi_start)
     yield from disarm_panda(panda)
