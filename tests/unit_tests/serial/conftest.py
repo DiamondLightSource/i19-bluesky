@@ -3,8 +3,11 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+from bluesky.run_engine import RunEngine
+from dodal.beamlines import i19_2
 from dodal.common.beamlines.beamline_utils import get_path_provider, set_path_provider
 from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitPathProvider
+from dodal.devices.i19.diffractometer import FourCircleDiffractometer
 from ophyd_async.core import Device, DeviceVector, init_devices
 from ophyd_async.epics.core import epics_signal_rw
 from ophyd_async.fastcs.panda import HDFPanda
@@ -73,3 +76,9 @@ async def mock_panda() -> HDFPanda:
     )
 
     return mock_panda
+
+
+@pytest.fixture
+async def serial_diffractometer(RE: RunEngine) -> FourCircleDiffractometer:
+    diffractometer = i19_2.diffractometer(connect_immediately=True, mock=True)
+    return diffractometer
