@@ -29,28 +29,22 @@ def setup_diffractometer(
 # phi_ramp_start = phi_start - 1
 
 
-def setup_zebra_positive(
-    zebra: Zebra, phi_end, diffractometer: FourCircleDiffractometer
+def setup_zebra(
+    zebra: Zebra,
+    phi_end,
+    diffractometer: FourCircleDiffractometer,
+    direction: RotationDirection,
 ):
     yield from setup_diffractometer(0, 0, 0, diffractometer)
     yield from setup_zebra_for_collection(
-        zebra, RotationDirection.POSITIVE, 0, 0, 0, "setup_zebra_for_collection", True
+        zebra,
+        direction,
+        0,
+        0,
+        0,
     )
-    yield from setup_out_triggers(zebra, "setup_out_triggers", True)
-    yield from setup_zebra_for_triggering(zebra, "setup_zebra_for_triggering")
-    arm_zebra(zebra)
-    yield from bps.abs_set(diffractometer.phi.user_setpoint, phi_end)
-    disarm_zebra(zebra)
-
-
-def setup_zebra_negative(
-    zebra: Zebra, phi_end, diffractometer: FourCircleDiffractometer
-):
-    yield from setup_zebra_for_collection(
-        zebra, RotationDirection.NEGATIVE, 0, 0, 0, "setup_zebra_for_collection", True
-    )
-    yield from setup_out_triggers(zebra, "setup_out_triggers", True)
-    yield from setup_zebra_for_triggering(zebra, "setup_zebra_for_triggering")
+    yield from setup_out_triggers(zebra)
+    yield from setup_zebra_for_triggering(zebra)
     arm_zebra(zebra)
     yield from bps.abs_set(diffractometer.phi.user_setpoint, phi_end)
     disarm_zebra(zebra)
