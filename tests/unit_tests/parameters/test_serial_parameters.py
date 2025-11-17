@@ -82,11 +82,11 @@ def test_wells_selection(dummy_wells_settings):
 
 
 def test_wells_selection_with_multiple_series(dummy_wells_settings):
-    dummy_wells_settings["series_length"] = 1
+    dummy_wells_settings["series_length"] = 2
 
     params = WellsSelection(**dummy_wells_settings)
 
-    assert params.num_series == 3
+    assert params.num_series == 2
 
 
 def test_serial_parameter_model(dummy_serial_params):
