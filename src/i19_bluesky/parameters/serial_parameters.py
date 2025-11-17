@@ -12,10 +12,10 @@ from i19_bluesky.parameters.components import (
 
 
 class GridType(StrEnum):
-    POLYMER = "polymer"
-    SILICON = "silicon"
-    KAPTON400 = "kapton"
-    FILM = "film"
+    POLYMER = "Polymer"
+    SILICON = "Silicon"
+    KAPTON400 = "Kapton"
+    FILM = "Film"
 
 
 class GridParameters(BaseModel):
@@ -61,19 +61,19 @@ class WellsSelection(BaseModel):
     first: int
     last: int
     selected: list[int]  # NOTE this is 1-indexed
-    series_length: int
+    series_length: int  # How many in the same detector arm
     manual_selection_enabled: bool = False
 
     @computed_field
     @property
-    def num_series(self):
+    def num_series(self) -> int:
         if len(self.selected) % self.series_length == 0:
             return len(self.selected) // self.series_length
         else:
             return len(self.selected) // self.series_length + 1
 
     @property
-    def wells_to_collect(self) -> int:
+    def num_wells_to_collect(self) -> int:
         return len(self.selected)
 
 
@@ -97,12 +97,12 @@ class SerialExperiment(VisitParameters):
     @computed_field
     @property
     def tot_num_images(self) -> int:
-        return self.images_per_well * self.wells.wells_to_collect
+        return self.images_per_well * self.wells.num_wells_to_collect
 
     # @property
     # @abstractmethod
     # def detector_params(self): ...
-    # TODO
+    # TODO see https://github.com/DiamondLightSource/i19-bluesky/issues/103
 
 
 class SerialExperimentEh2(SerialExperiment):

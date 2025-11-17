@@ -26,6 +26,9 @@ class VisitParameters(BaseModel):
     @field_validator("visit", mode="before")
     @classmethod
     def _parse_visit(cls, visit: str | Path):
+        # NOTE, for now leave like this, with the visit as the full path, but in the
+        # future it could just be the instrument session and then the full path can be
+        # rebuilt from hutch and year
         if isinstance(visit, str):
             return Path(visit)
         return visit
