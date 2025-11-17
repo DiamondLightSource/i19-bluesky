@@ -15,13 +15,13 @@ from i19_bluesky.serial.example_trigger_plan_zebra_vs_panda import (
 
 
 async def test_setup_diffractometer(
-    serial_diffractometer: FourCircleDiffractometer,
+    eh2_diffractometer: FourCircleDiffractometer,
     RE: RunEngine,
 ):
-    RE(setup_diffractometer(5.0, 10, 2, serial_diffractometer))
-    set_mock_value(serial_diffractometer.phi.user_readback, 5.0)
-    assert await serial_diffractometer.phi.user_readback.get_value() == 5
-    assert await serial_diffractometer.phi.velocity.get_value() == 5
+    RE(setup_diffractometer(5.0, 10, 2, eh2_diffractometer))
+    set_mock_value(eh2_diffractometer.phi.user_readback, 5.0)
+    assert await eh2_diffractometer.phi.user_readback.get_value() == 5
+    assert await eh2_diffractometer.phi.velocity.get_value() == 5
 
 
 @patch(
@@ -41,12 +41,12 @@ async def test_setup_zebra(
     mock_setup_out_triggers: MagicMock,
     mock_setup_zebra_for_triggering: MagicMock,
     eh2_zebra: Zebra,
-    serial_diffractometer: FourCircleDiffractometer,
+    eh2_diffractometer: FourCircleDiffractometer,
     rotation_direction: RotationDirection,
     RE: RunEngine,
 ):
-    RE(setup_zebra(eh2_zebra, 0, serial_diffractometer, rotation_direction))
-    mock_setup_diffractometer.assert_called_once_with(0, 0, 0, serial_diffractometer)
+    RE(setup_zebra(eh2_zebra, 5.0, 10, 3, 4, eh2_diffractometer, rotation_direction))
+    mock_setup_diffractometer.assert_called_once_with(0, 0, 0, eh2_diffractometer)
     mock_setup_zebra_for_collection.assert_called_once_with(
         eh2_zebra,
         rotation_direction,
@@ -56,13 +56,15 @@ async def test_setup_zebra(
     )
     mock_setup_out_triggers.assert_called_once_with(eh2_zebra)
     mock_setup_zebra_for_triggering.assert_called_once_with(eh2_zebra)
-    set_mock_value(serial_diffractometer.phi.user_readback, 7)
-    assert await serial_diffractometer.phi.user_readback.get_value() == 7
+    set_mock_value(eh2_diffractometer.phi.user_readback, 7)
+    assert await eh2_diffractometer.phi.user_readback.get_value() == 7
 
 
+@patch("i19_bluesky.serial.panda_stubs.disarm_panda")
+@patch("i19_bluesky.serial.panda_stubs.arm_panda")
+@patch("i19_bluesky.serial.panda_setup_plans.setup_panda_for_rotation")
+@patch("i19_bluesky.serial.example_trigger_plan_zebra_vs_panda.setup_diffractometer")
 async def test_trigger_panda(
-    mock_panda: HDFPanda,
-    serial_diffractometer: FourCircleDiffractometer,
     mock_setup_diffractometer: MagicMock,
     mock_setup_panda_for_rotation: MagicMock,
     mock_arm_panda: MagicMock,
@@ -70,14 +72,16 @@ async def test_trigger_panda(
     phi_start,
     phi_end,
     RE: RunEngine,
+    mock_panda: HDFPanda,
+    eh2_diffractometer: FourCircleDiffractometer,
 ):
-    RE(trigger_panda(mock_panda, serial_diffractometer, phi_start=7, phi_end=6))
-    mock_setup_diffractometer.assert_called_once_with(0, 0, 0, serial_diffractometer)
+    RE(trigger_panda(mock_panda, eh2_diffractometer, phi_start=7, phi_end=6))
+    mock_setup_diffractometer.assert_called_once_with(0, 0, 0, eh2_diffractometer)
     mock_setup_panda_for_rotation.assert_called_once_with(0, 0, 0, mock_panda)
     mock_arm_panda.assert_called_once_with(mock_panda)
-    set_mock_value(serial_diffractometer.phi.user_readback, phi_end)
-    assert await serial_diffractometer.phi.user_readback.get_value() == 6
+    set_mock_value(eh2_diffractometer.phi.user_readback, phi_end)
+    assert await eh2_diffractometer.phi.user_readback.get_value() == 6
     # test bps sleep
-    set_mock_value(serial_diffractometer.phi.user_readback, phi_start)
-    assert await serial_diffractometer.phi.user_readback.get_value() == 7
+    set_mock_value(eh2_diffractometer.phi.user_readback, phi_start)
+    assert await eh2_diffractometer.phi.user_readback.get_value() == 7
     mock_disarm_panda.assert_called_once_with(mock_panda)
