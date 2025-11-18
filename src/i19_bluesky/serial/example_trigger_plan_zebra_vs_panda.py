@@ -28,15 +28,17 @@ def setup_diffractometer(
 
 def setup_zebra(
     zebra: Zebra,
-    phi_start: float,
-    phi_end: float,
-    gate_width: float,
-    pulse_width: float,
+    phi_start,
+    phi_end,
+    gate_width,
+    pulse_width,
+    phi_steps,
+    exposure_time,
     diffractometer: FourCircleDiffractometer,
     direction: RotationDirection,
 ):
     gate_start = phi_start - 1  # gate_start is phi_ramp_start
-    yield from setup_diffractometer(0, 0, 0, diffractometer)
+    yield from setup_diffractometer(phi_start, phi_steps, exposure_time, diffractometer)
     yield from setup_zebra_for_collection(
         zebra,
         direction,
@@ -52,10 +54,24 @@ def setup_zebra(
 
 
 def trigger_panda(
-    panda: HDFPanda, diffractometer: FourCircleDiffractometer, phi_start, phi_end
+    panda: HDFPanda,
+    diffractometer: FourCircleDiffractometer,
+    phi_ramp_start,
+    phi_start,
+    phi_end,
+    phi_steps,
+    exposure_time,
+    time_between_images,
 ):
-    yield from setup_diffractometer(0, 0, 0, diffractometer)
-    yield from setup_panda_for_rotation(panda, 0, 0, 0, 0, 0)
+    yield from setup_diffractometer(phi_start, phi_steps, exposure_time, diffractometer)
+    yield from setup_panda_for_rotation(
+        panda,
+        phi_ramp_start,
+        phi_start,
+        phi_end,
+        phi_steps,
+        time_between_images,
+    )
     yield from arm_panda(panda)
     yield from bps.abs_set(diffractometer.phi, phi_end)
     yield from bps.sleep(2.0)
