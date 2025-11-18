@@ -38,7 +38,7 @@ async def test_setup_diffractometer(
 async def test_setup_zebra(
     mock_setup_diffractometer: MagicMock,
     mock_setup_zebra_for_collection: MagicMock,
-    mock_setup_out_triggers: MagicMock,
+    mock_setup_out_triggers: MagicMock,  # maybe no longer needed?
     mock_setup_zebra_for_triggering: MagicMock,
     eh2_zebra: Zebra,
     eh2_diffractometer: FourCircleDiffractometer,

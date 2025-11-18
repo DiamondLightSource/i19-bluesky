@@ -7,11 +7,7 @@ from ophyd_async.fastcs.panda import HDFPanda
 from i19_bluesky.eh2.zebra_arming_plan import arm_zebra, disarm_zebra
 from i19_bluesky.serial.panda_setup_plans import setup_panda_for_rotation
 from i19_bluesky.serial.panda_stubs import arm_panda, disarm_panda
-from i19_bluesky.serial.zebra_collection_setup_plan import (
-    setup_out_triggers,
-    setup_zebra_for_collection,
-    setup_zebra_for_triggering,
-)
+from i19_bluesky.serial.zebra_collection_setup_plan import setup_zebra_for_collection
 
 
 def setup_diffractometer(
@@ -24,6 +20,33 @@ def setup_diffractometer(
     yield from bps.abs_set(diffractometer.phi, phi_start)
     velocity = phi_steps / exposure_time
     yield from bps.abs_set(diffractometer.phi.velocity, velocity)
+
+
+def trigger_zebra(
+    zebra: Zebra,
+    phi_start: float,
+    phi_end: float,
+    diffractometer: FourCircleDiffractometer,
+    gate_start: float,
+    gate_width: float,
+    pulse_width: float,
+) -> MsgGenerator:
+    """Trigger zebra for collection in the forward (+ve) and backward (-ve) direction"""
+    yield from setup_diffractometer()
+    yield from arm_zebra(zebra)
+    yield from setup_zebra_for_collection(
+        zebra, RotationDirection.POSITIVE, gate_start, gate_width, pulse_width
+    )
+    yield from bps.abs_set(diffractometer.phi, phi_end)
+    yield from disarm_zebra(zebra)
+
+    yield from setup_diffractometer()
+    yield from arm_zebra(zebra)
+    yield from setup_zebra_for_collection(
+        zebra, RotationDirection.NEGATIVE, gate_start, gate_width, pulse_width
+    )
+    yield from bps.abs_set(diffractometer.phi, phi_start)
+    yield from disarm_zebra(zebra)
 
 
 def setup_zebra(
@@ -46,8 +69,6 @@ def setup_zebra(
         gate_width,
         pulse_width,
     )
-    yield from setup_out_triggers(zebra)
-    yield from setup_zebra_for_triggering(zebra)
     arm_zebra(zebra)
     yield from bps.abs_set(diffractometer.phi, phi_end)
     disarm_zebra(zebra)
