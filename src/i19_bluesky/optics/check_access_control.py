@@ -1,5 +1,4 @@
 from collections.abc import Callable
-from enum import Enum
 from functools import wraps
 from inspect import Parameter, signature
 from typing import Concatenate, ParamSpec, TypeVar
@@ -10,17 +9,13 @@ from dodal.devices.i19.access_controlled.hutch_access import HutchAccessControl
 
 from i19_bluesky.exceptions import HutchInvalidError
 from i19_bluesky.log import LOGGER
+from i19_bluesky.parameters.components import HutchName
 
 P = ParamSpec("P")
 R = TypeVar("R")
 
 
 HUTCH_INVALID_FLAG = "INVALID"
-
-
-class HutchName(str, Enum):
-    EH1 = "EH1"
-    EH2 = "EH2"
 
 
 def check_access(
