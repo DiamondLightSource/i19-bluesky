@@ -62,17 +62,19 @@ async def test_trigger_zebra(
             pulse_width=2,
         )
     )
+
+    mock_setup_diffractometer = call(4, 25, 10, eh2_diffractometer)
+
     parent_mock.assert_has_calls(
-        [
-            call.mock_setup_diffractometer(4, 25, 10, eh2_diffractometer),
-            call.mock_arm_zebra(eh2_zebra),
-            mock_setup_zebra_for_collection,
-            mock_disarm_zebra,
-            mock_setup_diffractometer,
-            mock_arm_zebra,
-            mock_setup_zebra_for_collection,
-            mock_disarm_zebra,
-        ]
+        mock_setup_diffractometer,
+        mock_arm_zebra(eh2_zebra),
+        mock_setup_zebra_for_collection,
+        mock_disarm_zebra,
+        mock_setup_diffractometer,
+        mock_arm_zebra,
+        mock_setup_zebra_for_collection,
+        mock_disarm_zebra,
+        any_order=False,
     )
 
     mock_setup_diffractometer.assert_called_once_with(5, 10, 20, eh2_diffractometer)
