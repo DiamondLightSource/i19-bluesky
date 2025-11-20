@@ -1,4 +1,4 @@
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, call, patch
 
 import pytest
 from bluesky.run_engine import RunEngine
@@ -9,8 +9,8 @@ from ophyd_async.testing import set_mock_value
 
 from i19_bluesky.serial.example_trigger_plan_zebra_vs_panda import (
     setup_diffractometer,
-    setup_zebra,
     trigger_panda,
+    trigger_zebra,
 )
 
 
@@ -24,10 +24,8 @@ async def test_setup_diffractometer(
     assert await eh2_diffractometer.phi.velocity.get_value() == 5
 
 
-@patch(
-    "i19_bluesky.serial.example_trigger_plan_zebra_vs_panda.setup_zebra_for_triggering"
-)
-@patch("i19_bluesky.serial.example_trigger_plan_zebra_vs_panda.setup_out_triggers")
+@patch("i19_bluesky.serial.example_trigger_plan_zebra_vs_panda.disarm_zebra")
+@patch("i19_bluesky.serial.example_trigger_plan_zebra_vs_panda.arm_zebra")
 @patch(
     "i19_bluesky.serial.example_trigger_plan_zebra_vs_panda.setup_zebra_for_collection"
 )
@@ -35,21 +33,48 @@ async def test_setup_diffractometer(
 @pytest.mark.parametrize(
     "rotation_direction", [RotationDirection.POSITIVE, RotationDirection.NEGATIVE]
 )
-async def test_setup_zebra(
+async def test_trigger_zebra(
     mock_setup_diffractometer: MagicMock,
     mock_setup_zebra_for_collection: MagicMock,
-    mock_setup_out_triggers: MagicMock,  # maybe no longer needed?
-    mock_setup_zebra_for_triggering: MagicMock,
+    mock_arm_zebra: MagicMock,
+    mock_disarm_zebra: MagicMock,
     eh2_zebra: Zebra,
     eh2_diffractometer: FourCircleDiffractometer,
     rotation_direction: RotationDirection,
     RE: RunEngine,
 ):
+    parent_mock = MagicMock()
+    parent_mock.attach_mock(mock_setup_diffractometer, "mock_setup_diffractometer")
+    parent_mock.attach_mock(
+        mock_setup_zebra_for_collection, "mock_setup_zebra_for_collection"
+    )
+    parent_mock.attach_mock(mock_arm_zebra, "mock_arm_zebra")
+    parent_mock.attach_mock(mock_disarm_zebra, "mock_disarm_zebra")
     RE(
-        setup_zebra(
-            eh2_zebra, 5.0, 10, 3, 4, 10, 20, eh2_diffractometer, rotation_direction
+        trigger_zebra(
+            zebra=eh2_zebra,
+            phi_start=5,
+            phi_end=10,
+            phi_steps=25,
+            exposure_time=10,
+            diffractometer=eh2_diffractometer,
+            gate_width=2,
+            pulse_width=2,
         )
     )
+    parent_mock.assert_has_calls(
+        [
+            call.mock_setup_diffractometer(4, 25, 10, eh2_diffractometer),
+            call.mock_arm_zebra(eh2_zebra),
+            mock_setup_zebra_for_collection,
+            mock_disarm_zebra,
+            mock_setup_diffractometer,
+            mock_arm_zebra,
+            mock_setup_zebra_for_collection,
+            mock_disarm_zebra,
+        ]
+    )
+
     mock_setup_diffractometer.assert_called_once_with(5, 10, 20, eh2_diffractometer)
     mock_setup_zebra_for_collection.assert_called_once_with(
         eh2_zebra,
@@ -58,8 +83,6 @@ async def test_setup_zebra(
         3,
         4,
     )
-    mock_setup_out_triggers.assert_called_once_with(eh2_zebra)
-    mock_setup_zebra_for_triggering.assert_called_once_with(eh2_zebra)
     set_mock_value(eh2_diffractometer.phi.user_readback, 7)
     assert await eh2_diffractometer.phi.user_readback.get_value() == 7
 
