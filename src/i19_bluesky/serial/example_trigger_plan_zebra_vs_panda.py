@@ -11,13 +11,13 @@ from i19_bluesky.serial.zebra_collection_setup_plan import setup_zebra_for_colle
 
 
 def setup_diffractometer(
-    phi_start: float,
+    ramp_value: float,
     phi_steps: int,
     exposure_time: int,
     diffractometer: FourCircleDiffractometer,
 ) -> MsgGenerator:
     """Setup phi on the diffractometer"""
-    yield from bps.abs_set(diffractometer.phi, phi_start)
+    yield from bps.abs_set(diffractometer.phi, ramp_value)
     velocity = phi_steps / exposure_time
     yield from bps.abs_set(diffractometer.phi.velocity, velocity)
 
@@ -26,13 +26,18 @@ def trigger_zebra(
     zebra: Zebra,
     phi_start: float,
     phi_end: float,
+    phi_steps: int,
+    exposure_time: int,
     diffractometer: FourCircleDiffractometer,
-    gate_start: float,
     gate_width: float,
     pulse_width: float,
 ) -> MsgGenerator:
     """Trigger zebra for collection in the forward (+ve) and backward (-ve) direction"""
-    yield from setup_diffractometer()
+    gate_start = phi_start - 1  # phi_ramp_start
+    gate_end = phi_end + 1  # phi_ramp_end
+    yield from setup_diffractometer(
+        gate_start, phi_steps, exposure_time, diffractometer
+    )
     yield from arm_zebra(zebra)
     yield from setup_zebra_for_collection(
         zebra, RotationDirection.POSITIVE, gate_start, gate_width, pulse_width
@@ -40,38 +45,13 @@ def trigger_zebra(
     yield from bps.abs_set(diffractometer.phi, phi_end)
     yield from disarm_zebra(zebra)
 
-    yield from setup_diffractometer()
+    yield from setup_diffractometer(gate_end, phi_steps, exposure_time, diffractometer)
     yield from arm_zebra(zebra)
     yield from setup_zebra_for_collection(
         zebra, RotationDirection.NEGATIVE, gate_start, gate_width, pulse_width
     )
     yield from bps.abs_set(diffractometer.phi, phi_start)
     yield from disarm_zebra(zebra)
-
-
-def setup_zebra(
-    zebra: Zebra,
-    phi_start,
-    phi_end,
-    gate_width,
-    pulse_width,
-    phi_steps,
-    exposure_time,
-    diffractometer: FourCircleDiffractometer,
-    direction: RotationDirection,
-):
-    gate_start = phi_start - 1  # gate_start is phi_ramp_start
-    yield from setup_diffractometer(phi_start, phi_steps, exposure_time, diffractometer)
-    yield from setup_zebra_for_collection(
-        zebra,
-        direction,
-        gate_start,
-        gate_width,
-        pulse_width,
-    )
-    arm_zebra(zebra)
-    yield from bps.abs_set(diffractometer.phi, phi_end)
-    disarm_zebra(zebra)
 
 
 def trigger_panda(
