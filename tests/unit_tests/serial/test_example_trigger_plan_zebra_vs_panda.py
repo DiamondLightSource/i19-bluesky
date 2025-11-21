@@ -18,7 +18,7 @@ async def test_setup_diffractometer(
     eh2_diffractometer: FourCircleDiffractometer,
     RE: RunEngine,
 ):
-    RE(setup_diffractometer(5.0, 10, 2, eh2_diffractometer))
+    RE(setup_diffractometer(eh2_diffractometer, 5.0, 10, 2))
     set_mock_value(eh2_diffractometer.phi.user_readback, 5.0)
     assert await eh2_diffractometer.phi.user_readback.get_value() == 5
     assert await eh2_diffractometer.phi.velocity.get_value() == 5

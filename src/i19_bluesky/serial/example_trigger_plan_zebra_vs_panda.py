@@ -14,13 +14,13 @@ from i19_bluesky.serial.zebra_collection_setup_plan import setup_zebra_for_colle
 
 
 def setup_diffractometer(
-    ramp_value: float,
+    diffractometer: FourCircleDiffractometer,
+    gate_start: float,
     phi_steps: int,
     exposure_time: float,
-    diffractometer: FourCircleDiffractometer,
 ) -> MsgGenerator:
     """Setup phi on the diffractometer"""
-    yield from bps.abs_set(diffractometer.phi, ramp_value)
+    yield from bps.abs_set(diffractometer.phi, gate_start)
     velocity = phi_steps / exposure_time
     yield from bps.abs_set(diffractometer.phi.velocity, velocity)
 
@@ -39,7 +39,10 @@ def trigger_zebra(
     gate_start = phi_start - 0.5  # phi_ramp_start
     gate_end = phi_end + 0.5  # phi_ramp_end
     yield from setup_diffractometer(
-        gate_start, phi_steps, exposure_time, diffractometer
+        diffractometer,
+        gate_start,
+        phi_steps,
+        exposure_time,
     )
     yield from arm_zebra(zebra)
     yield from setup_zebra_for_collection(
@@ -48,7 +51,12 @@ def trigger_zebra(
     yield from bps.abs_set(diffractometer.phi, phi_end)
     yield from disarm_zebra(zebra)
 
-    yield from setup_diffractometer(gate_end, phi_steps, exposure_time, diffractometer)
+    yield from setup_diffractometer(
+        diffractometer,
+        gate_end,
+        phi_steps,
+        exposure_time,
+    )
     yield from arm_zebra(zebra)
     yield from setup_zebra_for_collection(
         zebra, RotationDirection.NEGATIVE, gate_start, gate_width, pulse_width
@@ -60,16 +68,19 @@ def trigger_zebra(
 def trigger_panda(
     panda: HDFPanda,
     diffractometer: FourCircleDiffractometer,
-    phi_ramp_start,
     phi_start,
     phi_end,
     phi_steps,
     exposure_time,
 ):
-    yield from setup_diffractometer(phi_start, phi_steps, exposure_time, diffractometer)
+    yield from setup_diffractometer(
+        diffractometer,
+        phi_start,
+        phi_steps,
+        exposure_time,
+    )
     yield from setup_panda_for_rotation(
         panda,
-        phi_ramp_start,
         phi_start,
         phi_end,
         phi_steps,
@@ -106,7 +117,7 @@ def run_panda_test(
     panda: HDFPanda = inject("panda"),
 ) -> MsgGenerator:
     yield from bpp.contingency_wrapper(
-        trigger_panda(panda, diffractometer, 19.5, 20, 23, 30, 0.1),
+        trigger_panda(panda, diffractometer, 20, 23, 30, 0.1),
         except_plan=lambda: (yield from abort_panda(diffractometer, panda)),
         final_plan=lambda: (yield from move_diffractometer_back(diffractometer)),
         auto_raise=False,
@@ -118,7 +129,7 @@ def run_zebra_test(
     zebra: Zebra = inject("zebra"),
 ) -> MsgGenerator:
     yield from bpp.contingency_wrapper(
-        trigger_zebra(zebra, 20, 23, 30, 0.1, diffractometer, 3.1, 1),
+        trigger_zebra(zebra, diffractometer, 20, 23, 30, 0.1, 3.1, 1),
         except_plan=lambda: (yield from abort_zebra(diffractometer, zebra)),
         final_plan=lambda: (yield from move_diffractometer_back(diffractometer)),
         auto_raise=False,
