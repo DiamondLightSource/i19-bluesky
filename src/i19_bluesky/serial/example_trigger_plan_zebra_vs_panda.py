@@ -27,11 +27,11 @@ def setup_diffractometer(
 
 def trigger_zebra(
     zebra: Zebra,
+    diffractometer: FourCircleDiffractometer,
     phi_start: float,
     phi_end: float,
     phi_steps: int,
     exposure_time: float,
-    diffractometer: FourCircleDiffractometer,
     gate_width: float,
     pulse_width: float,
 ) -> MsgGenerator:

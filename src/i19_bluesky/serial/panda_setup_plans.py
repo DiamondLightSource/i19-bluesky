@@ -17,7 +17,6 @@ GENERAL_TIMEOUT = 60
 
 def setup_panda_for_rotation(
     panda: HDFPanda,
-    phi_ramp_start,
     phi_start,
     phi_end,
     phi_steps,
@@ -32,11 +31,11 @@ def setup_panda_for_rotation(
         DeviceSettingsConstants.PANDA_PC_FILENAME,
         panda,
     )
-
+    gate_start = phi_start - 0.5
     # Home the input encoder
     yield from bps.abs_set(
         panda.inenc[1].setp,  # type: ignore
-        phi_ramp_start * DEG_TO_ENC_COUNTS,
+        gate_start * DEG_TO_ENC_COUNTS,
         group="panda-setup",
     )
     yield from setup_outenc_vals(panda)
