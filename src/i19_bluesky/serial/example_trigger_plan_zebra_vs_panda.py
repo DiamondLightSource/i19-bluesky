@@ -33,8 +33,8 @@ def trigger_zebra(
     pulse_width: float,
 ) -> MsgGenerator:
     """Trigger zebra for collection in the forward (+ve) and backward (-ve) direction"""
-    gate_start = phi_start - 1  # phi_ramp_start
-    gate_end = phi_end + 1  # phi_ramp_end
+    gate_start = phi_start - 0.5  # phi_ramp_start
+    gate_end = phi_end + 0.5  # phi_ramp_end
     yield from setup_diffractometer(
         gate_start, phi_steps, exposure_time, diffractometer
     )
