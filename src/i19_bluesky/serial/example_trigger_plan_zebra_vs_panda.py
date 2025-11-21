@@ -65,7 +65,6 @@ def trigger_panda(
     phi_end,
     phi_steps,
     exposure_time,
-    time_between_images,
 ):
     yield from setup_diffractometer(phi_start, phi_steps, exposure_time, diffractometer)
     yield from setup_panda_for_rotation(
@@ -74,7 +73,7 @@ def trigger_panda(
         phi_start,
         phi_end,
         phi_steps,
-        time_between_images,
+        exposure_time,
     )
     yield from arm_panda(panda)
     yield from bps.abs_set(diffractometer.phi, phi_end)

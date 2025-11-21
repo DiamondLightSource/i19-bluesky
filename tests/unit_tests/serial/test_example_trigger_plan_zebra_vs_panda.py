@@ -62,7 +62,6 @@ async def test_trigger_zebra(
             pulse_width=2,
         )
     )
-
     mock_setup_diffractometer = call(4, 25, 10, eh2_diffractometer)
 
     parent_mock.assert_has_calls(
@@ -108,7 +107,7 @@ async def test_trigger_panda(
 ):
     phi_start = 5
     phi_end = 10
-    RE(trigger_panda(mock_panda, eh2_diffractometer, 4, phi_start, phi_end, 2, 30, 10))
+    RE(trigger_panda(mock_panda, eh2_diffractometer, 4, phi_start, phi_end, 2, 10))
     mock_setup_diffractometer.assert_called_once_with(5, 2, 30, eh2_diffractometer)
     mock_setup_panda_for_rotation.assert_called_once_with(
         mock_panda, 4, phi_start, phi_end, 2, 10

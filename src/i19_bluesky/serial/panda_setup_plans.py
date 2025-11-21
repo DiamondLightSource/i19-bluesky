@@ -21,7 +21,7 @@ def setup_panda_for_rotation(
     phi_start,
     phi_end,
     phi_steps,
-    time_between_images,
+    exposure_time,
 ) -> MsgGenerator:
     """Configures the PandA device for phi forward and backward rotation"""
 
@@ -41,9 +41,7 @@ def setup_panda_for_rotation(
     )
     yield from setup_outenc_vals(panda)
 
-    seq_table = generate_panda_seq_table(
-        phi_start, phi_end, phi_steps, time_between_images
-    )
+    seq_table = generate_panda_seq_table(phi_start, phi_end, phi_steps, exposure_time)
 
     yield from bps.abs_set(panda.seq[1].table, seq_table, group="panda-setup")
 
