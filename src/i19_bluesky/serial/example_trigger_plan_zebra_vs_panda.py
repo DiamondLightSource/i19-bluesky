@@ -36,19 +36,21 @@ def trigger_zebra(
     pulse_width: float,
 ) -> MsgGenerator:
     """Trigger zebra for collection in the forward (+ve) and backward (-ve) direction"""
-    gate_start = phi_start - 0.5  # phi_ramp_start
-    gate_end = phi_end + 0.5  # phi_ramp_end
+    gate_start = phi_start - 0.5
+    gate_end = phi_end + 0.5
     yield from setup_diffractometer(
         diffractometer,
         gate_start,
         phi_steps,
         exposure_time,
     )
+    LOGGER.info("Arm zebra and setup for +ve direction collection")
     yield from arm_zebra(zebra)
     yield from setup_zebra_for_collection(
         zebra, RotationDirection.POSITIVE, gate_start, gate_width, pulse_width
     )
     yield from bps.abs_set(diffractometer.phi, phi_end)
+    LOGGER.info("Disarm zebra")
     yield from disarm_zebra(zebra)
 
     yield from setup_diffractometer(
@@ -57,11 +59,13 @@ def trigger_zebra(
         phi_steps,
         exposure_time,
     )
+    LOGGER.info("Arm zebra and setup for -ve direction collection")
     yield from arm_zebra(zebra)
     yield from setup_zebra_for_collection(
         zebra, RotationDirection.NEGATIVE, gate_start, gate_width, pulse_width
     )
     yield from bps.abs_set(diffractometer.phi, phi_start)
+    LOGGER.info("Disarm zebra")
     yield from disarm_zebra(zebra)
 
 
@@ -72,7 +76,8 @@ def trigger_panda(
     phi_end,
     phi_steps,
     exposure_time,
-):
+) -> MsgGenerator:
+    """Trigger panda for collection"""
     yield from setup_diffractometer(
         diffractometer,
         phi_start,
@@ -86,15 +91,17 @@ def trigger_panda(
         phi_steps,
         exposure_time,
     )
+    LOGGER.info("Arm panda and move phi")
     yield from arm_panda(panda)
     yield from bps.abs_set(diffractometer.phi, phi_end)
     yield from bps.sleep(2.0)
     yield from bps.abs_set(diffractometer.phi, phi_start)
+    LOGGER.info("Disarm panda")
     yield from disarm_panda(panda)
 
 
 def abort_zebra(diffractometer: FourCircleDiffractometer, zebra: Zebra) -> MsgGenerator:
-    LOGGER.warning("I AM ABORTING")
+    LOGGER.warning("ABORT")
     yield from bps.abs_set(diffractometer.phi.motor_stop, 1, wait=True)
     yield from disarm_zebra(zebra)
 
@@ -102,7 +109,7 @@ def abort_zebra(diffractometer: FourCircleDiffractometer, zebra: Zebra) -> MsgGe
 def abort_panda(
     diffractometer: FourCircleDiffractometer, panda: HDFPanda
 ) -> MsgGenerator:
-    LOGGER.warning("I AM ABORTING")
+    LOGGER.warning("ABORT")
     yield from bps.abs_set(diffractometer.phi.motor_stop, 1, wait=True)
     yield from disarm_panda(panda)
 
