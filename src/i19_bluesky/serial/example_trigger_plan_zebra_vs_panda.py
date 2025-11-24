@@ -1,3 +1,7 @@
+"""
+Example trigger plan ZEBRA vs PandA.
+"""
+
 import bluesky.plan_stubs as bps
 import bluesky.preprocessors as bpp
 from bluesky.utils import MsgGenerator
@@ -15,12 +19,18 @@ from i19_bluesky.serial.zebra_collection_setup_plan import setup_zebra_for_colle
 
 def setup_diffractometer(
     diffractometer: FourCircleDiffractometer,
-    gate_start: float,
+    phi_start: float,
     phi_steps: int,
     exposure_time: float,
 ) -> MsgGenerator:
-    """Setup phi on the diffractometer"""
-    yield from bps.abs_set(diffractometer.phi, gate_start)
+    """Setup phi start posistion and velocity on the diffractometer.
+
+    Args:
+        diffractometer (FourCircleDiffractometer): The diffractometer ophyd device.
+        phi_start (float): Starting phi position.
+        phi_steps (int): Number of images to take.
+        exposure_time(float): Time between images, in seconds."""
+    yield from bps.abs_set(diffractometer.phi, phi_start)
     velocity = phi_steps / exposure_time
     yield from bps.abs_set(diffractometer.phi.velocity, velocity)
 
@@ -35,7 +45,21 @@ def trigger_zebra(
     gate_width: float,
     pulse_width: float,
 ) -> MsgGenerator:
-    """Trigger zebra for collection in the forward (+ve) and backward (-ve) direction"""
+    """Trigger zebra for collection in the forward and backward direction.
+    Gate start is calculated as phi start - 0.5.
+    Gate end is calculated as phi end + 0.5.
+
+    Args:
+        zebra (Zebra): The zebra ophyd device.
+        diffractometer (FourCircleDiffractometer): The diffractometer ophyd device.
+        phi_start (float): Starting phi position.
+        phi_end (float): Ending phi position.
+        phi_steps (int): Number of images to take.
+        exposure_time (float): Time between images, in seconds.
+        gate_width (float): Gate width value.
+        pulse_width (float): Value comes from change in degrees of scan/velocity.
+
+    """
     gate_start = phi_start - 0.5
     gate_end = phi_end + 0.5
     yield from setup_diffractometer(
@@ -44,12 +68,12 @@ def trigger_zebra(
         phi_steps,
         exposure_time,
     )
-    LOGGER.info("Arm zebra and setup for +ve direction collection")
+    LOGGER.info("Arm zebra and setup for positive direction collection")
     yield from arm_zebra(zebra)
     yield from setup_zebra_for_collection(
         zebra, RotationDirection.POSITIVE, gate_start, gate_width, pulse_width
     )
-    yield from bps.abs_set(diffractometer.phi, phi_end)
+    yield from bps.abs_set(diffractometer.phi, phi_end, wait=True)
     LOGGER.info("Disarm zebra")
     yield from disarm_zebra(zebra)
 
@@ -59,12 +83,12 @@ def trigger_zebra(
         phi_steps,
         exposure_time,
     )
-    LOGGER.info("Arm zebra and setup for -ve direction collection")
+    LOGGER.info("Arm zebra and setup for negative direction collection")
     yield from arm_zebra(zebra)
     yield from setup_zebra_for_collection(
         zebra, RotationDirection.NEGATIVE, gate_start, gate_width, pulse_width
     )
-    yield from bps.abs_set(diffractometer.phi, phi_start)
+    yield from bps.abs_set(diffractometer.phi, phi_start, wait=True)
     LOGGER.info("Disarm zebra")
     yield from disarm_zebra(zebra)
 
@@ -72,12 +96,21 @@ def trigger_zebra(
 def trigger_panda(
     panda: HDFPanda,
     diffractometer: FourCircleDiffractometer,
-    phi_start,
-    phi_end,
-    phi_steps,
-    exposure_time,
+    phi_start: float,
+    phi_end: float,
+    phi_steps: int,
+    exposure_time: float,
 ) -> MsgGenerator:
-    """Trigger panda for collection"""
+    """Trigger panda for collection in both directions.
+
+    Args:
+        panda (HDFPanda): The fastcs PandA ophyd device.
+        diffractometer (FourCircleDiffractometer): The diffractometer ophyd device.
+        phi_start (float): Starting phi position.
+        phi_end (float): Ending phi position.
+        phi_steps (int): Number of images to take.
+        exposure_time (float): Time between images, in seconds.
+    """
     yield from setup_diffractometer(
         diffractometer,
         phi_start,
@@ -93,9 +126,9 @@ def trigger_panda(
     )
     LOGGER.info("Arm panda and move phi")
     yield from arm_panda(panda)
-    yield from bps.abs_set(diffractometer.phi, phi_end)
+    yield from bps.abs_set(diffractometer.phi, phi_end, wait=True)
     yield from bps.sleep(2.0)
-    yield from bps.abs_set(diffractometer.phi, phi_start)
+    yield from bps.abs_set(diffractometer.phi, phi_start, wait=True)
     LOGGER.info("Disarm panda")
     yield from disarm_panda(panda)
 
@@ -115,7 +148,7 @@ def abort_panda(
 
 
 def move_diffractometer_back(diffractometer: FourCircleDiffractometer) -> MsgGenerator:
-    LOGGER.info("Move diffractometer back to where it was")
+    LOGGER.info("Move diffractometer back to start position")
     yield from bps.abs_set(diffractometer.phi, 19, wait=True)
 
 

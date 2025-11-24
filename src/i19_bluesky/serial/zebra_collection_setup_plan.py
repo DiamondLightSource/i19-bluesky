@@ -1,5 +1,5 @@
 """
-i19-2 Zebra setup plan for serial collection.
+i19 Zebra setup plan for serial collection.
 """
 
 import bluesky.plan_stubs as bps
@@ -20,7 +20,7 @@ def setup_zebra_for_collection(
     direction: RotationDirection,
     gate_start: float,
     gate_width: float,
-    pulse_width: float,  # value from: change in degrees of scan/velocity
+    pulse_width: float,
     group: str = "setup_zebra_for_collection",
     wait: bool = True,
 ):
@@ -33,6 +33,13 @@ def setup_zebra_for_collection(
     Pulse step is calculated as pulse width + 0.1.
     The plan can only go in the positive or negative direction at once since the zebra \
     box cannot go from high to low without disarming and resetting it.
+
+    Args:
+        zebra (Zebra): The zebra ophyd device.
+        direction (RotationDirection): Positive or Negative.
+        gate_start (float): Gate start value.
+        gate_width (float): Gate width value.
+        pulse_width (float): Value comes from change in degrees of scan/velocity.
     """
     LOGGER.debug("Setup ZEBRA for collection.")
     pulse_step = pulse_width + 0.1

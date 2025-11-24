@@ -1,3 +1,7 @@
+"""
+i19 PandA setup plan for serial collection.
+"""
+
 import bluesky.plan_stubs as bps
 from bluesky.utils import MsgGenerator
 from dodal.plans.load_panda_yaml import load_panda_from_yaml
@@ -17,10 +21,10 @@ GENERAL_TIMEOUT = 60
 
 def setup_panda_for_rotation(
     panda: HDFPanda,
-    phi_start,
-    phi_end,
-    phi_steps,
-    exposure_time,
+    phi_start: float,
+    phi_end: float,
+    phi_steps: int,
+    exposure_time: float,
 ) -> MsgGenerator:
     """Configures the PandA device for phi forward and backward rotation"""
 
