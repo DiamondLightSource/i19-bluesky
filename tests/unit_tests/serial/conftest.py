@@ -1,5 +1,4 @@
 import os
-from collections.abc import AsyncGenerator
 from pathlib import Path
 from typing import Any
 
@@ -9,11 +8,9 @@ from dodal.beamlines import i19_2
 from dodal.common.beamlines.beamline_utils import get_path_provider, set_path_provider
 from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitPathProvider
 from dodal.devices.i19.diffractometer import FourCircleDiffractometer
-from dodal.testing import patch_all_motors
-from ophyd_async.core import Device, DeviceVector, init_devices
+from ophyd_async.core import Device, DeviceVector, init_devices, set_mock_value
 from ophyd_async.epics.core import epics_signal_rw
 from ophyd_async.fastcs.panda import HDFPanda
-from ophyd_async.testing import set_mock_value
 
 set_path_provider(
     StaticVisitPathProvider(
@@ -82,8 +79,7 @@ async def mock_panda() -> HDFPanda:
 
 
 @pytest.fixture
-async def eh2_diffractometer(RE: RunEngine) -> AsyncGenerator[FourCircleDiffractometer]:
+async def eh2_diffractometer(RE: RunEngine) -> FourCircleDiffractometer:
     diffractometer = i19_2.diffractometer(connect_immediately=True, mock=True)
     set_mock_value(diffractometer.phi.velocity, 1)
-    with patch_all_motors(diffractometer):
-        yield diffractometer
+    return diffractometer

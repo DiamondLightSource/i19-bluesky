@@ -3,8 +3,8 @@ from unittest.mock import MagicMock, call, patch
 from bluesky.run_engine import RunEngine
 from dodal.devices.i19.diffractometer import FourCircleDiffractometer
 from dodal.devices.zebra.zebra import RotationDirection, Zebra
+from ophyd_async.core import get_mock_put
 from ophyd_async.fastcs.panda import HDFPanda
-from ophyd_async.testing import get_mock_put
 
 from i19_bluesky.serial.example_trigger_plan_zebra_vs_panda import (
     abort_panda,
