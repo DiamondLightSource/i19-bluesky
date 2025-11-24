@@ -37,9 +37,11 @@ def setup_zebra_for_collection(
     Args:
         zebra (Zebra): The zebra ophyd device.
         direction (RotationDirection): Positive or Negative.
-        gate_start (float): Gate start value.
-        gate_width (float): Gate width value.
-        pulse_width (float): Value comes from change in degrees of scan/velocity.
+        gate_start (float): Value from calculation: starting phi value - 0.02*velocity,\
+        in degrees.
+        gate_width (float): Total distance from gate_start to gate_end, in degrees.
+        pulse_width (float): Value from calculation: change in degrees of scan/velocity\
+        ,in seconds.
     """
     LOGGER.debug("Setup ZEBRA for collection.")
     pulse_step = pulse_width + 0.1

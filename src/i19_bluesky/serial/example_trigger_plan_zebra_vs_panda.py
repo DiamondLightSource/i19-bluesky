@@ -52,12 +52,13 @@ def trigger_zebra(
     Args:
         zebra (Zebra): The zebra ophyd device.
         diffractometer (FourCircleDiffractometer): The diffractometer ophyd device.
-        phi_start (float): Starting phi position.
-        phi_end (float): Ending phi position.
+        phi_start (float): Starting phi position, in degrees.
+        phi_end (float): Ending phi position, in degrees.
         phi_steps (int): Number of images to take.
         exposure_time (float): Time between images, in seconds.
-        gate_width (float): Gate width value.
-        pulse_width (float): Value comes from change in degrees of scan/velocity.
+        gate_width (float): Total distance from gate_start to gate_end, in degrees.
+        pulse_width (float): Value comes from change in degrees of scan/velocity,\
+        in seconds.
 
     """
     gate_start = phi_start - 0.5
