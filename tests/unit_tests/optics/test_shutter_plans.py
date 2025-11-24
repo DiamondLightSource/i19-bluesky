@@ -10,7 +10,7 @@ from dodal.devices.hutch_shutter import (
 )
 from dodal.devices.i19.access_controlled.hutch_access import HutchAccessControl
 from dodal.utils import AnyDeviceFactory
-from ophyd_async.testing import callback_on_mock_put, set_mock_value
+from ophyd_async.core import callback_on_mock_put, set_mock_value
 
 from i19_bluesky.exceptions import HutchInvalidError
 from i19_bluesky.optics.check_access_control import HutchName
