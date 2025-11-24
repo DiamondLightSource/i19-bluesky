@@ -106,8 +106,8 @@ def trigger_panda(
     Args:
         panda (HDFPanda): The fastcs PandA ophyd device.
         diffractometer (FourCircleDiffractometer): The diffractometer ophyd device.
-        phi_start (float): Starting phi position.
-        phi_end (float): Ending phi position.
+        phi_start (float): Starting phi position, in degrees.
+        phi_end (float): Ending phi position, in degrees.
         phi_steps (int): Number of images to take.
         exposure_time (float): Time between images, in seconds.
     """

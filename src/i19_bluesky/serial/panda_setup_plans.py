@@ -26,7 +26,15 @@ def setup_panda_for_rotation(
     phi_steps: int,
     exposure_time: float,
 ) -> MsgGenerator:
-    """Configures the PandA device for phi forward and backward rotation"""
+    """Configures the PandA device for phi forward and backward rotation
+
+    Args:
+        panda (HDFPanda): The fastcs PandA ophyd device.
+        phi_start (float): Starting phi position, in degrees.
+        phi_end (float): Ending phi position, in degrees.
+        phi_steps (int): Number of images to take.
+        exposure_time (float): Time between images, in seconds.
+    """
 
     yield from bps.stage(panda, group="panda-setup")
 
