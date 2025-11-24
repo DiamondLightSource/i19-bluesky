@@ -1,7 +1,7 @@
 import pytest
 from bluesky.run_engine import RunEngine
+from ophyd_async.core import set_mock_value
 from ophyd_async.fastcs.panda import HDFPanda, PandaBitMux, SeqTrigger
-from ophyd_async.testing import set_mock_value
 
 from i19_bluesky.serial.panda_stubs import (
     arm_panda,

@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 from bluesky.run_engine import RunEngine
 from dodal.devices.i19.pin_col_stages import PinColRequest, PinholeCollimatorControl
-from ophyd_async.testing import set_mock_value
+from ophyd_async.core import set_mock_value
 
 from i19_bluesky.eh2.pincol_control_plans import (
     move_pin_col_out_of_beam,
