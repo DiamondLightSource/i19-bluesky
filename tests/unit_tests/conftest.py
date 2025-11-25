@@ -6,7 +6,7 @@ from blueapi.core import BlueskyContext
 from bluesky.run_engine import RunEngine
 from dodal.beamlines import i19_2
 from dodal.devices.zebra.zebra import Zebra
-from ophyd_async.testing import get_mock_put, set_mock_value
+from ophyd_async.core import get_mock_put, set_mock_value
 
 
 @pytest.fixture
