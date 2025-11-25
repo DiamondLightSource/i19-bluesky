@@ -53,7 +53,7 @@ class GridParameters(BaseModel):
         return (self.z_steps - 1) * self.z_step_size
 
     @property
-    def tot_num_windows(self) -> int:
+    def total_num_wells(self) -> int:
         return self.x_steps * self.z_steps
 
 
