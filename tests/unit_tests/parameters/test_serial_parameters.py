@@ -71,7 +71,7 @@ def test_grid_parameters(grid_type, steps, expected_step_size, expected_block_si
     assert grid_params.city_block_x == expected_block_size[0]
     assert grid_params.city_block_z == expected_block_size[1]
 
-    assert grid_params.total_num_wells== 400
+    assert grid_params.total_num_wells == 400
 
 
 def test_wells_selection(dummy_wells_settings):
@@ -96,7 +96,7 @@ def test_serial_parameter_model(dummy_serial_params):
 def test_serial_parameter_model_for_eh2(dummy_serial_params):
     eh2_params = SerialExperimentEh2(**dummy_serial_params)
 
-    assert eh2_params.tot_num_images == 30
+    assert eh2_params.total_num_images == 30
     assert eh2_params.rotation_axis == "phi"
     assert eh2_params.collection_directory == Path("/tmp/i19-2/cm12345-1/foo")
 

@@ -96,7 +96,7 @@ class SerialExperiment(VisitParameters):
 
     @computed_field
     @property
-    def tot_num_images(self) -> int:
+    def total_num_images(self) -> int:
         return self.images_per_well * self.wells.num_wells_to_collect
 
     # @property
