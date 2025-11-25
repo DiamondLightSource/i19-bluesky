@@ -71,7 +71,7 @@ def test_grid_parameters(grid_type, steps, expected_step_size, expected_block_si
     assert grid_params.city_block_x == expected_block_size[0]
     assert grid_params.city_block_z == expected_block_size[1]
 
-    assert grid_params.tot_num_windows == 400
+    assert grid_params.total_num_wells== 400
 
 
 def test_wells_selection(dummy_wells_settings):
