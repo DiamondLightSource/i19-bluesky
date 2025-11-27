@@ -36,14 +36,14 @@ def setup_diffractometer(
 
 
 def trigger_zebra(
-    zebra: Zebra,
-    diffractometer: FourCircleDiffractometer,
     phi_start: float,
     phi_end: float,
     phi_steps: int,
     exposure_time: float,
     gate_width: float,
     pulse_width: float,
+    zebra: Zebra,
+    diffractometer: FourCircleDiffractometer,
 ) -> MsgGenerator:
     """Trigger zebra for collection in the forward and backward direction.
     Gate start is calculated as phi start - 0.5.
@@ -95,12 +95,12 @@ def trigger_zebra(
 
 
 def trigger_panda(
-    panda: HDFPanda,
-    diffractometer: FourCircleDiffractometer,
     phi_start: float,
     phi_end: float,
     phi_steps: int,
     exposure_time: float,
+    diffractometer: FourCircleDiffractometer,
+    panda: HDFPanda,
 ) -> MsgGenerator:
     """Trigger panda for collection in both directions.
 
@@ -154,11 +154,17 @@ def move_diffractometer_back(diffractometer: FourCircleDiffractometer) -> MsgGen
 
 
 def run_panda_test(
+    phi_start: float,
+    phi_end: float,
+    phi_steps: int,
+    exposure_time: float,
     diffractometer: FourCircleDiffractometer = inject("diffractometer"),
     panda: HDFPanda = inject("panda"),
 ) -> MsgGenerator:
     yield from bpp.contingency_wrapper(
-        trigger_panda(panda, diffractometer, 20, 23, 30, 0.1),
+        trigger_panda(
+            phi_start, phi_end, phi_steps, exposure_time, diffractometer, panda
+        ),
         except_plan=lambda: (yield from abort_panda(diffractometer, panda)),
         final_plan=lambda: (yield from move_diffractometer_back(diffractometer)),
         auto_raise=False,
@@ -166,11 +172,26 @@ def run_panda_test(
 
 
 def run_zebra_test(
-    diffractometer: FourCircleDiffractometer = inject("diffractometer"),
+    phi_start: float,
+    phi_end: float,
+    phi_steps: int,
+    exposure_time: float,
+    gate_width: float,
+    pulse_width: float,
     zebra: Zebra = inject("zebra"),
+    diffractometer: FourCircleDiffractometer = inject("diffractometer"),
 ) -> MsgGenerator:
     yield from bpp.contingency_wrapper(
-        trigger_zebra(zebra, diffractometer, 20, 23, 30, 0.1, 3.1, 1),
+        trigger_zebra(
+            phi_start,
+            phi_end,
+            phi_steps,
+            exposure_time,
+            gate_width,
+            pulse_width,
+            zebra,
+            diffractometer,
+        ),
         except_plan=lambda: (yield from abort_zebra(diffractometer, zebra)),
         final_plan=lambda: (yield from move_diffractometer_back(diffractometer)),
         auto_raise=False,
