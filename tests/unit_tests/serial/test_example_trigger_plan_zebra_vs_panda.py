@@ -20,9 +20,12 @@ async def test_setup_diffractometer(
     eh2_diffractometer: FourCircleDiffractometer,
     RE: RunEngine,
 ):
-    RE(setup_diffractometer(eh2_diffractometer, 5.0, 10, 2))
-    assert await eh2_diffractometer.phi.user_readback.get_value() == 5
-    assert await eh2_diffractometer.phi.velocity.get_value() == 5
+    RE(setup_diffractometer(eh2_diffractometer, 6.0, 10, 2))
+    mock_phi = get_mock_put(eh2_diffractometer.phi.user_setpoint)
+    mock_phi.assert_called_once_with(6.0, wait=True)
+
+    mock_phi_velocity = get_mock_put(eh2_diffractometer.phi.velocity)
+    mock_phi_velocity.assert_called_once_with(5.0, wait=True)
 
 
 @patch("i19_bluesky.serial.example_trigger_plan_zebra_vs_panda.disarm_zebra")
