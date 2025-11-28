@@ -145,6 +145,9 @@ lint.select = [
     "UP",  # pyupgrade - https://docs.astral.sh/ruff/rules/#pyupgrade-up
     "SLF", # self - https://docs.astral.sh/ruff/settings/#lintflake8-self
 ]
+lint.extend-ignore = [
+    "B008", # Allow inject("device")
+]
 
 [tool.ruff.lint.per-file-ignores]
 # By default, private member access is allowed in tests

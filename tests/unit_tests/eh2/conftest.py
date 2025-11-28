@@ -7,8 +7,7 @@ from dodal.devices.i19.access_controlled.shutter import (
 )
 from dodal.devices.i19.backlight import BacklightPosition
 from dodal.devices.i19.pin_col_stages import PinholeCollimatorControl
-from dodal.devices.zebra.zebra import Zebra
-from ophyd_async.core import get_mock_put, set_mock_value
+from ophyd_async.core import set_mock_value
 
 
 @pytest.fixture
@@ -26,21 +25,6 @@ async def pincol(RE: RunEngine) -> PinholeCollimatorControl:
     set_mock_value(pincol.mapt.pin_x_out, 30.0)
     set_mock_value(pincol.mapt.col_x_out, 20.0)
     return pincol
-
-
-@pytest.fixture
-def eh2_zebra(RE: RunEngine) -> Zebra:
-    zebra = i19_2.zebra(connect_immediately=True, mock=True)
-
-    def mock_disarm(_, wait):
-        set_mock_value(zebra.pc.arm.armed, 0)
-
-    def mock_arm(_, wait):
-        set_mock_value(zebra.pc.arm.armed, 1)
-
-    get_mock_put(zebra.pc.arm.arm_set).side_effect = mock_arm
-    get_mock_put(zebra.pc.arm.disarm_set).side_effect = mock_disarm
-    return zebra
 
 
 @pytest.fixture

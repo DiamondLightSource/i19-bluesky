@@ -1,3 +1,7 @@
+"""
+i19 PandA setup plan for serial collection.
+"""
+
 import bluesky.plan_stubs as bps
 from bluesky.utils import MsgGenerator
 from dodal.plans.load_panda_yaml import load_panda_from_yaml
@@ -17,13 +21,20 @@ GENERAL_TIMEOUT = 60
 
 def setup_panda_for_rotation(
     panda: HDFPanda,
-    phi_ramp_start,
-    phi_start,
-    phi_end,
-    phi_steps,
-    time_between_images,
+    phi_start: float,
+    phi_end: float,
+    phi_steps: int,
+    exposure_time: float,
 ) -> MsgGenerator:
-    """Configures the PandA device for phi forward and backward rotation"""
+    """Configures the PandA device for phi forward and backward rotation
+
+    Args:
+        panda (HDFPanda): The fastcs PandA ophyd device.
+        phi_start (float): Starting phi position, in degrees.
+        phi_end (float): Ending phi position, in degrees.
+        phi_steps (int): Number of images to take.
+        exposure_time (float): Time between images, in seconds.
+    """
 
     yield from bps.stage(panda, group="panda-setup")
 
@@ -32,18 +43,16 @@ def setup_panda_for_rotation(
         DeviceSettingsConstants.PANDA_PC_FILENAME,
         panda,
     )
-
+    gate_start = phi_start - 0.5
     # Home the input encoder
     yield from bps.abs_set(
         panda.inenc[1].setp,  # type: ignore
-        phi_ramp_start * DEG_TO_ENC_COUNTS,
+        gate_start * DEG_TO_ENC_COUNTS,
         group="panda-setup",
     )
     yield from setup_outenc_vals(panda)
 
-    seq_table = generate_panda_seq_table(
-        phi_start, phi_end, phi_steps, time_between_images
-    )
+    seq_table = generate_panda_seq_table(phi_start, phi_end, phi_steps, exposure_time)
 
     yield from bps.abs_set(panda.seq[1].table, seq_table, group="panda-setup")
 
