@@ -43,7 +43,7 @@ def setup_zebra_for_collection(
         pulse_width (float): Value from calculation: change in degrees of scan/velocity\
         ,in seconds.
     """
-    LOGGER.debug("Setup ZEBRA for collection.")
+    LOGGER.info("Setup ZEBRA for collection.")
     pulse_step = pulse_width + 0.1
 
     yield from bps.abs_set(zebra.pc.gate_start, gate_start, group=group)

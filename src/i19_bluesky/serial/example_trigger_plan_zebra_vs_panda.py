@@ -12,7 +12,7 @@ from ophyd_async.fastcs.panda import HDFPanda
 
 from i19_bluesky.eh2.zebra_arming_plan import arm_zebra, disarm_zebra
 from i19_bluesky.log import LOGGER
-from i19_bluesky.serial.panda_setup_plans import setup_panda_for_rotation
+from i19_bluesky.serial.panda_setup_plans import reset_panda, setup_panda_for_rotation
 from i19_bluesky.serial.panda_stubs import arm_panda, disarm_panda
 from i19_bluesky.serial.zebra_collection_setup_plan import setup_zebra_for_collection
 
@@ -69,11 +69,11 @@ def trigger_zebra(
         phi_steps,
         exposure_time,
     )
-    LOGGER.info("Arm zebra and setup for positive direction collection")
-    yield from arm_zebra(zebra)
+    LOGGER.info("Setup zebra for collection in the positive direction and arm")
     yield from setup_zebra_for_collection(
         zebra, RotationDirection.POSITIVE, gate_start, gate_width, pulse_width
     )
+    yield from arm_zebra(zebra)
     yield from bps.abs_set(diffractometer.phi, phi_end, wait=True)
     LOGGER.info("Disarm zebra")
     yield from disarm_zebra(zebra)
@@ -84,11 +84,11 @@ def trigger_zebra(
         phi_steps,
         exposure_time,
     )
-    LOGGER.info("Arm zebra and setup for negative direction collection")
-    yield from arm_zebra(zebra)
+    LOGGER.info("Setup zebra for collection in the negative direction and arm")
     yield from setup_zebra_for_collection(
         zebra, RotationDirection.NEGATIVE, gate_start, gate_width, pulse_width
     )
+    yield from arm_zebra(zebra)
     yield from bps.abs_set(diffractometer.phi, phi_start, wait=True)
     LOGGER.info("Disarm zebra")
     yield from disarm_zebra(zebra)
@@ -132,6 +132,7 @@ def trigger_panda(
     yield from bps.abs_set(diffractometer.phi, phi_start, wait=True)
     LOGGER.info("Disarm panda")
     yield from disarm_panda(panda)
+    yield from reset_panda(panda)
 
 
 def abort_zebra(diffractometer: FourCircleDiffractometer, zebra: Zebra) -> MsgGenerator:

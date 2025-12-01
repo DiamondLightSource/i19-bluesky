@@ -68,22 +68,22 @@ async def test_trigger_zebra(
     expected_calls = [
         call.mock_setup_diffractometer(eh2_diffractometer, 4.5, 25, 10),
         call.mock_setup_diffractometer().__iter__(),
-        call.mock_arm_zebra(eh2_zebra),
-        call.mock_arm_zebra().__iter__(),
         call.mock_setup_zebra_for_collection(
             eh2_zebra, RotationDirection.POSITIVE, 4.5, 2, 2
         ),
         call.mock_setup_zebra_for_collection().__iter__(),
+        call.mock_arm_zebra(eh2_zebra),
+        call.mock_arm_zebra().__iter__(),
         call.mock_disarm_zebra(eh2_zebra),
         call.mock_disarm_zebra().__iter__(),
         call.mock_setup_diffractometer(eh2_diffractometer, 10.5, 25, 10),
         call.mock_setup_diffractometer().__iter__(),
-        call.mock_arm_zebra(eh2_zebra),
-        call.mock_arm_zebra().__iter__(),
         call.mock_setup_zebra_for_collection(
             eh2_zebra, RotationDirection.NEGATIVE, 4.5, 2, 2
         ),
         call.mock_setup_zebra_for_collection().__iter__(),
+        call.mock_arm_zebra(eh2_zebra),
+        call.mock_arm_zebra().__iter__(),
         call.mock_disarm_zebra(eh2_zebra),
         call.mock_disarm_zebra().__iter__(),
     ]
@@ -91,6 +91,7 @@ async def test_trigger_zebra(
     parent_mock.assert_has_calls(expected_calls)
 
 
+@patch("i19_bluesky.serial.example_trigger_plan_zebra_vs_panda.reset_panda")
 @patch("i19_bluesky.serial.example_trigger_plan_zebra_vs_panda.bps.sleep")
 @patch("i19_bluesky.serial.example_trigger_plan_zebra_vs_panda.disarm_panda")
 @patch("i19_bluesky.serial.example_trigger_plan_zebra_vs_panda.arm_panda")
@@ -104,6 +105,7 @@ async def test_trigger_panda(
     mock_arm_panda: MagicMock,
     mock_disarm_panda: MagicMock,
     mock_sleep: MagicMock,
+    mock_reset_panda: MagicMock,
     mock_panda: HDFPanda,
     eh2_diffractometer: FourCircleDiffractometer,
     RE: RunEngine,
@@ -116,6 +118,7 @@ async def test_trigger_panda(
     parent_mock.attach_mock(mock_arm_panda, "mock_arm_panda")
     parent_mock.attach_mock(mock_disarm_panda, "mock_disarm_panda")
     parent_mock.attach_mock(mock_sleep, "mock_sleep")
+    parent_mock.attach_mock(mock_reset_panda, "mock_reset_panda")
 
     RE(
         trigger_panda(
@@ -141,6 +144,8 @@ async def test_trigger_panda(
         call.mock_sleep().__iter__(),
         call.mock_disarm_panda(mock_panda),
         call.mock_disarm_panda().__iter__(),
+        call.mock_reset_panda(mock_panda),
+        call.mock_reset_panda().__iter__(),
     ]
 
     parent_mock.assert_has_calls(expected_calls)
