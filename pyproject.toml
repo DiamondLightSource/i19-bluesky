@@ -101,6 +101,7 @@ filterwarnings = [
 testpaths = "docs src tests"
 
 [tool.coverage.run]
+patch = ["subprocess"]
 data_file = "/tmp/i19_bluesky.coverage"
 
 [tool.coverage.paths]
