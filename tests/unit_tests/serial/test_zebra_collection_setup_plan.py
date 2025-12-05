@@ -4,7 +4,7 @@ import pytest
 from bluesky.run_engine import RunEngine
 from dodal.devices.zebra.zebra import RotationDirection, Zebra
 
-from i19_bluesky.eh2.zebra_collection_setup_plan import (
+from i19_bluesky.serial.zebra_collection_setup_plan import (
     PULSE_START,
     setup_out_triggers,
     setup_zebra_for_collection,
@@ -12,8 +12,8 @@ from i19_bluesky.eh2.zebra_collection_setup_plan import (
 )
 
 
-@patch("i19_bluesky.eh2.zebra_collection_setup_plan.setup_zebra_for_triggering")
-@patch("i19_bluesky.eh2.zebra_collection_setup_plan.setup_out_triggers")
+@patch("i19_bluesky.serial.zebra_collection_setup_plan.setup_zebra_for_triggering")
+@patch("i19_bluesky.serial.zebra_collection_setup_plan.setup_out_triggers")
 @pytest.mark.parametrize(
     "rotation_direction", [RotationDirection.POSITIVE, RotationDirection.NEGATIVE]
 )
