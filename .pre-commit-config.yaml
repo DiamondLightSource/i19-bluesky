@@ -3,6 +3,7 @@ repos:
     rev: v5.0.0
     hooks:
       - id: check-added-large-files
+        exclude: ^uv.lock
       - id: check-yaml
       - id: check-merge-conflict
       - id: end-of-file-fixer
@@ -23,6 +24,7 @@ repos:
         types: [python]
         require_serial: true
 
+<<<<<<< before updating
       - id: import-contracts
         name: Ensure import directionality
         pass_filenames: false
@@ -30,3 +32,16 @@ repos:
         entry: lint-imports
         types: [python]
         require_serial: false
+=======
+      - id: uv-sync
+        name: update uv.lock and venv
+        pass_filenames: false
+        language: system
+        entry: uv sync
+        files: ^(uv\.lock|pyproject\.toml)$
+
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.28.0
+    hooks:
+      - id: gitleaks
+>>>>>>> after updating
