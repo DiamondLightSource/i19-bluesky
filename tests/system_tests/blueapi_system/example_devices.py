@@ -52,16 +52,14 @@ class AccessControlledOpticsMotors(OpticsBlueAPIDevice):
         instrument_session: str = "cm12345-1",
         name: str = "",
     ) -> None:
-        self.hutch = hutch
-        self.instrument = instrument_session
-        super().__init__(name)
+        super().__init__(hutch, instrument_session, name)
 
     @AsyncStatus.wrap
     async def set(self, value: MotorPosition):
         request_params = {
             "name": "move_motors",
             "params": {
-                "experiment_hutch": self.hutch.value,
+                "experiment_hutch": self._invoking_hutch,
                 "access_device": "access_control",
                 "position": value.value,
             },
