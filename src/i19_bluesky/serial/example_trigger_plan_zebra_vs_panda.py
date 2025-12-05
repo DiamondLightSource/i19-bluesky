@@ -16,6 +16,8 @@ from i19_bluesky.serial.panda_setup_plans import reset_panda, setup_panda_for_ro
 from i19_bluesky.serial.panda_stubs import arm_panda, disarm_panda
 from i19_bluesky.serial.zebra_collection_setup_plan import setup_zebra_for_collection
 
+RAMP = 0.5
+
 
 def setup_diffractometer(
     diffractometer: FourCircleDiffractometer,
@@ -61,8 +63,8 @@ def trigger_zebra(
         in seconds.
 
     """
-    gate_start = phi_start - 0.5
-    gate_end = phi_end + 0.5
+    gate_start = phi_start - RAMP
+    gate_end = phi_end + RAMP
     yield from setup_diffractometer(
         diffractometer,
         gate_start,
@@ -149,9 +151,11 @@ def abort_panda(
     yield from disarm_panda(panda)
 
 
-def move_diffractometer_back(diffractometer: FourCircleDiffractometer) -> MsgGenerator:
+def move_diffractometer_back(
+    diffractometer: FourCircleDiffractometer, phi_start: float
+) -> MsgGenerator:
     LOGGER.info("Move diffractometer back to start position")
-    yield from bps.abs_set(diffractometer.phi, 19, wait=True)
+    yield from bps.abs_set(diffractometer.phi, phi_start, wait=True)
 
 
 def run_panda_test(
@@ -172,7 +176,9 @@ def run_panda_test(
             exposure_time,
         ),
         except_plan=lambda: (yield from abort_panda(diffractometer, panda)),
-        final_plan=lambda: (yield from move_diffractometer_back(diffractometer)),
+        final_plan=lambda: (
+            yield from move_diffractometer_back(diffractometer, phi_start)
+        ),
         auto_raise=False,
     )
 
@@ -199,6 +205,8 @@ def run_zebra_test(
             pulse_width,
         ),
         except_plan=lambda: (yield from abort_zebra(diffractometer, zebra)),
-        final_plan=lambda: (yield from move_diffractometer_back(diffractometer)),
+        final_plan=lambda: (
+            yield from move_diffractometer_back(diffractometer, phi_start)
+        ),
         auto_raise=False,
     )

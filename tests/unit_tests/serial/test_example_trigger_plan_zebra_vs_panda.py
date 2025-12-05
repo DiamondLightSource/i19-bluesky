@@ -180,7 +180,9 @@ async def test_abort_panda(
 
 
 async def test_move_diffractometer_back(
-    eh2_diffractometer: FourCircleDiffractometer, RE: RunEngine
+    eh2_diffractometer: FourCircleDiffractometer,
+    RE: RunEngine,
 ):
-    RE(move_diffractometer_back(eh2_diffractometer))
-    assert await eh2_diffractometer.phi.user_readback.get_value() == 19
+    RE(move_diffractometer_back(eh2_diffractometer, 4))
+    mock_phi = get_mock_put(eh2_diffractometer.phi.user_setpoint)
+    mock_phi.assert_called_once_with(4.0, wait=True)
