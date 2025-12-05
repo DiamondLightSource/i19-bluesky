@@ -183,6 +183,6 @@ async def test_move_diffractometer_back(
     eh2_diffractometer: FourCircleDiffractometer,
     RE: RunEngine,
 ):
-    RE(move_diffractometer_back(eh2_diffractometer, 4))
+    RE(move_diffractometer_back(eh2_diffractometer, 4.0))
     mock_phi = get_mock_put(eh2_diffractometer.phi.user_setpoint)
     mock_phi.assert_called_once_with(4.0, wait=True)
