@@ -1,6 +1,10 @@
 import pytest
 from bluesky.run_engine import RunEngine
 from dodal.beamlines import i19_2
+from dodal.devices.i19.access_controlled.piezo_control import (
+    AccessControlledPiezoActuator,
+    FocusingMirrorType,
+)
 from dodal.devices.i19.access_controlled.shutter import (
     AccessControlledShutter,
     HutchState,
@@ -32,3 +36,25 @@ async def eh2_backlight(RE: RunEngine) -> BacklightPosition:
     backlight = BacklightPosition("", name="mock_backlight")
     await backlight.connect(mock=True)
     return backlight
+
+
+@pytest.fixture
+async def eh2_hfm_piezo(RE: RunEngine) -> AccessControlledPiezoActuator:
+    hfm_piezo = AccessControlledPiezoActuator(
+        "", FocusingMirrorType.HFM, HutchState.EH2, "", "mock_hfm_piezo"
+    )
+    await hfm_piezo.connect(mock=True)
+    hfm_piezo.url = "http://test-blueapi.url"
+    set_mock_value(hfm_piezo.readback, 3.041)
+    return hfm_piezo
+
+
+@pytest.fixture
+async def eh2_vfm_piezo(RE: RunEngine) -> AccessControlledPiezoActuator:
+    vfm_piezo = AccessControlledPiezoActuator(
+        "", FocusingMirrorType.VFM, HutchState.EH2, "", "mock_hfm_piezo"
+    )
+    await vfm_piezo.connect(mock=True)
+    vfm_piezo.url = "http://test-blueapi.url"
+    set_mock_value(vfm_piezo.readback, 1.675)
+    return vfm_piezo
