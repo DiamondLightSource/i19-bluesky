@@ -4,7 +4,7 @@ from dodal.devices.focusing_mirror import FocusingMirrorWithPiezo
 from dodal.devices.i19.access_controlled.hutch_access import HutchAccessControl
 from ophyd_async.core import set_mock_value
 
-from i19_bluesky.optics.fosing_mirrors_plans import apply_voltage_to_vfm_piezo
+from i19_bluesky.optics.focusing_mirrors_plans import apply_voltage_to_vfm_piezo
 from i19_bluesky.parameters.components import HutchName
 
 
