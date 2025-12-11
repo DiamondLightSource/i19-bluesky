@@ -9,15 +9,15 @@ from i19_bluesky.optics.check_access_control import check_access
 
 @check_access
 def apply_voltage_to_vfm_piezo(
-    demand: float, vfm: FocusingMirrorWithPiezo = inject("vfm")
+    voltage_demand: float, vfm: FocusingMirrorWithPiezo = inject("vfm")
 ) -> MsgGenerator:
     LOGGER.info("Set vfm piezo to {demand} V")
-    yield from bps.abs_set(vfm.piezo, demand, wait=True)
+    yield from bps.abs_set(vfm.piezo, voltage_demand, wait=True)
 
 
 @check_access
 def apply_voltage_to_hfm_piezo(
-    demand: float, hfm: FocusingMirrorWithPiezo = inject("hfm")
+    voltage_demand: float, hfm: FocusingMirrorWithPiezo = inject("hfm")
 ) -> MsgGenerator:
     LOGGER.info("Set hfm piezo to {demand} V")
-    yield from bps.abs_set(hfm.piezo, demand, wait=True)
+    yield from bps.abs_set(hfm.piezo, voltage_demand, wait=True)
