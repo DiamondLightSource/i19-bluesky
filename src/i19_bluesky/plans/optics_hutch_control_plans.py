@@ -46,21 +46,3 @@ def set_requested_voltage_to_vfm_piezo(
     vfm_piezo: AccessControlledPiezoActuator = inject("vfm_piezo"),
 ) -> MsgGenerator[None]:
     yield from apply_voltage_to_piezo_actuators(requested_voltage, vfm_piezo)
-
-
-def nudge_hfm_piezo_actuators(
-    delta: float, hfm_piezo: AccessControlledPiezoActuator = inject("hfm_piezo")
-) -> MsgGenerator[None]:
-    LOGGER.debug(f"Nudge hfm piezo by {delta} V.")
-    current_voltage = yield from bps.rd(hfm_piezo.readback)
-    requested_voltage = current_voltage + delta
-    yield from apply_voltage_to_piezo_actuators(requested_voltage, hfm_piezo)
-
-
-def nudge_vfm_piezo_actuators(
-    delta: float, vfm_piezo: AccessControlledPiezoActuator = inject("hfm_piezo")
-) -> MsgGenerator[None]:
-    LOGGER.debug(f"Nudge vfm piezo by {delta} V.")
-    current_voltage = yield from bps.rd(vfm_piezo.readback)
-    requested_voltage = current_voltage + delta
-    yield from apply_voltage_to_piezo_actuators(requested_voltage, vfm_piezo)

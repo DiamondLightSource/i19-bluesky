@@ -13,8 +13,6 @@ from i19_bluesky.eh2 import (
 )
 from i19_bluesky.plans.optics_hutch_control_plans import (
     apply_voltage_to_piezo_actuators,
-    nudge_hfm_piezo_actuators,
-    nudge_vfm_piezo_actuators,
     set_requested_voltage_to_hfm_piezo,
     set_requested_voltage_to_vfm_piezo,
 )
@@ -72,25 +70,3 @@ def test_set_requested_voltage_to_hfm(
 ):
     RE(set_requested_voltage_to_hfm_piezo(1.42, eh2_hfm_piezo))
     mock_apply_plan.assert_called_once_with(1.42, eh2_hfm_piezo)
-
-
-@patch("i19_bluesky.plans.optics_hutch_control_plans.apply_voltage_to_piezo_actuators")
-async def test_nudge_vfm_piezos(
-    mock_apply_plan: MagicMock,
-    eh2_vfm_piezo: AccessControlledPiezoActuator,
-    RE: RunEngine,
-):
-    assert await eh2_vfm_piezo.readback.get_value() == 1.675
-    RE(nudge_vfm_piezo_actuators(0.005, eh2_vfm_piezo))
-    mock_apply_plan.assert_called_once_with(1.68, eh2_vfm_piezo)
-
-
-@patch("i19_bluesky.plans.optics_hutch_control_plans.apply_voltage_to_piezo_actuators")
-async def test_nudge_hfm_piezos(
-    mock_apply_plan: MagicMock,
-    eh2_hfm_piezo: AccessControlledPiezoActuator,
-    RE: RunEngine,
-):
-    assert await eh2_hfm_piezo.readback.get_value() == 3.041
-    RE(nudge_hfm_piezo_actuators(0.005, eh2_hfm_piezo))
-    mock_apply_plan.assert_called_once_with(3.046, eh2_hfm_piezo)
