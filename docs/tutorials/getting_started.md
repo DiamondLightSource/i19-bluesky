@@ -19,4 +19,4 @@ If you use vs code, you may need to set the python interpreter for both reposito
 
 As a standard for the python versions to support, we are using the [numpy deprecation policy](https://numpy.org/neps/nep-0029-deprecation_policy.html).
 
-Currently supported versions are: 3.10, 3.11, 3.12.
+Currently supported versions are: 3.11, 3.12, 3.13.
