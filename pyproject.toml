@@ -106,7 +106,7 @@ source = ["src", "**/site-packages/"]
 [tool.tox]
 skipsdist = true
 # envs to runs automatically with tox -p
-env_list = ["pre-commit", "type-checking", "tests", "docs"]
+env_list = ["pre-commit", "type-checking", "tests", "docs", "system-test"]
 
 [tool.tox.env_run_base]
 # Pass all environment variables to the test environments
@@ -150,6 +150,17 @@ commands = [
         "--cov-report",
         "xml:cov.xml",
         "tests/unit_tests",
+        { replace = "posargs", default = [
+        ], extend = true },
+    ],
+]
+
+[tool.tox.env.system-test]
+description = "Run system tests"
+commands = [
+    [
+        "pytest",
+        "tests/system_tests",
         { replace = "posargs", default = [
         ], extend = true },
     ],
