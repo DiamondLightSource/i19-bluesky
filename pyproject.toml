@@ -149,6 +149,7 @@ commands = [
         "term",
         "--cov-report",
         "xml:cov.xml",
+        "tests/unit_tests",
         { replace = "posargs", default = [
         ], extend = true },
     ],
