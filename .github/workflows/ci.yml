@@ -37,8 +37,8 @@ jobs:
     if: needs.check.outputs.branch-pr == ''
     uses: ./.github/workflows/_system_test.yml
     with:
-      runs-on: ${{ matrix.runs-on }}
-      python-version: ${{ matrix.python-version }}
+      runs-on: "ubuntu-latest"
+      python-version: "3.12"
 
   docs:
     needs: check
