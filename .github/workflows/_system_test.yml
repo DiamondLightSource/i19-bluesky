@@ -34,11 +34,11 @@ jobs:
         run: echo "PYTHONPATH=${{ github.workspace }}/tests/system_tests/blueapi_system" >> $GITHUB_ENV
       
       - name: Start soft IOC for access device
-        run: python ${{ github.workspace }}/tests/system_tests/blueapi_system/fake_access_ioc.py &
+        run: uv run ${{ github.workspace }}/tests/system_tests/blueapi_system/fake_access_ioc.py &
 
       - name: Start Blueapi Server
         run: |
-          blueapi -c ${{ github.workspace }}/tests/system_tests/blueapi_system/config_optics_blueapi.yaml serve &
+          uv run blueapi -c ${{ github.workspace }}/tests/system_tests/blueapi_system/config_optics_blueapi.yaml serve &
 
       - name: Run tests
         run: uv run --locked tox -e system-test
