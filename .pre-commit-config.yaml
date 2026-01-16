@@ -31,6 +31,7 @@ repos:
         entry: lint-imports
         types: [python]
         require_serial: false
+
       - id: uv-sync
         name: update uv.lock and venv
         pass_filenames: false
