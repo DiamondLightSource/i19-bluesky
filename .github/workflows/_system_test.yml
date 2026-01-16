@@ -1,13 +1,23 @@
 on:
   workflow_call:
+    inputs:
+      python-version:
+        type: string
+        description: The version of python to install, default is from .python-version file
+        default: ""
+      runs-on:
+        type: string
+        description: The runner to run this job on
+        required: true
 
 env:
   # https://github.com/pytest-dev/pytest/issues/2042
   PY_IGNORE_IMPORTMISMATCH: "1"
+  UV_PYTHON: ${{ inputs.python-version }}
 
 jobs:
   run:
-    runs-on: ubuntu-latests
+    runs-on: ${{ inputs.runs-on }}
 
     steps:
       - name: Checkout
