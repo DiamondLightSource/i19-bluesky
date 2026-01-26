@@ -19,6 +19,8 @@ from i19_bluesky.eh1.pin_tip_detection import (
 def pin_tip_detection(RE: RunEngine) -> PinTipDetection:
     with init_devices(mock=True):
         device = PinTipDetection("", "mock-pintip-detection")
+    mock_trigger_result = SampleLocation(100, 200, np.array([]), np.array([]))
+    device._get_tip_and_edge_data = AsyncMock(return_value=mock_trigger_result)
     return device
 
 
@@ -41,11 +43,6 @@ async def test_save_pin_tip_position(
 def test_trigger_pin_tip_detection_plan(
     pin_tip_detection: PinTipDetection, RE: RunEngine
 ):
-    mock_trigger_result = SampleLocation(100, 200, np.array([]), np.array([]))
-    pin_tip_detection._get_tip_and_edge_data = AsyncMock(
-        return_value=mock_trigger_result
-    )
-
     plan_res = RE(trigger_pin_tip_detection(pin_tip_detection)).plan_result  # type: ignore
 
     assert all(plan_res == (100, 200))
@@ -58,14 +55,7 @@ async def test_pin_tip_detection(
     pin_tip_position: PinTipCentreHolder,
     RE: RunEngine,
 ):
-    mock_trigger_result = SampleLocation(100, 200, np.array([]), np.array([]))
-    pin_tip_detection._get_tip_and_edge_data = AsyncMock(
-        return_value=mock_trigger_result
-    )
-
-    with patch(
-        "i19_bluesky.eh1.pin_tip_detection.OAVParameters"  #
-    ) as mock_params:
+    with patch("i19_bluesky.eh1.pin_tip_detection.OAVParameters") as mock_params:
         RE(
             pin_tip_detection_plan(
                 "someContext", pin_tip_detection, pin_tip_position, ""
