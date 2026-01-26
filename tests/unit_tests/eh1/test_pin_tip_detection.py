@@ -1,6 +1,5 @@
 from unittest.mock import AsyncMock, MagicMock, patch
 
-import bluesky.plan_stubs as bps
 import numpy as np
 import pytest
 from bluesky import RunEngine
@@ -53,21 +52,17 @@ def test_trigger_pin_tip_detection_plan(
 
 
 @patch("i19_bluesky.eh1.pin_tip_detection.setup_pin_tip_detection_params")
-@patch("i19_bluesky.eh1.pin_tip_detection.trigger_pin_tip_detection")
-@patch("i19_bluesky.eh1.pin_tip_detection.save_pin_tip_position")
-def test_pin_tip_detection(
-    mock_save_pos: MagicMock,
-    mock_trigger_pin_tip: MagicMock,
+async def test_pin_tip_detection(
     mock_setup_params: MagicMock,
     pin_tip_detection: PinTipDetection,
     pin_tip_position: PinTipCentreHolder,
     RE: RunEngine,
 ):
-    def mock_pin_tip_generator(x, y):
-        yield from bps.null()
-        return np.array([x, y])
+    mock_trigger_result = SampleLocation(100, 200, np.array([]), np.array([]))
+    pin_tip_detection._get_tip_and_edge_data = AsyncMock(
+        return_value=mock_trigger_result
+    )
 
-    mock_trigger_pin_tip.side_effect = [mock_pin_tip_generator(100, 50)]
     with patch(
         "i19_bluesky.eh1.pin_tip_detection.OAVParameters"  #
     ) as mock_params:
@@ -80,5 +75,6 @@ def test_pin_tip_detection(
         mock_setup_params.assert_called_once_with(
             pin_tip_detection, mock_params("someContext", "")
         )
-        mock_trigger_pin_tip.assert_called_once()
-        mock_save_pos.assert_called_once()
+
+        assert await pin_tip_position.pin_tip_i.get_value() == 100
+        assert await pin_tip_position.pin_tip_j.get_value() == 200
