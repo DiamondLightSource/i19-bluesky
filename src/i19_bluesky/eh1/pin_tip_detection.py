@@ -45,7 +45,11 @@ def pin_tip_detection_plan(
 
     - Get the pin detection parameters from the OAVCentring json file
     - Trigger pin tip detection and find the x,y position
-    - Save the tip position to the overlay PVs.
+    - Save the tip position to the overlay PVs - this is a workaround as it's not
+    currently possible to get a plan result back from blueapi.
+
+    The workaround will be removed once this is done
+    https://github.com/DiamondLightSource/blueapi/issues/1349
     """
     oav_parameters = OAVParameters(centring_context, oav_config)
 
