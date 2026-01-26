@@ -19,6 +19,7 @@ dependencies = [
     "pydantic-extra-types >= 2.10.1",
     "requests",
     "fastapi[all]",
+    "mysql-connector-python == 9.5.0", # see https://github.com/DiamondLightSource/mx-bluesky/issues/1568
     # These dependencies may be issued as pre-release versions and should have a pin constraint
     # as by default pip-install will not upgrade to a pre-release.
     # Blueapi pinned until GDA can be updated on the beamline to use latest version
