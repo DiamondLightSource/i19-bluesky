@@ -1,9 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-<<<<<<< before updating
-    "config:best-practices"
-=======
     "config:recommended"
   ],
   "lockFileMaintenance": {
@@ -35,6 +32,5 @@
       ],
       "enabled": false
     }
->>>>>>> after updating
   ]
 }
