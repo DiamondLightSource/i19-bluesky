@@ -25,5 +25,5 @@ jobs:
 
       - name: Run tox
         env:
-          SKIP: 4{{ inputs.skip_hooks }}
+          SKIP: ${{ inputs.skip_hooks }}
         run: uv run --locked tox -e ${{ inputs.tox }}
