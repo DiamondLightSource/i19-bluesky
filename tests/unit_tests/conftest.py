@@ -29,7 +29,7 @@ def context() -> BlueskyContext:
 
 @pytest.fixture
 def eh2_zebra(RE: RunEngine) -> Zebra:
-    zebra = i19_2.zebra(connect_immediately=True, mock=True)
+    zebra = i19_2.zebra.build(connect_immediately=True, mock=True)
 
     def mock_disarm(_, wait):
         set_mock_value(zebra.pc.arm.armed, 0)
