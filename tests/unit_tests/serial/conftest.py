@@ -80,6 +80,6 @@ async def mock_panda() -> HDFPanda:
 
 @pytest.fixture
 async def eh2_diffractometer(RE: RunEngine) -> FourCircleDiffractometer:
-    diffractometer = i19_2.diffractometer(connect_immediately=True, mock=True)
+    diffractometer = i19_2.diffractometer.build(connect_immediately=True, mock=True)
     set_mock_value(diffractometer.phi.velocity, 1)
     return diffractometer

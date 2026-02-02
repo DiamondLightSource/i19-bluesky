@@ -25,7 +25,7 @@ async def eh2_shutter(RE: RunEngine) -> AccessControlledShutter:
 
 @pytest.fixture
 async def pincol(RE: RunEngine) -> PinholeCollimatorControl:
-    pincol = i19_2.pinhole_and_collimator(connect_immediately=True, mock=True)
+    pincol = i19_2.pinhole_and_collimator.build(connect_immediately=True, mock=True)
     set_mock_value(pincol.mapt.pin_x_out, 30.0)
     set_mock_value(pincol.mapt.col_x_out, 20.0)
     return pincol
