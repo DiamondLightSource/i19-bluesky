@@ -32,17 +32,3 @@ def apply_voltage_to_piezo_actuators(
 ) -> MsgGenerator[None]:
     LOGGER.info(f"Applying {requested_voltage} to {piezo_device.name}")
     yield from bps.abs_set(piezo_device, requested_voltage, wait=True)
-
-
-def set_requested_voltage_to_hfm_piezo(
-    requested_voltage: float,
-    hfm_piezo: AccessControlledPiezoActuator = inject("hfm_piezo"),
-) -> MsgGenerator[None]:
-    yield from apply_voltage_to_piezo_actuators(requested_voltage, hfm_piezo)
-
-
-def set_requested_voltage_to_vfm_piezo(
-    requested_voltage: float,
-    vfm_piezo: AccessControlledPiezoActuator = inject("vfm_piezo"),
-) -> MsgGenerator[None]:
-    yield from apply_voltage_to_piezo_actuators(requested_voltage, vfm_piezo)
