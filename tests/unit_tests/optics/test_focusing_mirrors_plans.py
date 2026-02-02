@@ -5,8 +5,7 @@ from dodal.devices.i19.access_controlled.hutch_access import HutchAccessControl
 from ophyd_async.core import set_mock_value
 
 from i19_bluesky.optics.focusing_mirrors_plans import (
-    apply_voltage_to_hfm_piezo,
-    apply_voltage_to_vfm_piezo,
+    apply_voltage_to_piezo,
 )
 from i19_bluesky.parameters.components import HutchName
 
@@ -21,7 +20,7 @@ async def test_apply_voltage_to_vfm_piezo(
 ):
     set_mock_value(access_control_device.active_hutch, active_hutch)
     RE(
-        apply_voltage_to_vfm_piezo(
+        apply_voltage_to_piezo(
             HutchName[active_hutch], access_control_device, voltage, vfm
         )
     )
@@ -42,7 +41,7 @@ async def test_voltage_not_applied_to_vfm_piezo_from_wrong_hutch(
     RE: RunEngine,
 ):
     set_mock_value(access_control_device.active_hutch, active_hutch)
-    RE(apply_voltage_to_vfm_piezo(request_hutch, access_control_device, voltage, vfm))
+    RE(apply_voltage_to_piezo(request_hutch, access_control_device, voltage, vfm))
 
     assert await vfm.piezo.get_value() == 1.0
 
@@ -57,7 +56,7 @@ async def test_apply_voltage_to_hfm_piezo(
 ):
     set_mock_value(access_control_device.active_hutch, active_hutch)
     RE(
-        apply_voltage_to_hfm_piezo(
+        apply_voltage_to_piezo(
             HutchName[active_hutch], access_control_device, voltage, hfm
         )
     )
@@ -78,6 +77,6 @@ async def test_voltage_not_applied_to_hfm_piezo_from_wrong_hutch(
     RE: RunEngine,
 ):
     set_mock_value(access_control_device.active_hutch, active_hutch)
-    RE(apply_voltage_to_hfm_piezo(request_hutch, access_control_device, voltage, hfm))
+    RE(apply_voltage_to_piezo(request_hutch, access_control_device, voltage, hfm))
 
     assert await hfm.piezo.get_value() == 3.0
