@@ -11,11 +11,11 @@ def move_backlight_in(
     backlight: BacklightPosition = inject("backlight"),
 ) -> MsgGenerator[None]:
     LOGGER.debug("Send command to move the backlight in.")
-    yield from bps.abs_set(backlight, InOutUpper.IN)
+    yield from bps.abs_set(backlight, InOutUpper.IN, wait=True)
 
 
 def move_backlight_out(
     backlight: BacklightPosition = inject("backlight"),
 ) -> MsgGenerator[None]:
     LOGGER.debug("Send command to move the backlight out.")
-    yield from bps.abs_set(backlight, InOutUpper.OUT)
+    yield from bps.abs_set(backlight, InOutUpper.OUT, wait=True)
