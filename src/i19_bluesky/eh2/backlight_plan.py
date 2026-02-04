@@ -8,14 +8,14 @@ from i19_bluesky.log import LOGGER
 
 
 def move_backlight_in(
-    backlight: BacklightPosition = inject("backlight"),  # noqa: B008
+    backlight: BacklightPosition = inject("backlight"),
 ) -> MsgGenerator[None]:
     LOGGER.debug("Send command to move the backlight in.")
-    yield from bps.abs_set(backlight, InOutUpper.IN, wait=True)
+    yield from bps.abs_set(backlight, InOutUpper.IN)
 
 
 def move_backlight_out(
-    backlight: BacklightPosition = inject("backlight"),  # noqa: B008
+    backlight: BacklightPosition = inject("backlight"),
 ) -> MsgGenerator[None]:
     LOGGER.debug("Send command to move the backlight out.")
-    yield from bps.abs_set(backlight, InOutUpper.OUT, wait=True)
+    yield from bps.abs_set(backlight, InOutUpper.OUT)
