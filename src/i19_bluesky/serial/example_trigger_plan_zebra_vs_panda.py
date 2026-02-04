@@ -6,7 +6,7 @@ import bluesky.plan_stubs as bps
 import bluesky.preprocessors as bpp
 from bluesky.utils import MsgGenerator
 from dodal.common import inject
-from dodal.devices.i19.diffractometer import FourCircleDiffractometer
+from dodal.devices.beamlines.i19.diffractometer import FourCircleDiffractometer
 from dodal.devices.zebra.zebra import RotationDirection, Zebra
 from ophyd_async.fastcs.panda import HDFPanda
 

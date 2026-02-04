@@ -1,5 +1,8 @@
 import pytest
 from dodal.beamlines import i19_optics
+from dodal.devices.beamlines.i19.access_controlled.hutch_access import (
+    HutchAccessControl,
+)
 from dodal.devices.focusing_mirror import FocusingMirrorWithPiezo
 from dodal.devices.hutch_shutter import (
     HUTCH_SAFE_FOR_OPERATIONS,
@@ -7,7 +10,6 @@ from dodal.devices.hutch_shutter import (
     ShutterDemand,
     ShutterState,
 )
-from dodal.devices.i19.access_controlled.hutch_access import HutchAccessControl
 from dodal.utils import AnyDeviceFactory
 from ophyd_async.core import callback_on_mock_put, set_mock_value
 

@@ -2,7 +2,7 @@ import bluesky.plan_stubs as bps
 from bluesky.utils import MsgGenerator
 from dodal.common import inject
 from dodal.common.enums import InOutUpper
-from dodal.devices.i19.backlight import BacklightPosition
+from dodal.devices.beamlines.i19.backlight import BacklightPosition
 
 from i19_bluesky.log import LOGGER
 

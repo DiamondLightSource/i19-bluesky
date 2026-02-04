@@ -2,13 +2,15 @@ import pytest
 from blueapi.core import BlueskyContext
 from bluesky.run_engine import RunEngine
 from dodal.beamlines import i19_optics
+from dodal.devices.beamlines.i19.access_controlled.hutch_access import (
+    HutchAccessControl,
+)
 from dodal.devices.hutch_shutter import (
     HUTCH_SAFE_FOR_OPERATIONS,
     HutchShutter,
     ShutterDemand,
     ShutterState,
 )
-from dodal.devices.i19.access_controlled.hutch_access import HutchAccessControl
 from dodal.utils import AnyDeviceFactory
 from ophyd_async.core import callback_on_mock_put, set_mock_value
 

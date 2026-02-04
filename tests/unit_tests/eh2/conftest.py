@@ -1,16 +1,16 @@
 import pytest
 from bluesky.run_engine import RunEngine
 from dodal.beamlines import i19_2
-from dodal.devices.i19.access_controlled.piezo_control import (
+from dodal.devices.beamlines.i19.access_controlled.piezo_control import (
     AccessControlledPiezoActuator,
     FocusingMirrorName,
 )
-from dodal.devices.i19.access_controlled.shutter import (
+from dodal.devices.beamlines.i19.access_controlled.shutter import (
     AccessControlledShutter,
     HutchState,
 )
-from dodal.devices.i19.backlight import BacklightPosition
-from dodal.devices.i19.pin_col_stages import PinholeCollimatorControl
+from dodal.devices.beamlines.i19.backlight import BacklightPosition
+from dodal.devices.beamlines.i19.pin_col_stages import PinholeCollimatorControl
 from ophyd_async.core import set_mock_value
 
 

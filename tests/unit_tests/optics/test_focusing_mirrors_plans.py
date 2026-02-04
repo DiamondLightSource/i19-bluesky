@@ -1,7 +1,9 @@
 import pytest
 from bluesky.run_engine import RunEngine
+from dodal.devices.beamlines.i19.access_controlled.hutch_access import (
+    HutchAccessControl,
+)
 from dodal.devices.focusing_mirror import FocusingMirrorWithPiezo
-from dodal.devices.i19.access_controlled.hutch_access import HutchAccessControl
 from ophyd_async.core import set_mock_value
 
 from i19_bluesky.optics.focusing_mirrors_plans import (

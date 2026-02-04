@@ -1,7 +1,7 @@
 from unittest.mock import MagicMock, call, patch
 
 from bluesky.run_engine import RunEngine
-from dodal.devices.i19.diffractometer import FourCircleDiffractometer
+from dodal.devices.beamlines.i19.diffractometer import FourCircleDiffractometer
 from dodal.devices.zebra.zebra import RotationDirection, Zebra
 from ophyd_async.core import get_mock_put
 from ophyd_async.fastcs.panda import HDFPanda
