@@ -22,7 +22,7 @@ async def test_setup_diffractometer(
 ):
     RE(setup_diffractometer(eh2_diffractometer, 6.0, 10, 2))
     mock_phi = get_mock_put(eh2_diffractometer.phi.user_setpoint)
-    mock_phi.assert_called_once_with(6.0, wait=True)
+    mock_phi.assert_called_once_with(6.0)
 
     mock_phi_velocity = get_mock_put(eh2_diffractometer.phi.velocity)
     mock_phi_velocity.assert_called_once_with(5.0)
