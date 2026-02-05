@@ -25,7 +25,7 @@ async def test_setup_diffractometer(
     mock_phi.assert_called_once_with(6.0, wait=True)
 
     mock_phi_velocity = get_mock_put(eh2_diffractometer.phi.velocity)
-    mock_phi_velocity.assert_called_once_with(5.0, wait=True)
+    mock_phi_velocity.assert_called_once_with(5.0)
 
 
 @patch("i19_bluesky.serial.example_trigger_plan_zebra_vs_panda.disarm_zebra")
