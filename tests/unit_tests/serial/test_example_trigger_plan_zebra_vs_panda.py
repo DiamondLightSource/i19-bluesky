@@ -63,7 +63,7 @@ async def test_trigger_zebra(
         )
     )
     mock_phi = get_mock_put(eh2_diffractometer.phi.user_setpoint)
-    mock_phi.assert_has_calls([call(10, wait=True), call(5, wait=True)])
+    mock_phi.assert_has_calls([call(10), call(5)])
 
     expected_calls = [
         call.mock_setup_diffractometer(eh2_diffractometer, 4.5, 25, 10),
@@ -131,7 +131,7 @@ async def test_trigger_panda(
         )
     )
     mock_phi = get_mock_put(eh2_diffractometer.phi.user_setpoint)
-    mock_phi.assert_has_calls([call(10, wait=True), call(5, wait=True)])
+    mock_phi.assert_has_calls([call(10), call(5)])
 
     expected_calls = [
         call.mock_setup_diffractometer(eh2_diffractometer, 5, 25, 10),
@@ -159,9 +159,7 @@ async def test_abort_zebra(
     RE: RunEngine,
 ):
     RE(abort_zebra(eh2_diffractometer, eh2_zebra))
-    get_mock_put(eh2_diffractometer.phi.motor_stop).assert_called_once_with(
-        1, wait=True
-    )
+    get_mock_put(eh2_diffractometer.phi.motor_stop).assert_called_once_with(1)
     mock_disarm_zebra.assert_called_once_with(eh2_zebra)
 
 
@@ -173,9 +171,7 @@ async def test_abort_panda(
     RE: RunEngine,
 ):
     RE(abort_panda(eh2_diffractometer, mock_panda))
-    get_mock_put(eh2_diffractometer.phi.motor_stop).assert_called_once_with(
-        1, wait=True
-    )
+    get_mock_put(eh2_diffractometer.phi.motor_stop).assert_called_once_with(1)
     mock_disarm_panda.assert_called_once_with(mock_panda)
 
 
@@ -185,4 +181,4 @@ async def test_move_diffractometer_back(
 ):
     RE(move_diffractometer_back(eh2_diffractometer, 4.0))
     mock_phi = get_mock_put(eh2_diffractometer.phi.user_setpoint)
-    mock_phi.assert_called_once_with(4.0, wait=True)
+    mock_phi.assert_called_once_with(4.0)
