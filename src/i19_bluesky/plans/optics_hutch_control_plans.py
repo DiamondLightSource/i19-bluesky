@@ -4,11 +4,13 @@ from one of the hutches."""
 import bluesky.plan_stubs as bps
 from bluesky.utils import MsgGenerator
 from dodal.common import inject
-from dodal.devices.hutch_shutter import ShutterDemand
-from dodal.devices.i19.access_controlled.piezo_control import (
+from dodal.devices.beamlines.i19.access_controlled.piezo_control import (
     AccessControlledPiezoActuator,
 )
-from dodal.devices.i19.access_controlled.shutter import AccessControlledShutter
+from dodal.devices.beamlines.i19.access_controlled.shutter import (
+    AccessControlledShutter,
+)
+from dodal.devices.hutch_shutter import ShutterDemand
 
 from i19_bluesky.log import LOGGER
 

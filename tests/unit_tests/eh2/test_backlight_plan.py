@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 from bluesky.run_engine import RunEngine
 from dodal.common.enums import InOutUpper
-from dodal.devices.i19.backlight import BacklightPosition
+from dodal.devices.beamlines.i19.backlight import BacklightPosition
 
 from i19_bluesky.eh2.backlight_plan import (
     move_backlight_in,

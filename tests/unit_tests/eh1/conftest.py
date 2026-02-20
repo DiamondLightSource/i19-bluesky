@@ -1,10 +1,10 @@
 import pytest
 from bluesky.run_engine import RunEngine
-from dodal.devices.i19.access_controlled.piezo_control import (
+from dodal.devices.beamlines.i19.access_controlled.piezo_control import (
     AccessControlledPiezoActuator,
     FocusingMirrorName,
 )
-from dodal.devices.i19.access_controlled.shutter import (
+from dodal.devices.beamlines.i19.access_controlled.shutter import (
     AccessControlledShutter,
     HutchState,
 )
