@@ -3,11 +3,11 @@ import time
 
 import pytest
 from blueapi.client.client import BlueapiClient
+from blueapi.client.rest import ServiceUnavailableError
 from blueapi.config import ApplicationConfig, RestConfig
 from bluesky.run_engine import RunEngine
 from dodal.devices.beamlines.i19.access_controlled.blueapi_device import HutchState
 from pydantic import HttpUrl
-from requests.exceptions import ConnectionError
 
 from .blueapi_system.example_devices import (
     AccessControlledOpticsMotors,
@@ -27,9 +27,9 @@ def wait_for_server():
 
     for _ in range(20):
         try:
-            client.get_environment()
+            _env = client.environment
             return
-        except ConnectionError:
+        except ServiceUnavailableError:
             ...
         time.sleep(0.5)
     raise TimeoutError("No connection to blueapi server")
@@ -37,8 +37,8 @@ def wait_for_server():
 
 @pytest.fixture(autouse=True)
 def clean_existing_tasks(blueapi_client: BlueapiClient):
-    for task in blueapi_client.get_all_tasks().tasks:
-        blueapi_client.clear_task(task.task_id)
+    for task in blueapi_client._rest.get_all_tasks().tasks:
+        blueapi_client._rest.clear_task(task.task_id)
     yield
 
 
