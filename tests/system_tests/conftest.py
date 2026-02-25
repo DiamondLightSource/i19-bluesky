@@ -27,7 +27,7 @@ def wait_for_server():
 
     for _ in range(20):
         try:
-            client.get_environment()
+            _env = client.environment
             return
         except ConnectionError:
             ...

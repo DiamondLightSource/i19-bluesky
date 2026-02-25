@@ -31,7 +31,7 @@ _DATA_PATH = Path(__file__).parent / "blueapi_system"
 
 @pytest.mark.system_test
 def test_blueapi_initialised_without_errors(blueapi_client: BlueapiClient):
-    env = blueapi_client.get_environment()
+    env = blueapi_client.environment
 
     assert env.initialized
     assert not env.error_message
