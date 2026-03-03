@@ -24,7 +24,7 @@ dependencies = [
     # Blueapi pinned until GDA can be updated on the beamline to use latest version
     "blueapi >= 1.4.1",
     "ophyd ==1.11.0",
-    "ophyd-async[ca,pva] == 0.14.2",
+    "ophyd-async[ca,pva] >= 0.15.0",
     "bluesky >= 1.13",
     "dls-dodal @ git+https://github.com/DiamondLightSource/dodal.git@main",
 ]

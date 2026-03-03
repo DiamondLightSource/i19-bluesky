@@ -31,10 +31,10 @@ def context() -> BlueskyContext:
 def eh2_zebra(RE: RunEngine) -> Zebra:
     zebra = i19_2.zebra.build(connect_immediately=True, mock=True)
 
-    def mock_disarm(_, wait):
+    def mock_disarm(_):
         set_mock_value(zebra.pc.arm.armed, 0)
 
-    def mock_arm(_, wait):
+    def mock_arm(_):
         set_mock_value(zebra.pc.arm.armed, 1)
 
     get_mock_put(zebra.pc.arm.arm_set).side_effect = mock_arm
