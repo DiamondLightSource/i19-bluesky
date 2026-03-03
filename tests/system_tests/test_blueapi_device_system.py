@@ -31,7 +31,7 @@ _DATA_PATH = Path(__file__).parent / "blueapi_system"
 
 @pytest.mark.system_test
 def test_blueapi_initialised_without_errors(blueapi_client: BlueapiClient):
-    env = blueapi_client.get_environment()
+    env = blueapi_client.environment
 
     assert env.initialized
     assert not env.error_message
@@ -47,7 +47,7 @@ def expected_plans() -> PlanResponse:
 @pytest.mark.system_test
 def test_get_plans_by_name(blueapi_client: BlueapiClient, expected_plans: PlanResponse):
     for plan in expected_plans.plans:
-        assert blueapi_client.get_plan(plan.name) == plan
+        assert blueapi_client._rest.get_plan(plan.name) == plan
 
 
 @pytest.fixture
@@ -59,7 +59,7 @@ def expected_devices() -> DeviceResponse:
 
 @pytest.mark.system_test
 def test_get_devices(blueapi_client: BlueapiClient, expected_devices: DeviceResponse):
-    retrieved_devices = blueapi_client.get_devices()
+    retrieved_devices = blueapi_client._rest.get_devices()
     retrieved_devices.devices.sort(key=lambda x: x.name)
     expected_devices.devices.sort(key=lambda x: x.name)
 
@@ -76,7 +76,7 @@ async def test_move_motors_plan_does_not_run_when_check_access_fails(
 ):
     await eh2_motors_with_blueapi.set(MotorPosition.IN)
 
-    task_list = blueapi_client.get_all_tasks()
+    task_list = blueapi_client._rest.get_all_tasks()
 
     assert task_list.tasks[0].is_complete
     assert len(task_list.tasks[0].errors) == 0
@@ -89,7 +89,7 @@ async def test_motors_move_when_hutch_check_passes(
 ):
     await eh1_motors_with_blueapi.set(MotorPosition.IN)
 
-    task_list = blueapi_client.get_all_tasks()
+    task_list = blueapi_client._rest.get_all_tasks()
     task = task_list.tasks[0]
 
     assert task.is_complete

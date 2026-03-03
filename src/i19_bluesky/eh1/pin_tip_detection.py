@@ -2,7 +2,7 @@ from collections.abc import Generator
 
 import bluesky.plan_stubs as bps
 from bluesky.utils import Msg, MsgGenerator
-from dodal.devices.i19.pin_tip import PinTipCentreHolder
+from dodal.devices.beamlines.i19.pin_tip import PinTipCentreHolder
 from dodal.devices.oav.oav_parameters import OAVParameters
 from dodal.devices.oav.pin_image_recognition import PinTipDetection, Tip
 from dodal.plans.device_setup_plans import setup_pin_tip_detection_params

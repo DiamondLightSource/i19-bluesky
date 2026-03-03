@@ -4,11 +4,13 @@ from bluesky.protocols import Movable
 from dodal.common.beamlines.beamline_utils import (
     device_factory,
 )
-from dodal.devices.i19.access_controlled.blueapi_device import (
+from dodal.devices.beamlines.i19.access_controlled.blueapi_device import (
     HutchState,
     OpticsBlueAPIDevice,
 )
-from dodal.devices.i19.access_controlled.hutch_access import HutchAccessControl
+from dodal.devices.beamlines.i19.access_controlled.hutch_access import (
+    HutchAccessControl,
+)
 from ophyd_async.core import AsyncStatus, StandardReadable
 from ophyd_async.sim import SimMotor
 

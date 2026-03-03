@@ -7,7 +7,7 @@ from bluesky.run_engine import RunEngine
 from dodal.beamlines import i19_2
 from dodal.common.beamlines.beamline_utils import get_path_provider, set_path_provider
 from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitPathProvider
-from dodal.devices.i19.diffractometer import FourCircleDiffractometer
+from dodal.devices.beamlines.i19.diffractometer import FourCircleDiffractometer
 from ophyd_async.core import Device, DeviceVector, init_devices, set_mock_value
 from ophyd_async.epics.core import epics_signal_rw
 from ophyd_async.fastcs.panda import HDFPanda

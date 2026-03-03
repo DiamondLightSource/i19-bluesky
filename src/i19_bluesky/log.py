@@ -1,5 +1,5 @@
 import logging
-from enum import Enum
+from enum import StrEnum
 from os import environ
 from pathlib import Path
 
@@ -19,7 +19,7 @@ LOGGER.parent = dodal_logger
 ophyd_async_logger = logging.getLogger("ophyd_async")
 
 
-class BeamlineHutch(str, Enum):
+class BeamlineHutch(StrEnum):
     """Define the beamline name depending on hutch.
     Useful to get the path to save the logs."""
 
