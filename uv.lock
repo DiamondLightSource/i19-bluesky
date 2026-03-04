@@ -2031,7 +2031,7 @@ requires-dist = [
     { name = "nexgen" },
     { name = "numpy" },
     { name = "ophyd", specifier = "==1.11.0" },
-    { name = "ophyd-async", extras = ["ca", "pva"], specifier = ">=0.15.0" },
+    { name = "ophyd-async", extras = ["ca", "pva"], specifier = ">=0.16.0" },
     { name = "pydantic" },
     { name = "pydantic-extra-types", specifier = ">=2.10.1" },
     { name = "requests" },
