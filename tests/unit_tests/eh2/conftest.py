@@ -1,6 +1,9 @@
 import pytest
 from bluesky.run_engine import RunEngine
 from dodal.beamlines import i19_2
+from dodal.devices.beamlines.i19.access_controlled.attenuator_motor_squad import (
+    AttenuatorMotorSquad,
+)
 from dodal.devices.beamlines.i19.access_controlled.piezo_control import (
     AccessControlledPiezoActuator,
     FocusingMirrorName,
@@ -12,6 +15,17 @@ from dodal.devices.beamlines.i19.access_controlled.shutter import (
 from dodal.devices.beamlines.i19.backlight import BacklightPosition
 from dodal.devices.beamlines.i19.pin_col_stages import PinholeCollimatorControl
 from ophyd_async.core import set_mock_value
+
+
+@pytest.fixture
+async def attenuator_motor_squad(RE: RunEngine) -> AttenuatorMotorSquad:
+    att_motor_squad = AttenuatorMotorSquad(
+        hutch=HutchState.EH2, name="mock_attenuator_motors"
+    )
+    await att_motor_squad.connect(mock=True)
+
+    att_motor_squad.url = "http://test-blueapi.url"
+    return att_motor_squad
 
 
 @pytest.fixture
