@@ -22,7 +22,7 @@ def move_stage(detector_stage: DetectorMotion, det_z, two_theta=0.0):
                     called.
     """
     current_location = yield from bps.rd(detector_stage.det_z)
-    if current_location <= det_z:
+    if current_location >= det_z:
         # if the current value is higher than the requested one, first attempt to move
         # 2theta and then det_z
         yield from bps.mv(detector_stage.two_theta, two_theta)

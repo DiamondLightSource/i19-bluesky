@@ -71,6 +71,7 @@ async def test_move_order_two_theta_first(
     mock_two_theta = get_mock_put(eh2_diffractometer.det_stage.two_theta.user_setpoint)
     parent.attach_mock(mock_det_z, "det_z")
     parent.attach_mock(mock_two_theta, "two_theta")
+    RE(move_stage(eh2_diffractometer.det_stage, 80, 90))
 <<<<<<< HEAD
     RE(move_detector_stage(eh2_diffractometer.det_stage, 80, 90))
 =======
