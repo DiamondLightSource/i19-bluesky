@@ -23,8 +23,11 @@ def active_device_factories() -> set[AnyDeviceFactory]:
 
 @pytest.fixture
 def expt_shutter(RE) -> HutchShutter:
-    expt_shutter = i19_optics.shutter.build(connect_immediately=True, mock=True)
-    set_mock_value(expt_shutter.interlock.status, HUTCH_SAFE_FOR_OPERATIONS)
+    expt_shutter = i19_optics.shutter.build(
+        connect_immediately=True,
+        mock=True,
+    )
+    set_mock_value(expt_shutter.interlock.status, HUTCH_SAFE_FOR_OPERATIONS)  # type: ignore
 
     def set_status(value: ShutterDemand, *args, **kwargs):
         value_sta = ShutterState.OPEN if value == "Open" else ShutterState.CLOSED
