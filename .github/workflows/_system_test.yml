@@ -1,34 +1,44 @@
 on:
   workflow_call:
+    inputs:
+      python-version:
+        type: string
+        description: The version of python to install, default is from .python-version file
+        default: ""
+      runs-on:
+        type: string
+        description: The runner to run this job on
+        required: true
 
 env:
   # https://github.com/pytest-dev/pytest/issues/2042
   PY_IGNORE_IMPORTMISMATCH: "1"
+  UV_PYTHON: ${{ inputs.python-version }}
 
 jobs:
   run:
-    runs-on: ubuntu-latest
+    runs-on: ${{ inputs.runs-on }}
 
     steps:
       - name: Checkout
-        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
+        uses: actions/checkout@v5
         with:
           # Need this to get version number from last tag
           fetch-depth: 0
 
-      - name: Install python packages
-        uses: ./.github/actions/install_requirements
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
       
       - name: Set PythonPath
         id: set-path
         run: echo "PYTHONPATH=${{ github.workspace }}/tests/system_tests/blueapi_system" >> $GITHUB_ENV
       
       - name: Start soft IOC for access device
-        run: python ${{ github.workspace }}/tests/system_tests/blueapi_system/fake_access_ioc.py &
+        run: uv run ${{ github.workspace }}/tests/system_tests/blueapi_system/fake_access_ioc.py &
 
       - name: Start Blueapi Server
         run: |
-          blueapi -c ${{ github.workspace }}/tests/system_tests/blueapi_system/config_optics_blueapi.yaml serve &
+          uv run blueapi -c ${{ github.workspace }}/tests/system_tests/blueapi_system/config_optics_blueapi.yaml serve &
 
       - name: Run tests
-        run: tox -e system-test
+        run: uv run --locked tox -e system-test
