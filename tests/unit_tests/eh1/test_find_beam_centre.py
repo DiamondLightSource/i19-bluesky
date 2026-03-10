@@ -18,7 +18,7 @@ async def centre_device() -> CentreEllipseMethod:
     return centre_device
 
 
-@patch("i19_bluesky.eh1.find_beam_centre_plan.bps.trigger")
+@patch("i19_bluesky.eh1.find_beam_centre.bps.trigger")
 async def test_find_beam_centre_plan(
     mock_trigger: MagicMock, centre_device: CentreEllipseMethod, RE: RunEngine
 ):
