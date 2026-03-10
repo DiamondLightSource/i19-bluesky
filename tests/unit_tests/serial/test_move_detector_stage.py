@@ -19,9 +19,7 @@ async def test_move_detector_stage(
     eh2_diffractometer: FourCircleDiffractometer,
     RE: RunEngine,
 ):
-    RE(
-        move_stage(eh2_diffractometer.det_stage, detector_z, detector_two_theta)  # type: ignore
-    )
+    RE(move_stage(eh2_diffractometer.det_stage, detector_z, detector_two_theta))
     assert (
         await eh2_diffractometer.det_stage.det_z.user_readback.get_value() == detector_z
     )

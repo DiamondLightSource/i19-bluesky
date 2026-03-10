@@ -1,12 +1,11 @@
 import bluesky.plan_stubs as bps
 from dodal.devices.beamlines.i19.diffractometer import DetectorMotion
 
-# import bluesky.protocols
-# from bluesky.utils import MsgGenerator
 
-
-def move_stage(detector_stage: DetectorMotion, det_z, two_theta=0.0):
-    """Moves the Detector in the X and Two-Theta axis.
+def move_stage(detector_stage: DetectorMotion, det_z: float, two_theta: float = 0.0):
+    """Moves the Detector a distance of det_z and two_theta in the respective\
+                directions. Order dependant on position of detector when \
+                called.
         Args:
             detector_stage : DetectorMotion object
             det_z : Float
@@ -14,12 +13,6 @@ def move_stage(detector_stage: DetectorMotion, det_z, two_theta=0.0):
             two_theta : Float
                 (default 0.0)
                 Distance to move in Two-Theta axis
-            Reutrns:
-                    N/A
-            Yields:
-                    bps.mv a distance of det_z and two_theta in the respective\
-                    directions. Order dependant on position of detector when \
-                    called.
     """
     current_location = yield from bps.rd(detector_stage.det_z)
     if current_location >= det_z:
