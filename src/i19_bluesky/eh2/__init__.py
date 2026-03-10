@@ -1,7 +1,5 @@
 """A place for eh2 specific plans."""
 
-# from move_detector_stage import move_stage ##need user input???
-
 from i19_bluesky.eh2.pincol_control_plans import (
     move_pin_col_out_of_beam,
     move_pin_col_to_requested_in_position,
@@ -18,5 +16,4 @@ __all__ = [
     "move_pin_col_out_of_beam",
     "move_pin_col_to_requested_in_position",
     "apply_voltage_to_piezo_actuators",
-    # "move_stage",
 ]
