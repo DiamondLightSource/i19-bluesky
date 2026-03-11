@@ -2,10 +2,10 @@ from bluesky.log import logger
 from bluesky.utils import MsgGenerator
 from dodal.devices.beamlines.i19.diffractometer import FourCircleDiffractometer
 
-import i19_bluesky.eh2.move_detector_stage as mvstgpln
+from i19_bluesky.eh2.move_detector_stage import move_stage
 
 
-def setup_detector(
+def setup_beamline_before_collection(
     diffractometer: FourCircleDiffractometer, det_z: float, two_theta: float
 ) -> MsgGenerator:
     """Runs setup tasks prior to data collection. Currently, moves the diffractometer\
@@ -19,4 +19,4 @@ def setup_detector(
                 Distance to move in Two-Theta axis"""
 
     logger.info("Moving detector stage into position")
-    yield from mvstgpln.move_stage(diffractometer.det_stage, det_z, two_theta)
+    yield from move_stage(diffractometer.det_stage, det_z, two_theta)
