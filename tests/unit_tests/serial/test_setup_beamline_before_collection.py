@@ -1,4 +1,4 @@
-from unittest.mock import AsyncMock
+from unittest.mock import MagicMock
 
 import pytest
 from bluesky.run_engine import RunEngine
@@ -32,17 +32,17 @@ async def test_setup_beamline_before_collection(
     eh2_diffractometer: FourCircleDiffractometer,
     RE: RunEngine,
     eh2_backlight: BacklightPosition,
-    eh2_aperture: PinColRequest,
     pincol: PinholeCollimatorControl,
+    eh2_aperture: PinColRequest,
 ):
     RE(
         setup_beamline_before_collection(
+            detector_z,
+            detector_two_theta,
             eh2_backlight,
             eh2_diffractometer,
             pincol,
             eh2_aperture,
-            detector_z,
-            detector_two_theta,
         )
     )
     assert (
@@ -52,15 +52,15 @@ async def test_setup_beamline_before_collection(
         await eh2_diffractometer.det_stage.two_theta.user_readback.get_value()
         == detector_two_theta
     )
-    mock_setup_beamline_before_collection = AsyncMock()
+    mock_setup_beamline_before_collection = MagicMock()
     RE(
         mock_setup_beamline_before_collection(
+            detector_z,
+            detector_two_theta,
             eh2_backlight,
             eh2_diffractometer,
             pincol,
             eh2_aperture,
-            detector_z,
-            detector_two_theta,
         )
     )
     mock_setup_beamline_before_collection.assert_called_once()
