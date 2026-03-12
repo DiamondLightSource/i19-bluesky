@@ -13,12 +13,12 @@ from i19_bluesky.eh2.pincol_control_plans import move_pin_col_to_requested_in_po
 
 
 def setup_beamline_before_collection(
+    det_z: float,
+    two_theta: float,
     backlight: BacklightPosition,
     diffractometer: FourCircleDiffractometer,
     pinhole_collimator: PinholeCollimatorControl,
     aperture: PinColRequest,
-    det_z: float,
-    two_theta: float,
 ) -> MsgGenerator:
     """Runs setup tasks prior to data collection. Currently, moves the backlight to its\
         'out' position, then moves the pinhole collimator to position to record at the \
@@ -26,15 +26,16 @@ def setup_beamline_before_collection(
         a command to move the diffractometer an inputted distance in the X and Two-Theta
         axis.
         Args:
-            backlight : Backlight controller object
-            diffractometer : Diffractometer object
-            pinhole collimator : Pinhole Collimator control object
-            aperture : StrEnum
             det_z : Float
                 Distance to move in Z axis
             two_theta : Float
                 (default 0.0)
-                Distance to move in Two-Theta axis"""
+                Distance to move in Two-Theta axis
+            backlight : Backlight controller object
+            diffractometer : Diffractometer object
+            pinhole collimator : Pinhole Collimator control object
+            aperture : PinColRequest object (StrEnum)
+"""
     logger.info("Moving backlight out")
     yield from move_backlight_out(backlight)
     logger.info("Moving pinhole collimator into position")
