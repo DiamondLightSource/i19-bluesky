@@ -7,7 +7,7 @@ from dodal.devices.beamlines.i19.diffractometer import (
 )
 from ophyd_async.core import get_mock_put
 
-from i19_bluesky.eh2.move_detector_stage import move_stage
+from i19_bluesky.eh2.move_detector_stage import move_detector_stage
 
 
 @pytest.mark.parametrize(
@@ -19,7 +19,11 @@ async def test_move_detector_stage(
     eh2_diffractometer: FourCircleDiffractometer,
     RE: RunEngine,
 ):
-    RE(move_stage(eh2_diffractometer.det_stage, detector_z, detector_two_theta))
+    RE(
+        move_detector_stage(
+            eh2_diffractometer.det_stage, detector_z, detector_two_theta
+        )
+    )
     assert (
         await eh2_diffractometer.det_stage.det_z.user_readback.get_value() == detector_z
     )
@@ -38,7 +42,7 @@ async def test_move_order_det_z_first(
     mock_two_theta = get_mock_put(eh2_diffractometer.det_stage.two_theta.user_setpoint)
     parent.attach_mock(mock_det_z, "det_z")
     parent.attach_mock(mock_two_theta, "two_theta")
-    RE(move_stage(eh2_diffractometer.det_stage, 120, 45))
+    RE(move_detector_stage(eh2_diffractometer.det_stage, 120, 45))
     parent.assert_has_calls([call.det_z(120), call.two_theta(45)])
 
 
@@ -51,5 +55,5 @@ async def test_move_order_two_theta_first(
     mock_two_theta = get_mock_put(eh2_diffractometer.det_stage.two_theta.user_setpoint)
     parent.attach_mock(mock_det_z, "det_z")
     parent.attach_mock(mock_two_theta, "two_theta")
-    RE(move_stage(eh2_diffractometer.det_stage, 80, 90))
+    RE(move_detector_stage(eh2_diffractometer.det_stage, 80, 90))
     parent.assert_has_calls([call.two_theta(90), call.det_z(80)])
