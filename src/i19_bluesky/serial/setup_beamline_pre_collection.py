@@ -8,7 +8,7 @@ from dodal.devices.beamlines.i19.pin_col_stages import (
 )
 
 from i19_bluesky.eh2.backlight_plan import move_backlight_out
-from i19_bluesky.eh2.move_detector_stage import move_stage
+from i19_bluesky.eh2.move_detector_stage import move_detector_stage
 from i19_bluesky.eh2.pincol_control_plans import move_pin_col_to_requested_in_position
 
 
@@ -43,4 +43,4 @@ def setup_beamline_before_collection(
     logger.info("Moving attenuator wedge")
     ###TODO: find or write this
     logger.info("Moving detector stage into position")
-    yield from move_stage(diffractometer.det_stage, det_z, two_theta)
+    yield from move_detector_stage(diffractometer.det_stage, det_z, two_theta)
