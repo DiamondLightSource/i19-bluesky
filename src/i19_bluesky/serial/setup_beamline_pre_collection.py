@@ -33,7 +33,7 @@ def setup_beamline_before_collection(
                 Distance to move in Two-Theta axis
             backlight : Backlight controller object
             diffractometer : Diffractometer object
-            pinhole collimator : Pinhole Collimator control object
+            pinhole_collimator : Pinhole Collimator control object
             aperture : PinColRequest object (StrEnum)
 """
     logger.info("Moving backlight out")
