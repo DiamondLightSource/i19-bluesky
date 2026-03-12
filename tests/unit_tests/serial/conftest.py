@@ -7,8 +7,10 @@ from bluesky.run_engine import RunEngine
 from dodal.beamlines import i19_2
 from dodal.common.beamlines.beamline_utils import get_path_provider, set_path_provider
 from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitPathProvider
-from dodal.devices.beamlines.i19.diffractometer import (
-    FourCircleDiffractometer,
+from dodal.devices.beamlines.i19.backlight import BacklightPosition
+from dodal.devices.beamlines.i19.diffractometer import FourCircleDiffractometer
+from dodal.devices.beamlines.i19.pin_col_stages import (
+    PinholeCollimatorControl,
 )
 from ophyd_async.core import Device, DeviceVector, init_devices, set_mock_value
 from ophyd_async.epics.core import epics_signal_rw
@@ -87,3 +89,18 @@ async def eh2_diffractometer(RE: RunEngine) -> FourCircleDiffractometer:
     set_mock_value(diffractometer.det_stage.det_z.user_readback, 100)
     set_mock_value(diffractometer.det_stage.two_theta.user_readback, 0)
     return diffractometer
+
+
+@pytest.fixture
+async def pincol(RE: RunEngine) -> PinholeCollimatorControl:
+    pincol = i19_2.pinhole_and_collimator.build(connect_immediately=True, mock=True)
+    set_mock_value(pincol.mapt.pin_x_out, 30.0)
+    set_mock_value(pincol.mapt.col_x_out, 20.0)
+    return pincol
+
+
+@pytest.fixture
+async def eh2_backlight(RE: RunEngine) -> BacklightPosition:
+    backlight = BacklightPosition("", name="mock_backlight")
+    await backlight.connect(mock=True)
+    return backlight
