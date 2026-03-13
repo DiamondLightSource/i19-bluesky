@@ -130,7 +130,20 @@ async def test_trigger_panda(
             exposure_time=10,
         )
     )
+
+
+@patch("i19_bluesky.serial.example_trigger_plan_zebra_vs_panda.disarm_panda")
+async def test_abort_panda(
+    mock_disarm_panda: MagicMock,
+    mock_panda: HDFPanda,
+    eh2_diffractometer: FourCircleDiffractometer,
+    RE: RunEngine,
+):
+    parent_mock = MagicMock()
     mock_phi = get_mock_put(eh2_diffractometer.phi.user_setpoint)
+    RE(abort_panda(eh2_diffractometer, mock_panda))
+    get_mock_put(eh2_diffractometer.phi.motor_stop).assert_called_once_with(1)
+    mock_disarm_panda.assert_called_once_with(mock_panda)
     mock_phi.assert_has_calls([call(10), call(5)])
 
     expected_calls = [
@@ -163,16 +176,16 @@ async def test_abort_zebra(
     mock_disarm_zebra.assert_called_once_with(eh2_zebra)
 
 
-@patch("i19_bluesky.serial.example_trigger_plan_zebra_vs_panda.disarm_panda")
-async def test_abort_panda(
-    mock_disarm_panda: MagicMock,
-    mock_panda: HDFPanda,
-    eh2_diffractometer: FourCircleDiffractometer,
-    RE: RunEngine,
-):
-    RE(abort_panda(eh2_diffractometer, mock_panda))
-    get_mock_put(eh2_diffractometer.phi.motor_stop).assert_called_once_with(1)
-    mock_disarm_panda.assert_called_once_with(mock_panda)
+# @patch("i19_bluesky.serial.example_trigger_plan_zebra_vs_panda.disarm_panda")
+# async def test_abort_panda(
+#     mock_disarm_panda: MagicMock,
+#     mock_panda: HDFPanda,
+#     eh2_diffractometer: FourCircleDiffractometer,
+#     RE: RunEngine,
+# ):
+#     RE(abort_panda(eh2_diffractometer, mock_panda))
+#     get_mock_put(eh2_diffractometer.phi.motor_stop).assert_called_once_with(1)
+#     mock_disarm_panda.assert_called_once_with(mock_panda)
 
 
 async def test_move_diffractometer_back(
