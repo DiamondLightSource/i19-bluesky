@@ -19,24 +19,6 @@ from i19_bluesky.serial.zebra_collection_setup_plan import setup_zebra_for_colle
 RAMP = 0.5
 
 
-def setup_diffractometer(
-    diffractometer: FourCircleDiffractometer,
-    phi_start: float,
-    phi_steps: int,
-    exposure_time: float,
-) -> MsgGenerator:
-    """Setup phi start posistion and velocity on the diffractometer.
-
-    Args:
-        diffractometer (FourCircleDiffractometer): The diffractometer ophyd device.
-        phi_start (float): Starting phi position.
-        phi_steps (int): Number of images to take.
-        exposure_time(float): Time between images, in seconds."""
-    yield from bps.abs_set(diffractometer.phi, phi_start)
-    velocity = phi_steps / exposure_time
-    yield from bps.abs_set(diffractometer.phi.velocity, velocity)
-
-
 def trigger_zebra(
     zebra: Zebra,
     diffractometer: FourCircleDiffractometer,
@@ -96,6 +78,59 @@ def trigger_zebra(
     yield from disarm_zebra(zebra)
 
 
+def abort_zebra(diffractometer: FourCircleDiffractometer, zebra: Zebra) -> MsgGenerator:
+    LOGGER.warning("ABORT")
+    yield from bps.abs_set(diffractometer.phi.motor_stop, 1, wait=True)
+    yield from disarm_zebra(zebra)
+
+
+def run_zebra_test(
+    phi_start: float,
+    phi_end: float,
+    phi_steps: int,
+    exposure_time: float,
+    gate_width: float,
+    pulse_width: float,
+    zebra: Zebra = inject("zebra"),
+    diffractometer: FourCircleDiffractometer = inject("diffractometer"),
+) -> MsgGenerator:
+    yield from bpp.contingency_wrapper(
+        trigger_zebra(
+            zebra,
+            diffractometer,
+            phi_start,
+            phi_end,
+            phi_steps,
+            exposure_time,
+            gate_width,
+            pulse_width,
+        ),
+        except_plan=lambda: (yield from abort_zebra(diffractometer, zebra)),
+        final_plan=lambda: (
+            yield from move_diffractometer_back(diffractometer, phi_start)
+        ),
+        auto_raise=False,
+    )
+
+
+def setup_diffractometer(
+    diffractometer: FourCircleDiffractometer,
+    phi_start: float,
+    phi_steps: int,
+    exposure_time: float,
+) -> MsgGenerator:
+    """Setup phi start posistion and velocity on the diffractometer.
+
+    Args:
+        diffractometer (FourCircleDiffractometer): The diffractometer ophyd device.
+        phi_start (float): Starting phi position.
+        phi_steps (int): Number of images to take.
+        exposure_time(float): Time between images, in seconds."""
+    yield from bps.abs_set(diffractometer.phi, phi_start)
+    velocity = phi_steps / exposure_time
+    yield from bps.abs_set(diffractometer.phi.velocity, velocity)
+
+
 def trigger_panda(
     panda: HDFPanda,
     diffractometer: FourCircleDiffractometer,
@@ -137,12 +172,6 @@ def trigger_panda(
     yield from reset_panda(panda)
 
 
-def abort_zebra(diffractometer: FourCircleDiffractometer, zebra: Zebra) -> MsgGenerator:
-    LOGGER.warning("ABORT")
-    yield from bps.abs_set(diffractometer.phi.motor_stop, 1, wait=True)
-    yield from disarm_zebra(zebra)
-
-
 def abort_panda(
     diffractometer: FourCircleDiffractometer, panda: HDFPanda
 ) -> MsgGenerator:
@@ -176,35 +205,6 @@ def run_panda_test(
             exposure_time,
         ),
         except_plan=lambda: (yield from abort_panda(diffractometer, panda)),
-        final_plan=lambda: (
-            yield from move_diffractometer_back(diffractometer, phi_start)
-        ),
-        auto_raise=False,
-    )
-
-
-def run_zebra_test(
-    phi_start: float,
-    phi_end: float,
-    phi_steps: int,
-    exposure_time: float,
-    gate_width: float,
-    pulse_width: float,
-    zebra: Zebra = inject("zebra"),
-    diffractometer: FourCircleDiffractometer = inject("diffractometer"),
-) -> MsgGenerator:
-    yield from bpp.contingency_wrapper(
-        trigger_zebra(
-            zebra,
-            diffractometer,
-            phi_start,
-            phi_end,
-            phi_steps,
-            exposure_time,
-            gate_width,
-            pulse_width,
-        ),
-        except_plan=lambda: (yield from abort_zebra(diffractometer, zebra)),
         final_plan=lambda: (
             yield from move_diffractometer_back(diffractometer, phi_start)
         ),
