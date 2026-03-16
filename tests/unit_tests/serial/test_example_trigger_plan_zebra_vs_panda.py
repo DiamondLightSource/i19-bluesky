@@ -11,10 +11,12 @@ from i19_bluesky.serial.example_trigger_plan_zebra_vs_panda import (
 )
 
 
-@patch("i19_bluesky.eh2.zebra_arming_plan.disarm_zebra")
-@patch("i19_bluesky.eh2.zebra_arming_plan.arm_zebra")
-@patch("i19_bluesky.serial.zebra_collection_setup_plan.setup_zebra_for_collection")
-@patch("i19_bluesky.serial.run_serial_with_panda.setup_diffractometer")
+@patch("i19_bluesky.serial.example_trigger_plan_zebra_vs_panda.disarm_zebra")
+@patch("i19_bluesky.serial.example_trigger_plan_zebra_vs_panda.arm_zebra")
+@patch(
+    "i19_bluesky.serial.example_trigger_plan_zebra_vs_panda.setup_zebra_for_collection"
+)
+@patch("i19_bluesky.serial.example_trigger_plan_zebra_vs_panda.setup_diffractometer")
 async def test_trigger_zebra(
     mock_setup_diffractometer: MagicMock,
     mock_setup_zebra_for_collection: MagicMock,
@@ -72,7 +74,7 @@ async def test_trigger_zebra(
     parent_mock.assert_has_calls(expected_calls)
 
 
-@patch("i19_bluesky.eh2.zebra_arming_plan.disarm_zebra")
+@patch("i19_bluesky.serial.example_trigger_plan_zebra_vs_panda.disarm_zebra")
 async def test_abort_zebra(
     mock_disarm_zebra: MagicMock,
     eh2_zebra: Zebra,
