@@ -1,4 +1,4 @@
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 import pytest
 from bluesky.run_engine import RunEngine
@@ -26,7 +26,15 @@ from i19_bluesky.serial.setup_beamline_pre_collection import (
         (PinColRequest.PCOL100),
     ],
 )
+@patch("i19_bluesky.serial.setup_beamline_pre_collection.move_detector_stage")
+@patch(
+    "i19_bluesky.serial.setup_beamline_pre_collection.move_pin_col_to_requested_in_position"
+)
+@patch("i19_bluesky.serial.setup_beamline_pre_collection.move_backlight_out")
 async def test_setup_beamline_before_collection(
+    mock_move_backlight_out: MagicMock,
+    mock_move_pin_col_to_requested_in_position: MagicMock,
+    mock_move_detector_stage: MagicMock,
     detector_z: float,
     detector_two_theta: float,
     eh2_diffractometer: FourCircleDiffractometer,
@@ -45,22 +53,12 @@ async def test_setup_beamline_before_collection(
             eh2_aperture,
         )
     )
-    assert (
-        await eh2_diffractometer.det_stage.det_z.user_readback.get_value() == detector_z
+    mock_move_backlight_out.assert_called_once_with(eh2_backlight)
+    mock_move_pin_col_to_requested_in_position.assert_called_once_with(
+        eh2_aperture, pincol
     )
-    assert (
-        await eh2_diffractometer.det_stage.two_theta.user_readback.get_value()
-        == detector_two_theta
+    mock_move_detector_stage.assert_called_once_with(
+        eh2_diffractometer.det_stage,
+        detector_z,
+        detector_two_theta,
     )
-    mock_setup_beamline_before_collection = MagicMock()
-    RE(
-        mock_setup_beamline_before_collection(
-            detector_z,
-            detector_two_theta,
-            eh2_backlight,
-            eh2_diffractometer,
-            pincol,
-            eh2_aperture,
-        )
-    )
-    mock_setup_beamline_before_collection.assert_called_once()
