@@ -16,7 +16,7 @@ from i19_bluesky.serial.example_trigger_plan_zebra_vs_panda import (
 @patch(
     "i19_bluesky.serial.example_trigger_plan_zebra_vs_panda.setup_zebra_for_collection"
 )
-@patch("i19_bluesky.serial.example_trigger_plan_zebra_vs_panda.setup_diffractometer")
+@patch("i19_bluesky.serial.run_serial_with_panda.setup_diffractometer")
 async def test_trigger_zebra(
     mock_setup_diffractometer: MagicMock,
     mock_setup_zebra_for_collection: MagicMock,
