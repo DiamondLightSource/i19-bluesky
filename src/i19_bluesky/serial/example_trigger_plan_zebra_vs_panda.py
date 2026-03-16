@@ -11,10 +11,8 @@ from dodal.devices.zebra.zebra import RotationDirection, Zebra
 
 from i19_bluesky.eh2.zebra_arming_plan import arm_zebra, disarm_zebra
 from i19_bluesky.log import LOGGER
-from i19_bluesky.serial.run_serial_with_panda import (
-    move_diffractometer_back,
-    setup_diffractometer,
-)
+from i19_bluesky.serial.panda_serial_collection import setup_diffractometer
+from i19_bluesky.serial.run_serial_with_panda import move_diffractometer_back
 from i19_bluesky.serial.zebra_collection_setup_plan import setup_zebra_for_collection
 
 RAMP = 0.5
