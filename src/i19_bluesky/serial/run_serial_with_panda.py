@@ -1,16 +1,3 @@
-# Entrypoint plan
-# Inject, a type, and a msg generator
-# should be exposed to blueAPI by having it in__init__
-# must create new file "run serial with panda"
-# has contingency wrapper like this that calls 2 plans
-# like doing try except finally
-# any raise error / abort will go into except plan
-# then will run final plan regardless (to reset)
-# all in bluesky docs
-# also in this you have main_collection_plan which will replace the contingency wrapper
-# will call setup beamline then trigger_panda
-# then: go to the UI and use blueAPI client (will hopefully be updated today)
-# this will then run this test run serial with panda test
 import bluesky.plan_stubs as bps
 import bluesky.preprocessors as bpp
 from bluesky.utils import MsgGenerator
