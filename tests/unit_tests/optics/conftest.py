@@ -6,7 +6,7 @@ from dodal.devices.beamlines.i19.access_controlled.hutch_access import (
 from dodal.devices.focusing_mirror import FocusingMirrorWithPiezo
 from dodal.devices.hutch_shutter import (
     HUTCH_SAFE_FOR_OPERATIONS,
-    HutchShutter,
+    InterlockedHutchShutter,
     ShutterDemand,
     ShutterState,
 )
@@ -22,12 +22,12 @@ def active_device_factories() -> set[AnyDeviceFactory]:
 
 
 @pytest.fixture
-def expt_shutter(RE) -> HutchShutter:
+def expt_shutter(RE) -> InterlockedHutchShutter:
     expt_shutter = i19_optics.shutter.build(
         connect_immediately=True,
         mock=True,
     )
-    set_mock_value(expt_shutter.interlock.status, HUTCH_SAFE_FOR_OPERATIONS)  # type: ignore
+    set_mock_value(expt_shutter.interlock.status, HUTCH_SAFE_FOR_OPERATIONS)
 
     def set_status(value: ShutterDemand, *args, **kwargs):
         value_sta = ShutterState.OPEN if value == "Open" else ShutterState.CLOSED

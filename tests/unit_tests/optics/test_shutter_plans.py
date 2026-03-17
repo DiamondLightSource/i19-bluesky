@@ -5,7 +5,7 @@ from dodal.devices.beamlines.i19.access_controlled.hutch_access import (
     HutchAccessControl,
 )
 from dodal.devices.hutch_shutter import (
-    HutchShutter,
+    InterlockedHutchShutter,
     ShutterDemand,
     ShutterState,
 )
@@ -57,7 +57,7 @@ async def test_hutch_shutter_opens_and_closes_if_run_by_active_hutch(
     start_state: ShutterState,
     expected_state: ShutterState,
     shutter_demand: ShutterDemand,
-    expt_shutter: HutchShutter,
+    expt_shutter: InterlockedHutchShutter,
     access_control_device: HutchAccessControl,
     RE: RunEngine,
 ):
@@ -111,7 +111,7 @@ async def test_hutch_shutter_does_not_operate_from_wrong_hutch(
     shutter_demand: ShutterDemand,
     start_state: ShutterState,
     expected_state: ShutterState,
-    expt_shutter: HutchShutter,
+    expt_shutter: InterlockedHutchShutter,
     access_control_device: HutchAccessControl,
     RE: RunEngine,
 ):
@@ -139,7 +139,7 @@ async def test_hutch_shutter_does_not_operate_from_wrong_hutch(
 def test_operate_hutch_shutter_raises_error_if_hutch_invalid(
     request_hutch: HutchName,
     shutter_demand: ShutterDemand,
-    expt_shutter: HutchShutter,
+    expt_shutter: InterlockedHutchShutter,
     access_control_device: HutchAccessControl,
     RE: RunEngine,
 ):
