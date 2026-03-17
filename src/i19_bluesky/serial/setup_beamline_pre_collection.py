@@ -41,6 +41,6 @@ def setup_beamline_before_collection(
     LOGGER.info("Moving pinhole collimator into position")
     yield from move_pin_col_to_requested_in_position(aperture, pinhole_collimator)
     LOGGER.info("Moving attenuator wedge")
-    #
+    # waiting for https://github.com/DiamondLightSource/i19-bluesky/issues/8
     LOGGER.info("Moving detector stage into position")
     yield from move_detector_stage(diffractometer.det_stage, det_z, two_theta)
