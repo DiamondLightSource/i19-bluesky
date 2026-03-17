@@ -109,5 +109,5 @@ async def eh2_backlight(RE: RunEngine) -> BacklightPosition:
 
 @pytest.fixture
 async def eh2_eiger(RE: RunEngine) -> EigerController:
-    eiger = EigerController()
+    eiger = EigerController()  # ???
     return eiger
