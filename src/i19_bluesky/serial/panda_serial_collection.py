@@ -5,6 +5,7 @@ from dodal.common import inject
 from dodal.devices.beamlines.i19.diffractometer import (
     FourCircleDiffractometer,
 )
+from ophyd_async.fastcs.eiger import EigerController
 from ophyd_async.fastcs.panda import HDFPanda
 
 from i19_bluesky.log import LOGGER
@@ -33,6 +34,7 @@ def setup_diffractometer(
 def trigger_panda(
     panda: HDFPanda,
     diffractometer: FourCircleDiffractometer,
+    eiger: EigerController,
     phi_start: float,
     phi_end: float,
     phi_steps: int,
@@ -64,10 +66,14 @@ def trigger_panda(
     LOGGER.info("Arm panda and move phi")
     yield from arm_panda(panda)
     yield from bps.abs_set(diffractometer.phi, phi_end, wait=True)
+    LOGGER.info("Arm eiger")
+    yield from eiger.arm()
     yield from bps.sleep(2.0)
     yield from bps.abs_set(diffractometer.phi, phi_start, wait=True)
     LOGGER.info("Disarm panda")
     yield from disarm_panda(panda)
+    LOGGER.info("Disarm eiger")
+    yield from eiger.disarm()
     yield from reset_panda(panda)
 
 
@@ -93,11 +99,13 @@ def run_panda_test(
     exposure_time: float,
     diffractometer: FourCircleDiffractometer = inject("diffractometer"),
     panda: HDFPanda = inject("panda"),
+    eiger: EigerController = inject("eiger"),
 ) -> MsgGenerator:
     yield from bpp.contingency_wrapper(
         trigger_panda(
             panda,
             diffractometer,
+            eiger,
             phi_start,
             phi_end,
             phi_steps,

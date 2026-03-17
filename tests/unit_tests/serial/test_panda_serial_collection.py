@@ -5,6 +5,7 @@ from dodal.devices.beamlines.i19.diffractometer import (
     FourCircleDiffractometer,
 )
 from ophyd_async.core import get_mock_put
+from ophyd_async.fastcs.eiger import EigerController
 from ophyd_async.fastcs.panda import HDFPanda
 
 from i19_bluesky.serial.panda_serial_collection import (
@@ -27,6 +28,8 @@ async def test_setup_diffractometer(
     mock_phi_velocity.assert_called_once_with(5.0)
 
 
+@patch("i19_bluesky.serial.panda_serial_collection.eiger.disarm")
+@patch("i19_bluesky.serial.panda_serial_collection.eiger.arm")
 @patch("i19_bluesky.serial.panda_serial_collection.reset_panda")
 @patch("i19_bluesky.serial.panda_serial_collection.bps.sleep")
 @patch("i19_bluesky.serial.panda_serial_collection.disarm_panda")
@@ -40,7 +43,10 @@ async def test_trigger_panda(
     mock_disarm_panda: MagicMock,
     mock_sleep: MagicMock,
     mock_reset_panda: MagicMock,
+    mock_arm: MagicMock,
+    mock_disarm: MagicMock,
     mock_panda: HDFPanda,
+    eh2_eiger: EigerController,
     eh2_diffractometer: FourCircleDiffractometer,
     RE: RunEngine,
 ):
@@ -53,11 +59,13 @@ async def test_trigger_panda(
     parent_mock.attach_mock(mock_disarm_panda, "mock_disarm_panda")
     parent_mock.attach_mock(mock_sleep, "mock_sleep")
     parent_mock.attach_mock(mock_reset_panda, "mock_reset_panda")
-
+    parent_mock.attach_mock(mock_arm, "mock_arm")
+    parent_mock.attach_mock(mock_disarm, "mock_disarm")
     RE(
         trigger_panda(
             panda=mock_panda,
             diffractometer=eh2_diffractometer,
+            eiger=eh2_eiger,
             phi_start=5,
             phi_end=10,
             phi_steps=25,
@@ -74,10 +82,12 @@ async def test_trigger_panda(
         call.mock_setup_panda_for_rotation().__iter__(),
         call.mock_arm_panda(mock_panda),
         call.mock_arm_panda().__iter__(),
+        call.mock_arm(),  # arm eiger
         call.mock_sleep(2.0),
         call.mock_sleep().__iter__(),
         call.mock_disarm_panda(mock_panda),
         call.mock_disarm_panda().__iter__(),
+        call.mock_disarm,  # disarm eiger
         call.mock_reset_panda(mock_panda),
         call.mock_reset_panda().__iter__(),
     ]
