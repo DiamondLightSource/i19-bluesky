@@ -50,7 +50,7 @@ async def test_move_order_two_theta_first(
     eh2_diffractometer: FourCircleDiffractometer,
     RE: RunEngine,
 ):
-    RE(move_stage(eh2_diffractometer.det_stage, 80, 90))
+    RE(move_detector_stage(eh2_diffractometer.det_stage, 80, 90))
     parent = MagicMock()
     mock_det_z = get_mock_put(eh2_diffractometer.det_stage.det_z.user_setpoint)
     mock_two_theta = get_mock_put(eh2_diffractometer.det_stage.two_theta.user_setpoint)
