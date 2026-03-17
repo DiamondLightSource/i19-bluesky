@@ -5,7 +5,6 @@ from dodal.common import inject
 from dodal.devices.beamlines.i19.diffractometer import (
     FourCircleDiffractometer,
 )
-from dodal.devices.eiger import EigerDetector
 from ophyd_async.fastcs.panda import HDFPanda
 
 from i19_bluesky.log import LOGGER
@@ -34,7 +33,6 @@ def setup_diffractometer(
 def trigger_panda(
     panda: HDFPanda,
     diffractometer: FourCircleDiffractometer,
-    eiger: EigerDetector,
     phi_start: float,
     phi_end: float,
     phi_steps: int,
@@ -65,13 +63,11 @@ def trigger_panda(
     )
     LOGGER.info("Arm panda and move phi")
     yield from arm_panda(panda)
-    eiger.stage()
     yield from bps.abs_set(diffractometer.phi, phi_end, wait=True)
     yield from bps.sleep(2.0)
     yield from bps.abs_set(diffractometer.phi, phi_start, wait=True)
     LOGGER.info("Disarm panda")
     yield from disarm_panda(panda)
-    # disarm diffractometer
     yield from reset_panda(panda)
 
 

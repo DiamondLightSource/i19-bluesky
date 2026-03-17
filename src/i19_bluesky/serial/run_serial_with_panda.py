@@ -9,7 +9,6 @@ from dodal.devices.beamlines.i19.pin_col_stages import (
     PinColRequest,
     PinholeCollimatorControl,
 )
-from dodal.devices.eiger import EigerDetector
 from ophyd_async.fastcs.panda import HDFPanda
 
 from i19_bluesky.serial.panda_serial_collection import (
@@ -30,7 +29,6 @@ def setup_then_trigger_panda(
     phi_steps: int,
     exposure_time: float,
     eh2_aperture: PinColRequest,
-    eh2_eiger: EigerDetector = inject("eiger"),
     eh2_diffractometer: FourCircleDiffractometer = inject("diffractometer"),
     eh2_backlight: BacklightPosition = inject("backlight"),
     pincol: PinholeCollimatorControl = inject("pincol"),
@@ -62,13 +60,7 @@ def setup_then_trigger_panda(
         eh2_aperture,
     )
     yield from trigger_panda(
-        panda,
-        eh2_diffractometer,
-        eh2_eiger,
-        phi_start,
-        phi_end,
-        phi_steps,
-        exposure_time,
+        panda, eh2_diffractometer, phi_start, phi_end, phi_steps, exposure_time
     )
 
 
@@ -80,7 +72,6 @@ def main_entry_plan(
     phi_steps: int,
     exposure_time: float,
     eh2_aperture: PinColRequest,
-    eh2_eiger: EigerDetector = inject("eiger"),
     eh2_diffractometer: FourCircleDiffractometer = inject("diffractometer"),
     eh2_backlight: BacklightPosition = inject("backlight"),
     pincol: PinholeCollimatorControl = inject("pincol"),
@@ -95,7 +86,6 @@ def main_entry_plan(
             phi_steps,
             exposure_time,
             eh2_aperture,
-            eh2_eiger,
             eh2_diffractometer,
             eh2_backlight,
             pincol,
