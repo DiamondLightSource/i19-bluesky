@@ -54,10 +54,10 @@ def setup_then_trigger_panda(
     yield from setup_beamline_before_collection(
         detector_z,
         detector_two_theta,
+        eh2_aperture,
         eh2_backlight,
         eh2_diffractometer,
         pincol,
-        eh2_aperture,
     )
     yield from trigger_panda(
         panda, eh2_diffractometer, phi_start, phi_end, phi_steps, exposure_time
