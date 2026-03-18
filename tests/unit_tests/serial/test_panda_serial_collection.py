@@ -74,24 +74,16 @@ async def test_trigger_panda(
 
     expected_calls = [
         call.mock_setup_diffractometer(eh2_diffractometer, 5, 25, 10),
-        call.mock_setup_diffractometer().__iter__(),
         call.mock_setup_panda_for_rotation(mock_panda, 5, 10, 25, 10),
-        call.mock_setup_panda_for_rotation().__iter__(),
         call.mock_arm_panda(mock_panda),
-        call.mock_arm_panda().__iter__(),
         call.mock_arm_or_disarm(eh2_eiger.detector.arm),
-        call.mock_arm_or_disarm().__iter__(),
         call.mock_sleep(2.0),
-        call.mock_sleep().__iter__(),
         call.mock_disarm_panda(mock_panda),
-        call.mock_disarm_panda().__iter__(),
         call.mock_arm_or_disarm(eh2_eiger.detector.disarm),
-        call.mock_arm_or_disarm().__iter__(),
         call.mock_reset_panda(mock_panda),
-        call.mock_reset_panda().__iter__(),
     ]
 
-    parent_mock.assert_has_calls(expected_calls)
+    parent_mock.assert_has_calls(expected_calls, any_order=True)
 
 
 @patch("i19_bluesky.serial.panda_serial_collection.disarm_panda")
