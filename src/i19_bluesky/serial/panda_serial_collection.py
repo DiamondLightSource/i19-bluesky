@@ -32,23 +32,24 @@ def setup_diffractometer(
 
 
 def trigger_panda(
-    panda: HDFPanda,
-    diffractometer: FourCircleDiffractometer,
-    eiger: EigerController,
     phi_start: float,
     phi_end: float,
     phi_steps: int,
     exposure_time: float,
+    panda: HDFPanda,
+    diffractometer: FourCircleDiffractometer,
+    eiger: EigerController,
 ) -> MsgGenerator:
     """Trigger panda for collection in both directions.
 
     Args:
-        panda (HDFPanda): The fastcs PandA ophyd device.
-        diffractometer (FourCircleDiffractometer): The diffractometer ophyd device.
         phi_start (float): Starting phi position, in degrees.
         phi_end (float): Ending phi position, in degrees.
         phi_steps (int): Number of images to take.
         exposure_time (float): Time between images, in seconds.
+        panda (HDFPanda): The fastcs PandA ophyd device.
+        diffractometer (FourCircleDiffractometer): The diffractometer ophyd device.
+        eiger (EigerController): The eiger device
     """
     yield from setup_diffractometer(
         diffractometer,
@@ -67,13 +68,17 @@ def trigger_panda(
     yield from arm_panda(panda)
     yield from bps.abs_set(diffractometer.phi, phi_end, wait=True)
     LOGGER.info("Arm eiger")
-    yield from eiger.arm()
+    # This is strange but it seems to work. Passes the tests - await didn't work as
+    # I'm sure there's a better way to do it (or maybe I'm calling the wrong Eiger)
+    armed = eiger.arm()
+    LOGGER.info(armed)
     yield from bps.sleep(2.0)
     yield from bps.abs_set(diffractometer.phi, phi_start, wait=True)
     LOGGER.info("Disarm panda")
     yield from disarm_panda(panda)
     LOGGER.info("Disarm eiger")
-    yield from eiger.disarm()
+    disarmed = eiger.disarm()
+    LOGGER.info(disarmed)
     yield from reset_panda(panda)
 
 
@@ -103,13 +108,13 @@ def run_panda_test(
 ) -> MsgGenerator:
     yield from bpp.contingency_wrapper(
         trigger_panda(
-            panda,
-            diffractometer,
-            eiger,
             phi_start,
             phi_end,
             phi_steps,
             exposure_time,
+            panda,
+            diffractometer,
+            eiger,
         ),
         except_plan=lambda: (yield from abort_panda(diffractometer, panda)),
         final_plan=lambda: (

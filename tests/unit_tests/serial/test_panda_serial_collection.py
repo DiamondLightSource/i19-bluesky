@@ -28,8 +28,8 @@ async def test_setup_diffractometer(
     mock_phi_velocity.assert_called_once_with(5.0)
 
 
-@patch("i19_bluesky.serial.panda_serial_collection.eiger.disarm")
-@patch("i19_bluesky.serial.panda_serial_collection.eiger.arm")
+@patch("i19_bluesky.serial.panda_serial_collection.EigerController.disarm")
+@patch("i19_bluesky.serial.panda_serial_collection.EigerController.arm")
 @patch("i19_bluesky.serial.panda_serial_collection.reset_panda")
 @patch("i19_bluesky.serial.panda_serial_collection.bps.sleep")
 @patch("i19_bluesky.serial.panda_serial_collection.disarm_panda")
@@ -63,13 +63,13 @@ async def test_trigger_panda(
     parent_mock.attach_mock(mock_disarm, "mock_disarm")
     RE(
         trigger_panda(
-            panda=mock_panda,
-            diffractometer=eh2_diffractometer,
-            eiger=eh2_eiger,
             phi_start=5,
             phi_end=10,
             phi_steps=25,
             exposure_time=10,
+            panda=mock_panda,
+            diffractometer=eh2_diffractometer,
+            eiger=eh2_eiger,
         )
     )
     mock_phi = get_mock_put(eh2_diffractometer.phi.user_setpoint)
