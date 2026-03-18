@@ -1,7 +1,5 @@
 import bluesky.plan_stubs as bps
-import bluesky.preprocessors as bpp
 from bluesky.utils import MsgGenerator
-from dodal.common import inject
 from dodal.devices.beamlines.i19.diffractometer import (
     FourCircleDiffractometer,
 )
@@ -91,30 +89,3 @@ def move_diffractometer_back(
 ) -> MsgGenerator:
     LOGGER.info("Move diffractometer back to start position")
     yield from bps.abs_set(diffractometer.phi, phi_start, wait=True)
-
-
-def run_panda_test(
-    phi_start: float,
-    phi_end: float,
-    phi_steps: int,
-    exposure_time: float,
-    diffractometer: FourCircleDiffractometer = inject("diffractometer"),
-    panda: HDFPanda = inject("panda"),
-    eiger: EigerDriverIO = inject("eiger"),
-) -> MsgGenerator:
-    yield from bpp.contingency_wrapper(
-        trigger_panda(
-            phi_start,
-            phi_end,
-            phi_steps,
-            exposure_time,
-            panda,
-            diffractometer,
-            eiger,
-        ),
-        except_plan=lambda: (yield from abort_panda(diffractometer, panda)),
-        final_plan=lambda: (
-            yield from move_diffractometer_back(diffractometer, phi_start)
-        ),
-        auto_raise=False,
-    )
