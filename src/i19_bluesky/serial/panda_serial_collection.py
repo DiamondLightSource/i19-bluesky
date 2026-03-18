@@ -5,7 +5,7 @@ from dodal.common import inject
 from dodal.devices.beamlines.i19.diffractometer import (
     FourCircleDiffractometer,
 )
-from ophyd_async.fastcs.eiger import EigerController
+from ophyd_async.fastcs.eiger import EigerDriverIO
 from ophyd_async.fastcs.panda import HDFPanda
 
 from i19_bluesky.log import LOGGER
@@ -38,7 +38,7 @@ def trigger_panda(
     exposure_time: float,
     panda: HDFPanda,
     diffractometer: FourCircleDiffractometer,
-    eiger: EigerController,
+    eiger: EigerDriverIO,
 ) -> MsgGenerator:
     """Trigger panda for collection in both directions.
 
@@ -68,18 +68,13 @@ def trigger_panda(
     yield from arm_panda(panda)
     yield from bps.abs_set(diffractometer.phi, phi_end, wait=True)
     LOGGER.info("Arm eiger")
-    # This is strange but it seems to work. Passes the tests - await didn't work as
-    # I'm sure there's a better way to do it (or maybe I'm calling the wrong Eiger)
-    armed = eiger.arm()
-    LOGGER.info(armed)
-    # LOGGER.info(armed)
+    yield from bps.trigger(eiger.detector.arm)
     yield from bps.sleep(2.0)
     yield from bps.abs_set(diffractometer.phi, phi_start, wait=True)
     LOGGER.info("Disarm panda")
     yield from disarm_panda(panda)
     LOGGER.info("Disarm eiger")
-    disarmed = eiger.disarm()
-    LOGGER.info(disarmed)
+    yield from bps.trigger(eiger.detector.disarm)
     yield from reset_panda(panda)
 
 
@@ -105,7 +100,7 @@ def run_panda_test(
     exposure_time: float,
     diffractometer: FourCircleDiffractometer = inject("diffractometer"),
     panda: HDFPanda = inject("panda"),
-    eiger: EigerController = inject("eiger"),
+    eiger: EigerDriverIO = inject("eiger"),
 ) -> MsgGenerator:
     yield from bpp.contingency_wrapper(
         trigger_panda(

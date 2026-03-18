@@ -14,7 +14,6 @@ from dodal.devices.beamlines.i19.diffractometer import (
 from dodal.devices.beamlines.i19.pin_col_stages import PinholeCollimatorControl
 from ophyd_async.core import Device, DeviceVector, init_devices, set_mock_value
 from ophyd_async.epics.core import epics_signal_rw
-from ophyd_async.fastcs.eiger import EigerController
 from ophyd_async.fastcs.eiger._eiger_io import EigerDriverIO
 from ophyd_async.fastcs.panda import HDFPanda
 
@@ -109,7 +108,6 @@ async def eh2_backlight(RE: RunEngine) -> BacklightPosition:
 
 
 @pytest.fixture
-async def eh2_eiger(RE: RunEngine) -> EigerController:
-    mock_driver = EigerDriverIO(uri="uri", name="mock_driver")
-    eiger = EigerController(mock_driver)  # ???
+async def eh2_eiger(RE: RunEngine) -> EigerDriverIO:
+    eiger = EigerDriverIO(uri="mock")
     return eiger
