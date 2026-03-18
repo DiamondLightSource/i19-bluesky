@@ -72,6 +72,7 @@ def trigger_panda(
     # I'm sure there's a better way to do it (or maybe I'm calling the wrong Eiger)
     armed = eiger.arm()
     LOGGER.info(armed)
+    # LOGGER.info(armed)
     yield from bps.sleep(2.0)
     yield from bps.abs_set(diffractometer.phi, phi_start, wait=True)
     LOGGER.info("Disarm panda")
