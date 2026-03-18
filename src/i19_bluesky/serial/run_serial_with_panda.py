@@ -34,8 +34,8 @@ def setup_then_trigger_panda(
     pincol: PinholeCollimatorControl = inject("pincol"),
     panda: HDFPanda = inject("panda"),
 ) -> MsgGenerator:
-    """Run primary setup processes then trigger PandA to collect data from experiment. \
-    Has contingencies to abort if any stage produces errors, before moving the \
+    """Run primary setup processes then trigger PandA to collect data from experiment.
+    Has contingencies to abort if any stage produces errors, before moving the
     diffractometer to its starting position. Designed to be called with BlueAPI.
 
     Args:
@@ -64,7 +64,7 @@ def setup_then_trigger_panda(
     )
 
 
-def main_entry_plan(
+def run_serial_with_panda(
     detector_z: float,
     detector_two_theta: float,
     phi_start: float,

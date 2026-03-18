@@ -13,7 +13,7 @@ from dodal.devices.beamlines.i19.pin_col_stages import (
 from ophyd_async.fastcs.panda import HDFPanda
 
 from i19_bluesky.serial.run_serial_with_panda import (
-    main_entry_plan,
+    run_serial_with_panda,
     setup_then_trigger_panda,
 )
 
@@ -23,7 +23,6 @@ from i19_bluesky.serial.run_serial_with_panda import (
     [
         (100, 30, 50, 60, 0.5, 0.2),
         (80, 90, 50, 60, 0.5, 0.2),
-        # (301, 90, 50, 60, 0.5, 0.2),
     ],
 )
 @pytest.mark.parametrize(
@@ -35,9 +34,7 @@ from i19_bluesky.serial.run_serial_with_panda import (
 )
 @patch("i19_bluesky.serial.run_serial_with_panda.move_diffractometer_back")
 @patch("i19_bluesky.serial.run_serial_with_panda.setup_then_trigger_panda")
-@patch("i19_bluesky.serial.run_serial_with_panda.abort_panda")
-async def test_main_entry_plan(
-    mock_abort_panda: MagicMock,
+async def test_run_serial_with_panda(
     mock_setup_then_trigger_panda: MagicMock,
     mock_move_diffractometer_back: MagicMock,
     detector_z: float,
@@ -53,48 +50,21 @@ async def test_main_entry_plan(
     pincol: PinholeCollimatorControl,
     mock_panda: HDFPanda,
 ):
-    # assert that abort panda is ran if required
-    # if detector_z > 300:
-    #    raise ValueError
-    # This am unsure how to impliment, am looking up ways to trigger wrapper.
-    if detector_z > 300:
-        with pytest.raises(ValueError):
-            RE(
-                main_entry_plan(
-                    detector_z,
-                    detector_two_theta,
-                    phi_start,
-                    phi_end,
-                    phi_steps,
-                    exposure_time,
-                    eh2_aperture,
-                    eh2_diffractometer,
-                    eh2_backlight,
-                    pincol,
-                    mock_panda,
-                )
-            )
-            mock_setup_then_trigger_panda.assert_called_once()
-            mock_abort_panda.assert_called_once()
-            mock_move_diffractometer_back.assert_called_once_with(
-                eh2_diffractometer, phi_start
-            )
-    else:
-        RE(
-            main_entry_plan(
-                detector_z,
-                detector_two_theta,
-                phi_start,
-                phi_end,
-                phi_steps,
-                exposure_time,
-                eh2_aperture,
-                eh2_diffractometer,
-                eh2_backlight,
-                pincol,
-                mock_panda,
-            )
+    RE(
+        run_serial_with_panda(
+            detector_z,
+            detector_two_theta,
+            phi_start,
+            phi_end,
+            phi_steps,
+            exposure_time,
+            eh2_aperture,
+            eh2_diffractometer,
+            eh2_backlight,
+            pincol,
+            mock_panda,
         )
+    )
     mock_setup_then_trigger_panda.assert_called_once()
     mock_move_diffractometer_back.assert_called_once_with(eh2_diffractometer, phi_start)
 
@@ -139,5 +109,14 @@ async def test_setup_then_trigger_panda(
             mock_panda,
         )
     )
-    mock_setup_beamline_before_collection.assert_called_once()
-    mock_trigger_panda.assert_called_once()
+    mock_setup_beamline_before_collection.assert_called_once_with(
+        detector_z,
+        detector_two_theta,
+        eh2_aperture,
+        eh2_backlight,
+        eh2_diffractometer,
+        pincol,
+    )
+    mock_trigger_panda.assert_called_once_with(
+        mock_panda, eh2_diffractometer, phi_start, phi_end, phi_steps, exposure_time
+    )
