@@ -9,6 +9,7 @@ from dodal.devices.beamlines.i19.pin_col_stages import (
     PinColRequest,
     PinholeCollimatorControl,
 )
+from ophyd_async.fastcs.eiger import EigerDriverIO
 from ophyd_async.fastcs.panda import HDFPanda
 
 from i19_bluesky.serial.panda_serial_collection import (
@@ -33,6 +34,7 @@ def setup_then_trigger_panda(
     eh2_backlight: BacklightPosition = inject("backlight"),
     pincol: PinholeCollimatorControl = inject("pincol"),
     panda: HDFPanda = inject("panda"),
+    eiger: EigerDriverIO = inject("eiger"),
 ) -> MsgGenerator:
     """Run primary setup processes then trigger PandA to collect data from experiment.
     Has contingencies to abort if any stage produces errors, before moving the
@@ -60,7 +62,7 @@ def setup_then_trigger_panda(
         pincol,
     )
     yield from trigger_panda(
-        panda, eh2_diffractometer, phi_start, phi_end, phi_steps, exposure_time
+        phi_start, phi_end, phi_steps, exposure_time, panda, eh2_diffractometer, eiger
     )
 
 
@@ -76,6 +78,7 @@ def run_serial_with_panda(
     eh2_backlight: BacklightPosition = inject("backlight"),
     pincol: PinholeCollimatorControl = inject("pincol"),
     panda: HDFPanda = inject("panda"),
+    eiger: EigerDriverIO = inject("eiger"),
 ) -> MsgGenerator:
     yield from bpp.contingency_wrapper(
         setup_then_trigger_panda(
@@ -90,6 +93,7 @@ def run_serial_with_panda(
             eh2_backlight,
             pincol,
             panda,
+            eiger,
         ),
         except_plan=lambda: (yield from abort_panda(eh2_diffractometer, panda)),
         final_plan=lambda: (
