@@ -19,10 +19,10 @@ from i19_bluesky.serial.run_serial_with_panda import (
 
 
 @pytest.mark.parametrize(
-    "detector_z,detector_two_theta,phi_start,phi_end,phi_steps,exposure_time",
+    "detector_x,detector_z,detector_two_theta,phi_start,phi_end,phi_steps,exposure_time",
     [
-        (100, 30, 50, 60, 0.5, 0.2),
-        (80, 90, 50, 60, 0.5, 0.2),
+        (100, 50, 30, 50, 60, 0.5, 0.2),
+        (80, 80, 90, 50, 60, 0.5, 0.2),
     ],
 )
 @pytest.mark.parametrize(
@@ -37,6 +37,7 @@ from i19_bluesky.serial.run_serial_with_panda import (
 async def test_run_serial_with_panda(
     mock_setup_then_trigger_panda: MagicMock,
     mock_move_diffractometer_back: MagicMock,
+    detector_x: float,
     detector_z: float,
     detector_two_theta: float,
     phi_start: float,
@@ -52,6 +53,7 @@ async def test_run_serial_with_panda(
 ):
     RE(
         run_serial_with_panda(
+            detector_x,
             detector_z,
             detector_two_theta,
             phi_start,
@@ -70,10 +72,10 @@ async def test_run_serial_with_panda(
 
 
 @pytest.mark.parametrize(
-    "detector_z,detector_two_theta,phi_start,phi_end,phi_steps,exposure_time,eh2_aperture",
+    "detector_z,detector_x,detector_two_theta,phi_start,phi_end,phi_steps,exposure_time,eh2_aperture",
     [
-        (100.0, 30, 50.0, 60, 1, 0.2, PinColRequest.PCOL20),
-        (80.0, 90, 50.0, 60, 1, 0.2, PinColRequest.PCOL100),
+        (100.0, 50.0, 30, 50.0, 60, 1, 0.2, PinColRequest.PCOL20),
+        (80.0, 80.0, 90, 50.0, 60, 1, 0.2, PinColRequest.PCOL100),
     ],
 )
 @patch("i19_bluesky.serial.run_serial_with_panda.setup_beamline_before_collection")
@@ -81,6 +83,7 @@ async def test_run_serial_with_panda(
 async def test_setup_then_trigger_panda(
     mock_trigger_panda: MagicMock,
     mock_setup_beamline_before_collection: MagicMock,
+    detector_x: float,
     detector_z: float,
     detector_two_theta: float,
     phi_start: float,
@@ -96,6 +99,7 @@ async def test_setup_then_trigger_panda(
 ):
     RE(
         setup_then_trigger_panda(
+            detector_x,
             detector_z,
             detector_two_theta,
             phi_start,
@@ -118,5 +122,12 @@ async def test_setup_then_trigger_panda(
         pincol,
     )
     mock_trigger_panda.assert_called_once_with(
-        mock_panda, eh2_diffractometer, phi_start, phi_end, phi_steps, exposure_time
+        detector_x,
+        detector_z,
+        phi_start,
+        phi_end,
+        phi_steps,
+        exposure_time,
+        eh2_diffractometer,
+        mock_panda,
     )

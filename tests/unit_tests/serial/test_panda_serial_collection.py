@@ -9,22 +9,8 @@ from ophyd_async.fastcs.panda import HDFPanda
 
 from i19_bluesky.serial.panda_serial_collection import (
     abort_panda,
-    move_diffractometer_back,
-    setup_diffractometer,
     trigger_panda,
 )
-
-
-async def test_setup_diffractometer(
-    eh2_diffractometer: FourCircleDiffractometer,
-    RE: RunEngine,
-):
-    RE(setup_diffractometer(eh2_diffractometer, 6.0, 10, 2))
-    mock_phi = get_mock_put(eh2_diffractometer.phi.user_setpoint)
-    mock_phi.assert_called_once_with(6.0)
-
-    mock_phi_velocity = get_mock_put(eh2_diffractometer.phi.velocity)
-    mock_phi_velocity.assert_called_once_with(5.0)
 
 
 @patch("i19_bluesky.serial.panda_serial_collection.reset_panda")
@@ -91,12 +77,3 @@ async def test_abort_panda(
     RE(abort_panda(eh2_diffractometer, mock_panda))
     get_mock_put(eh2_diffractometer.phi.motor_stop).assert_called_once_with(1)
     mock_disarm_panda.assert_called_once_with(mock_panda)
-
-
-async def test_move_diffractometer_back(
-    eh2_diffractometer: FourCircleDiffractometer,
-    RE: RunEngine,
-):
-    RE(move_diffractometer_back(eh2_diffractometer, 4.0))
-    mock_phi = get_mock_put(eh2_diffractometer.phi.user_setpoint)
-    mock_phi.assert_called_once_with(4.0)

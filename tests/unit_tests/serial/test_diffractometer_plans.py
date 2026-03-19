@@ -7,7 +7,32 @@ from dodal.devices.beamlines.i19.diffractometer import (
 )
 from ophyd_async.core import get_mock_put
 
-from i19_bluesky.eh2.move_detector_stage import move_detector_stage
+from i19_bluesky.serial.diffractometer_plans import (
+    move_detector_stage,
+    move_diffractometer_back,
+    setup_diffractometer,
+)
+
+
+async def test_move_diffractometer_back(
+    eh2_diffractometer: FourCircleDiffractometer,
+    RE: RunEngine,
+):
+    RE(move_diffractometer_back(eh2_diffractometer, 4.0))
+    mock_phi = get_mock_put(eh2_diffractometer.phi.user_setpoint)
+    mock_phi.assert_called_once_with(4.0)
+
+
+async def test_setup_diffractometer(
+    eh2_diffractometer: FourCircleDiffractometer,
+    RE: RunEngine,
+):
+    RE(setup_diffractometer(eh2_diffractometer, 6.0, 10, 2))
+    mock_phi = get_mock_put(eh2_diffractometer.phi.user_setpoint)
+    mock_phi.assert_called_once_with(6.0)
+
+    mock_phi_velocity = get_mock_put(eh2_diffractometer.phi.velocity)
+    mock_phi_velocity.assert_called_once_with(5.0)
 
 
 @pytest.mark.parametrize(

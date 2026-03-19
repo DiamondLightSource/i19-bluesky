@@ -22,6 +22,7 @@ from i19_bluesky.serial.setup_beamline_pre_collection import (
 
 
 def setup_then_trigger_panda(
+    detector_x: float,
     detector_z: float,
     detector_two_theta: float,
     phi_start: float,
@@ -60,6 +61,7 @@ def setup_then_trigger_panda(
         pincol,
     )
     yield from trigger_panda(
+        detector_x,
         detector_z,
         phi_start,
         phi_end,
@@ -71,6 +73,7 @@ def setup_then_trigger_panda(
 
 
 def run_serial_with_panda(
+    detector_x: float,
     detector_z: float,
     detector_two_theta: float,
     phi_start: float,
@@ -85,6 +88,7 @@ def run_serial_with_panda(
 ) -> MsgGenerator:
     yield from bpp.contingency_wrapper(
         setup_then_trigger_panda(
+            detector_x,
             detector_z,
             detector_two_theta,
             phi_start,

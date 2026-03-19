@@ -15,6 +15,7 @@ from i19_bluesky.serial.panda_stubs import arm_panda, disarm_panda
 
 
 def trigger_panda(
+    det_x: float,
     det_z: float,
     phi_start: float,
     phi_end: float,
@@ -26,12 +27,13 @@ def trigger_panda(
     """Trigger panda for collection in both directions.
 
     Args:
-        panda (HDFPanda): The fastcs PandA ophyd device.
-        diffractometer (FourCircleDiffractometer): The diffractometer ophyd device.
+
         phi_start (float): Starting phi position, in degrees.
         phi_end (float): Ending phi position, in degrees.
         phi_steps (int): Number of images to take.
         exposure_time (float): Time between images, in seconds.
+        diffractometer (FourCircleDiffractometer): The diffractometer ophyd device.
+        panda (HDFPanda): The fastcs PandA ophyd device.
     """
     yield from setup_diffractometer(
         diffractometer,
@@ -48,12 +50,17 @@ def trigger_panda(
     )
     LOGGER.info("Arm panda and move phi")
     yield from arm_panda(panda)  # move in X
-    # for X
-    yield from move_stage_x_and_z(100, det_z, diffractometer)
+    # jumps to make = Round ( total distance we can move??? / wellsize, 1)
+    # for amount of jumps in x:
+    #   for amount of jumps in z:
+    yield from move_stage_x_and_z(det_x, det_z, diffractometer)  # move one jump in z
     yield from bps.abs_set(diffractometer.phi, phi_end, wait=True)
     yield from bps.sleep(2.0)
-    yield from move_stage_x_and_z(100, det_z, diffractometer)
-    yield from bps.abs_set(diffractometer.phi, phi_start, wait=True)
+    yield from bps.abs_set(
+        diffractometer.phi, phi_start, wait=True
+    )  # reset to start phi position
+    # TODO iterate on det_x and det_z in the dict.
+    yield from move_stage_x_and_z(det_x, det_z, diffractometer)
     LOGGER.info("Disarm panda")
     yield from disarm_panda(panda)
     yield from reset_panda(panda)
