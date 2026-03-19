@@ -11,9 +11,9 @@ from dodal.devices.beamlines.i19.pin_col_stages import (
 )
 from ophyd_async.fastcs.panda import HDFPanda
 
+from i19_bluesky.serial.diffractometer_plans import move_diffractometer_back
 from i19_bluesky.serial.panda_serial_collection import (
     abort_panda,
-    move_diffractometer_back,
     trigger_panda,
 )
 from i19_bluesky.serial.setup_beamline_pre_collection import (
@@ -60,7 +60,13 @@ def setup_then_trigger_panda(
         pincol,
     )
     yield from trigger_panda(
-        panda, eh2_diffractometer, phi_start, phi_end, phi_steps, exposure_time
+        detector_z,
+        phi_start,
+        phi_end,
+        phi_steps,
+        exposure_time,
+        eh2_diffractometer,
+        panda,
     )
 
 

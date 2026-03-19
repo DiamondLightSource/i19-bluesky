@@ -56,12 +56,14 @@ async def test_trigger_panda(
 
     RE(
         trigger_panda(
-            panda=mock_panda,
-            diffractometer=eh2_diffractometer,
+            det_z=100,
+            det_x=100,
             phi_start=5,
             phi_end=10,
             phi_steps=25,
             exposure_time=10,
+            panda=mock_panda,
+            diffractometer=eh2_diffractometer,
         )
     )
     mock_phi = get_mock_put(eh2_diffractometer.phi.user_setpoint)
