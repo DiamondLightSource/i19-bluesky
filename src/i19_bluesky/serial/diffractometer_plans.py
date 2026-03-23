@@ -38,15 +38,15 @@ def move_stage_x_and_z(
     well_z: float,
     diffractometer: FourCircleDiffractometer,
 ):
-    """Moves the sample stage a distance of det_z and two_theta in the respective\
+    """Moves the sample stage a distance of well_x and well_z in the respective\
                 directions. Order dependant on position of detector when \
                 called.
         Args:
-            det_x : Float
+            well_x : Float
                 Distance to move in X axis
-            det_z : Float
+            well_z : Float
                 Distance to move in Z axis
-            sample_stage : XYZStage object
+            diffractometer : FourCircleDiffractometer object
     """
     yield from bps.mv(diffractometer.x, well_x)
     yield from bps.mv(diffractometer.z, well_z)
