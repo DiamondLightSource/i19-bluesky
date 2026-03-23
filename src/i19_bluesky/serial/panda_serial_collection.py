@@ -52,10 +52,13 @@ def trigger_panda(
     yield from arm_panda(panda)
     for x in params.keys():
         yield from move_stage_x_and_z(params[x][0], params[x][2], diffractometer)
+        LOGGER.info(f"Moved to well {x}")
         if x % 2 == 0:
+            LOGGER.info(f"Rotating {phi_start} to {phi_end}")
             yield from bps.abs_set(diffractometer.phi, phi_end, wait=True)
             yield from bps.sleep(2.0)
         else:
+            LOGGER.info(f"Rotating {phi_end} to {phi_start}")
             yield from bps.abs_set(diffractometer.phi, phi_start, wait=True)
             yield from bps.sleep(2.0)
     LOGGER.info("Disarm panda")
