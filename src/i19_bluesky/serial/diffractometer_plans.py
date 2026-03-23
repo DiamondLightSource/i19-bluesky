@@ -34,11 +34,11 @@ def move_diffractometer_back(
 
 
 def move_stage_x_and_z(
-    det_x: float,
-    det_z: float,
-    detector_stage: FourCircleDiffractometer,
+    well_x: float,
+    well_z: float,
+    diffractometer: FourCircleDiffractometer,
 ):
-    """Moves the Detector a distance of det_z and two_theta in the respective\
+    """Moves the sample stage a distance of det_z and two_theta in the respective\
                 directions. Order dependant on position of detector when \
                 called.
         Args:
@@ -46,10 +46,10 @@ def move_stage_x_and_z(
                 Distance to move in X axis
             det_z : Float
                 Distance to move in Z axis
-            detector_stage : FourCircleDiffractometer object
+            sample_stage : XYZStage object
     """
-    yield from bps.mv(detector_stage.x, det_x)
-    yield from bps.mv(detector_stage.det_stage.det_z, det_z)
+    yield from bps.mv(diffractometer.x, well_x)
+    yield from bps.mv(diffractometer.z, well_z)
 
 
 def move_detector_stage(

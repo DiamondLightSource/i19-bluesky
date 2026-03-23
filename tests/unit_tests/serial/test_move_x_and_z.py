@@ -16,6 +16,4 @@ async def test_move_stage_x_and_z(
 ):
     RE(move_stage_x_and_z(detector_x, detector_z, eh2_diffractometer))
     assert await eh2_diffractometer.x.user_readback.get_value() == detector_x
-    assert (
-        await eh2_diffractometer.det_stage.det_z.user_readback.get_value() == detector_z
-    )
+    assert await eh2_diffractometer.z.user_readback.get_value() == detector_z
