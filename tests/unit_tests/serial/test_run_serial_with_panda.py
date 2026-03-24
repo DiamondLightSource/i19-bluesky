@@ -10,7 +10,7 @@ from dodal.devices.beamlines.i19.pin_col_stages import (
     PinColRequest,
     PinholeCollimatorControl,
 )
-from ophyd_async.fastcs.eiger import EigerDriverIO
+from ophyd_async.fastcs.eiger import EigerDetector
 from ophyd_async.fastcs.panda import HDFPanda
 
 from i19_bluesky.serial.run_serial_with_panda import (
@@ -93,7 +93,7 @@ async def test_setup_then_trigger_panda(
     eh2_backlight: BacklightPosition,
     pincol: PinholeCollimatorControl,
     mock_panda: HDFPanda,
-    eh2_eiger: EigerDriverIO,
+    eh2_eiger: EigerDetector,
     RE: RunEngine,
 ):
     RE(
