@@ -5,7 +5,7 @@ from dodal.devices.beamlines.i19.diffractometer import (
     FourCircleDiffractometer,
 )
 from ophyd_async.core import get_mock_put
-from ophyd_async.fastcs.eiger import EigerDriverIO
+from ophyd_async.fastcs.eiger import EigerDetector
 from ophyd_async.fastcs.panda import HDFPanda
 
 from i19_bluesky.serial.panda_serial_collection import (
@@ -44,7 +44,7 @@ async def test_trigger_panda(
     mock_reset_panda: MagicMock,
     mock_arm_or_disarm: MagicMock,
     mock_panda: HDFPanda,
-    eh2_eiger: EigerDriverIO,
+    eh2_eiger: EigerDetector,
     eh2_diffractometer: FourCircleDiffractometer,
     RE: RunEngine,
 ):
@@ -76,10 +76,10 @@ async def test_trigger_panda(
         call.mock_setup_diffractometer(eh2_diffractometer, 5, 25, 10),
         call.mock_setup_panda_for_rotation(mock_panda, 5, 10, 25, 10),
         call.mock_arm_panda(mock_panda),
-        call.mock_arm_or_disarm(eh2_eiger.detector.arm),
+        call.mock_arm_or_disarm(eh2_eiger.drv.detector.arm),
         call.mock_sleep(2.0),
         call.mock_disarm_panda(mock_panda),
-        call.mock_arm_or_disarm(eh2_eiger.detector.disarm),
+        call.mock_arm_or_disarm(eh2_eiger.drv.detector.disarm),
         call.mock_reset_panda(mock_panda),
     ]
 

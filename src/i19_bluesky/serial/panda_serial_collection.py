@@ -3,7 +3,7 @@ from bluesky.utils import MsgGenerator
 from dodal.devices.beamlines.i19.diffractometer import (
     FourCircleDiffractometer,
 )
-from ophyd_async.fastcs.eiger import EigerDriverIO
+from ophyd_async.fastcs.eiger import EigerDetector
 from ophyd_async.fastcs.panda import HDFPanda
 
 from i19_bluesky.log import LOGGER
@@ -36,7 +36,7 @@ def trigger_panda(
     exposure_time: float,
     panda: HDFPanda,
     diffractometer: FourCircleDiffractometer,
-    eiger: EigerDriverIO,
+    eiger: EigerDetector,
 ) -> MsgGenerator:
     """Trigger panda for collection in both directions.
 
@@ -47,7 +47,7 @@ def trigger_panda(
         exposure_time (float): Time between images, in seconds.
         panda (HDFPanda): The fastcs PandA ophyd device.
         diffractometer (FourCircleDiffractometer): The diffractometer ophyd device.
-        eiger (EigerController): The eiger device
+        eiger (EigerDriverIO): The eiger device
     """
     yield from setup_diffractometer(
         diffractometer,
@@ -66,13 +66,13 @@ def trigger_panda(
     yield from arm_panda(panda)
     yield from bps.abs_set(diffractometer.phi, phi_end, wait=True)
     LOGGER.info("Arm eiger")
-    yield from bps.trigger(eiger.detector.arm)
+    yield from bps.trigger(eiger.drv.detector.arm)
     yield from bps.sleep(2.0)
     yield from bps.abs_set(diffractometer.phi, phi_start, wait=True)
     LOGGER.info("Disarm panda")
     yield from disarm_panda(panda)
     LOGGER.info("Disarm eiger")
-    yield from bps.trigger(eiger.detector.disarm)
+    yield from bps.trigger(eiger.drv.detector.disarm)
     yield from reset_panda(panda)
 
 
