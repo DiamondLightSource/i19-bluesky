@@ -53,6 +53,7 @@ def setup_then_trigger_panda(
         backlight : Backlight controller object
         pinhole_collimator : Pinhole Collimator control object
         panda (HDFPanda): The fastcs PandA ophyd device.
+        eiger (EigerDetector): the eiger detector device.
     """
     yield from setup_beamline_before_collection(
         detector_z,

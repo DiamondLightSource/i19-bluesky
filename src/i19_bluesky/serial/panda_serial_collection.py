@@ -36,9 +36,7 @@ def trigger_panda(
         exposure_time (float): Time between images, in seconds.
         diffractometer (FourCircleDiffractometer): The diffractometer ophyd device.
         panda (HDFPanda): The fastcs PandA ophyd device.
-        panda (HDFPanda): The fastcs PandA ophyd device.
-        diffractometer (FourCircleDiffractometer): The diffractometer ophyd device.
-        eiger (EigerDriverIO): The eiger device
+        eiger (EigerDetector): The eiger detector device
     """
     yield from setup_diffractometer(
         diffractometer,
