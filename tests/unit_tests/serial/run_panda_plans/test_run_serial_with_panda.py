@@ -13,7 +13,7 @@ from dodal.devices.beamlines.i19.pin_col_stages import (
 from ophyd_async.fastcs.eiger import EigerDetector
 from ophyd_async.fastcs.panda import HDFPanda
 
-from i19_bluesky.serial.run_serial_with_panda import (
+from i19_bluesky.serial.run_panda_plans.run_serial_with_panda import (
     run_serial_with_panda,
     setup_then_trigger_panda,
 )
@@ -56,8 +56,12 @@ from i19_bluesky.serial.run_serial_with_panda import (
         ),
     ],
 )
-@patch("i19_bluesky.serial.run_serial_with_panda.move_diffractometer_back")
-@patch("i19_bluesky.serial.run_serial_with_panda.setup_then_trigger_panda")
+@patch(
+    "i19_bluesky.serial.run_panda_plans.run_serial_with_panda.move_diffractometer_back"
+)
+@patch(
+    "i19_bluesky.serial.run_panda_plans.run_serial_with_panda.setup_then_trigger_panda"
+)
 async def test_run_serial_with_panda(
     mock_setup_then_trigger_panda: MagicMock,
     mock_move_diffractometer_back: MagicMock,
@@ -132,8 +136,10 @@ async def test_run_serial_with_panda(
         ),
     ],
 )
-@patch("i19_bluesky.serial.run_serial_with_panda.setup_beamline_before_collection")
-@patch("i19_bluesky.serial.run_serial_with_panda.trigger_panda")
+@patch(
+    "i19_bluesky.serial.run_panda_plans.run_serial_with_panda.setup_beamline_before_collection"
+)
+@patch("i19_bluesky.serial.run_panda_plans.run_serial_with_panda.trigger_panda")
 async def test_setup_then_trigger_panda(
     mock_trigger_panda: MagicMock,
     mock_setup_beamline_before_collection: MagicMock,

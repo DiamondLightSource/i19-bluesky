@@ -9,7 +9,9 @@ from dodal.devices.beamlines.i19.pin_col_stages import (
 from i19_bluesky.eh2.backlight_plan import move_backlight_out
 from i19_bluesky.eh2.pincol_control_plans import move_pin_col_to_requested_in_position
 from i19_bluesky.log import LOGGER
-from i19_bluesky.serial.diffractometer_plans import move_detector_stage
+from i19_bluesky.serial.device_setup_plans.diffractometer_plans import (
+    move_detector_stage,
+)
 
 
 def setup_beamline_before_collection(

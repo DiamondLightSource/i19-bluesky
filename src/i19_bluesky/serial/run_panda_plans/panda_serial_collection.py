@@ -7,12 +7,15 @@ from ophyd_async.fastcs.eiger import EigerDetector
 from ophyd_async.fastcs.panda import HDFPanda
 
 from i19_bluesky.log import LOGGER
-from i19_bluesky.serial.diffractometer_plans import (
+from i19_bluesky.serial.device_setup_plans.diffractometer_plans import (
     move_stage_x_and_z,
     setup_diffractometer,
 )
-from i19_bluesky.serial.panda_setup_plans import reset_panda, setup_panda_for_rotation
-from i19_bluesky.serial.panda_stubs import arm_panda, disarm_panda
+from i19_bluesky.serial.panda_setup_plans.panda_setup_plans import (
+    reset_panda,
+    setup_panda_for_rotation,
+)
+from i19_bluesky.serial.panda_setup_plans.panda_stubs import arm_panda, disarm_panda
 
 
 def trigger_panda(

@@ -4,7 +4,9 @@ from dodal.devices.beamlines.i19.diffractometer import (
     FourCircleDiffractometer,
 )
 
-from i19_bluesky.serial.diffractometer_plans import move_stage_x_and_z
+from i19_bluesky.serial.device_setup_plans.diffractometer_plans import (
+    move_stage_x_and_z,
+)
 
 
 @pytest.mark.parametrize("detector_x,detector_z", [(200, 0), (100, 30), (80, 90)])

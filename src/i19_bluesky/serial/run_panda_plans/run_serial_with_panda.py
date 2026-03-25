@@ -12,12 +12,14 @@ from dodal.devices.beamlines.i19.pin_col_stages import (
 from ophyd_async.fastcs.eiger import EigerDetector
 from ophyd_async.fastcs.panda import HDFPanda
 
-from i19_bluesky.serial.diffractometer_plans import move_diffractometer_back
-from i19_bluesky.serial.panda_serial_collection import (
+from i19_bluesky.serial.device_setup_plans.diffractometer_plans import (
+    move_diffractometer_back,
+)
+from i19_bluesky.serial.run_panda_plans.panda_serial_collection import (
     abort_panda,
     trigger_panda,
 )
-from i19_bluesky.serial.setup_beamline_pre_collection import (
+from i19_bluesky.serial.setup_beamline_plans.setup_beamline_pre_collection import (
     setup_beamline_before_collection,
 )
 

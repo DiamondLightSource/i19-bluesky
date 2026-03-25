@@ -7,7 +7,7 @@ from dodal.devices.beamlines.i19.diffractometer import (
 )
 from ophyd_async.core import get_mock_put
 
-from i19_bluesky.serial.diffractometer_plans import (
+from i19_bluesky.serial.device_setup_plans.diffractometer_plans import (
     move_detector_stage,
     move_diffractometer_back,
     setup_diffractometer,

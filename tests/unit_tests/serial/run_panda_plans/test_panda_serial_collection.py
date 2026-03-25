@@ -9,8 +9,10 @@ from ophyd_async.core import get_mock_put
 from ophyd_async.fastcs.eiger import EigerDetector
 from ophyd_async.fastcs.panda import HDFPanda
 
-from i19_bluesky.serial.diffractometer_plans import setup_diffractometer
-from i19_bluesky.serial.panda_serial_collection import (
+from i19_bluesky.serial.device_setup_plans.diffractometer_plans import (
+    setup_diffractometer,
+)
+from i19_bluesky.serial.run_panda_plans.panda_serial_collection import (
     abort_panda,
     trigger_panda,
 )
@@ -29,15 +31,19 @@ async def test_setup_diffractometer(
 
 
 @pytest.mark.parametrize("params,phival", [({1: [1, 2, 3]}, 5), ({2: [1, 2, 3]}, 10)])
-@patch("i19_bluesky.serial.panda_serial_collection.bps.trigger")
-@patch("i19_bluesky.serial.panda_serial_collection.bps.abs_set")
-@patch("i19_bluesky.serial.panda_serial_collection.move_stage_x_and_z")
-@patch("i19_bluesky.serial.panda_serial_collection.reset_panda")
-@patch("i19_bluesky.serial.panda_serial_collection.bps.sleep")
-@patch("i19_bluesky.serial.panda_serial_collection.disarm_panda")
-@patch("i19_bluesky.serial.panda_serial_collection.arm_panda")
-@patch("i19_bluesky.serial.panda_serial_collection.setup_panda_for_rotation")
-@patch("i19_bluesky.serial.panda_serial_collection.setup_diffractometer")
+@patch("i19_bluesky.serial.run_panda_plans.panda_serial_collection.bps.trigger")
+@patch("i19_bluesky.serial.run_panda_plans.panda_serial_collection.bps.abs_set")
+@patch("i19_bluesky.serial.run_panda_plans.panda_serial_collection.move_stage_x_and_z")
+@patch("i19_bluesky.serial.run_panda_plans.panda_serial_collection.reset_panda")
+@patch("i19_bluesky.serial.run_panda_plans.panda_serial_collection.bps.sleep")
+@patch("i19_bluesky.serial.run_panda_plans.panda_serial_collection.disarm_panda")
+@patch("i19_bluesky.serial.run_panda_plans.panda_serial_collection.arm_panda")
+@patch(
+    "i19_bluesky.serial.run_panda_plans.panda_serial_collection.setup_panda_for_rotation"
+)
+@patch(
+    "i19_bluesky.serial.run_panda_plans.panda_serial_collection.setup_diffractometer"
+)
 async def test_trigger_panda(
     mock_setup_diffractometer: MagicMock,
     mock_setup_panda_for_rotation: MagicMock,
@@ -95,7 +101,7 @@ async def test_trigger_panda(
     parent_mock.assert_has_calls(expected_calls, any_order=True)
 
 
-@patch("i19_bluesky.serial.panda_serial_collection.disarm_panda")
+@patch("i19_bluesky.serial.run_panda_plans.panda_serial_collection.disarm_panda")
 async def test_abort_panda(
     mock_disarm_panda: MagicMock,
     mock_panda: HDFPanda,

@@ -8,7 +8,7 @@ from dodal.plans.load_panda_yaml import load_panda_from_yaml
 from ophyd_async.fastcs.panda import HDFPanda
 
 from i19_bluesky.log import LOGGER
-from i19_bluesky.serial.panda_stubs import (
+from i19_bluesky.serial.panda_setup_plans.panda_stubs import (
     DeviceSettingsConstants,
     arm_panda,
     generate_panda_seq_table,
