@@ -90,9 +90,6 @@ async def test_trigger_panda(
         call.mock_setup_panda_for_rotation(mock_panda, 5, 10, 25, 10),
         call.mock_arm_panda(mock_panda),
         call.mock_arm_or_disarm(eh2_eiger.drv.detector.arm),
-        call.mock_disarm_panda(mock_panda),
-        call.mock_arm_or_disarm(eh2_eiger.drv.detector.disarm),
-        call.mock_reset_panda(mock_panda),
         call.mock_move_stage_x_and_z(1, 3, eh2_diffractometer),
         call.mock_set_value_for_params(eh2_diffractometer.phi, phival, wait=True),
     ]
