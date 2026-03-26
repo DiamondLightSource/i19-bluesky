@@ -100,6 +100,7 @@ async def test_trigger_panda(
     parent_mock.assert_has_calls(expected_calls, any_order=True)
 
 
+@patch("i19_bluesky.serial.run_panda_plans.panda_serial_collection.reset_panda")
 @patch(
     "i19_bluesky.serial.run_panda_plans.panda_serial_collection.move_diffractometer_back"
 )
@@ -109,6 +110,7 @@ async def test_end_run(
     mock_disarm_panda: MagicMock,
     mock_disarm_eiger: MagicMock,
     mock_move_diffractometer_back: MagicMock,
+    mock_reset_panda: MagicMock,
     mock_panda: HDFPanda,
     eh2_eiger: EigerDetector,
     eh2_diffractometer: FourCircleDiffractometer,
@@ -116,8 +118,9 @@ async def test_end_run(
 ):
     RE(end_run(mock_panda, eh2_eiger, eh2_diffractometer, 0.0))
     mock_disarm_eiger.assert_called_once_with(eh2_eiger.drv.detector.disarm)
-    mock_disarm_panda.assert_called_once_with(mock_panda)
     mock_move_diffractometer_back.assert_called_once_with(eh2_diffractometer, 0)
+    mock_disarm_panda.assert_called_once_with(mock_panda)
+    mock_reset_panda.assert_called_once_with(mock_panda)
 
 
 @patch("i19_bluesky.serial.run_panda_plans.panda_serial_collection.bps.trigger")
