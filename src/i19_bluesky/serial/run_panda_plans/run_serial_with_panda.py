@@ -16,7 +16,7 @@ from i19_bluesky.serial.device_setup_plans.diffractometer_plans import (
     move_diffractometer_back,
 )
 from i19_bluesky.serial.run_panda_plans.panda_serial_collection import (
-    abort_panda,
+    run_on_collection_abort,
     trigger_panda,
 )
 from i19_bluesky.serial.setup_beamline_plans.setup_beamline_pre_collection import (
@@ -25,7 +25,7 @@ from i19_bluesky.serial.setup_beamline_plans.setup_beamline_pre_collection impor
 
 
 def setup_then_trigger_panda(
-    params: dict,
+    well_positions,  # Currently a test, will be modified as we solidify parameters
     detector_z: float,
     detector_two_theta: float,
     phi_start: float,
@@ -66,7 +66,7 @@ def setup_then_trigger_panda(
         pincol,
     )
     yield from trigger_panda(
-        params,
+        well_positions,
         phi_start,
         phi_end,
         phi_steps,
@@ -78,7 +78,7 @@ def setup_then_trigger_panda(
 
 
 def run_serial_with_panda(
-    params: dict,
+    well_positions,
     detector_z: float,
     detector_two_theta: float,
     phi_start: float,
@@ -94,7 +94,7 @@ def run_serial_with_panda(
 ) -> MsgGenerator:
     yield from bpp.contingency_wrapper(
         setup_then_trigger_panda(
-            params,
+            well_positions,
             detector_z,
             detector_two_theta,
             phi_start,
@@ -108,7 +108,9 @@ def run_serial_with_panda(
             panda,
             eiger,
         ),
-        except_plan=lambda: (yield from abort_panda(eh2_diffractometer, panda)),
+        except_plan=lambda: (
+            yield from run_on_collection_abort(eh2_diffractometer, panda, eiger)
+        ),
         final_plan=lambda: (
             yield from move_diffractometer_back(eh2_diffractometer, phi_start)
         ),

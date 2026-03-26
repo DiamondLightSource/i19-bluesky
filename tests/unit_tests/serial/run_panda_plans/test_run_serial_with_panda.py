@@ -20,7 +20,7 @@ from i19_bluesky.serial.run_panda_plans.run_serial_with_panda import (
 
 
 @pytest.mark.parametrize(
-    "params,detector_z,detector_two_theta,phi_start,phi_end,phi_steps,exposure_time,eh2_aperture",
+    "well_positions,detector_z,detector_two_theta,phi_start,phi_end,phi_steps,exposure_time,eh2_aperture",
     [
         (
             {
@@ -65,7 +65,7 @@ from i19_bluesky.serial.run_panda_plans.run_serial_with_panda import (
 async def test_run_serial_with_panda(
     mock_setup_then_trigger_panda: MagicMock,
     mock_move_diffractometer_back: MagicMock,
-    params: dict,
+    well_positions,
     detector_z: float,
     detector_two_theta: float,
     phi_start: float,
@@ -78,10 +78,11 @@ async def test_run_serial_with_panda(
     eh2_backlight: BacklightPosition,
     pincol: PinholeCollimatorControl,
     mock_panda: HDFPanda,
+    eh2_eiger: EigerDetector,
 ):
     RE(
         run_serial_with_panda(
-            params,
+            well_positions,
             detector_z,
             detector_two_theta,
             phi_start,
@@ -93,6 +94,7 @@ async def test_run_serial_with_panda(
             eh2_backlight,
             pincol,
             mock_panda,
+            eh2_eiger,
         )
     )
     mock_setup_then_trigger_panda.assert_called_once()
@@ -100,7 +102,7 @@ async def test_run_serial_with_panda(
 
 
 @pytest.mark.parametrize(
-    "params,detector_z,detector_two_theta,phi_start,phi_end,phi_steps,exposure_time,eh2_aperture",
+    "well_positions,detector_z,detector_two_theta,phi_start,phi_end,phi_steps,exposure_time,eh2_aperture",
     [
         (
             {
@@ -143,7 +145,7 @@ async def test_run_serial_with_panda(
 async def test_setup_then_trigger_panda(
     mock_trigger_panda: MagicMock,
     mock_setup_beamline_before_collection: MagicMock,
-    params: dict,
+    well_positions,
     detector_z: float,
     detector_two_theta: float,
     phi_start: float,
@@ -160,7 +162,7 @@ async def test_setup_then_trigger_panda(
 ):
     RE(
         setup_then_trigger_panda(
-            params,
+            well_positions,
             detector_z,
             detector_two_theta,
             phi_start,
@@ -184,7 +186,7 @@ async def test_setup_then_trigger_panda(
         pincol,
     )
     mock_trigger_panda.assert_called_once_with(
-        params,
+        well_positions,
         phi_start,
         phi_end,
         phi_steps,

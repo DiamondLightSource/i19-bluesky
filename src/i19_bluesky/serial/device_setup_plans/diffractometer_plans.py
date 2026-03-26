@@ -48,8 +48,7 @@ def move_stage_x_and_z(
                 Distance to move in Z axis
             diffractometer : FourCircleDiffractometer object
     """
-    yield from bps.mv(diffractometer.x, well_x)
-    yield from bps.mv(diffractometer.z, well_z)
+    yield from bps.mv(diffractometer.x, well_x, diffractometer.z, well_z)
 
 
 def move_detector_stage(
@@ -70,9 +69,9 @@ def move_detector_stage(
     if current_location >= det_z:
         # if the current value is higher than the requested one, first attempt to move
         # 2theta and then det_z
-        yield from bps.mv(detector_stage.two_theta, two_theta)
-        yield from bps.mv(detector_stage.det_z, det_z)
+        yield from bps.abs_set(detector_stage.two_theta, two_theta, wait=True)
+        yield from bps.abs_set(detector_stage.det_z, det_z, wait=True)
     else:
         # otherwise first move det_z and then 2theta
-        yield from bps.mv(detector_stage.det_z, det_z)
-        yield from bps.mv(detector_stage.two_theta, two_theta)
+        yield from bps.abs_set(detector_stage.det_z, det_z, wait=True)
+        yield from bps.abs_set(detector_stage.two_theta, two_theta, wait=True)
