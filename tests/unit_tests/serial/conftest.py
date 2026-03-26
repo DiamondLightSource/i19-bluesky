@@ -14,6 +14,7 @@ from dodal.devices.beamlines.i19.diffractometer import (
 from dodal.devices.beamlines.i19.pin_col_stages import PinholeCollimatorControl
 from ophyd_async.core import Device, DeviceVector, init_devices, set_mock_value
 from ophyd_async.epics.core import epics_signal_rw
+from ophyd_async.fastcs.eiger import EigerDetector
 from ophyd_async.fastcs.panda import HDFPanda
 
 set_path_provider(
@@ -104,3 +105,9 @@ async def eh2_backlight(RE: RunEngine) -> BacklightPosition:
     backlight = BacklightPosition("", name="mock_backlight")
     await backlight.connect(mock=True)
     return backlight
+
+
+@pytest.fixture
+async def eh2_eiger(RE: RunEngine) -> EigerDetector:
+    eiger = EigerDetector(prefix="ixx-test-eiger", path_provider=get_path_provider())
+    return eiger
