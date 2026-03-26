@@ -56,15 +56,13 @@ from i19_bluesky.serial.run_panda_plans.run_serial_with_panda import (
         ),
     ],
 )
-@patch(
-    "i19_bluesky.serial.run_panda_plans.run_serial_with_panda.move_diffractometer_back"
-)
+@patch("i19_bluesky.serial.run_panda_plans.run_serial_with_panda.end_run")
 @patch(
     "i19_bluesky.serial.run_panda_plans.run_serial_with_panda.setup_then_trigger_panda"
 )
 async def test_run_serial_with_panda(
     mock_setup_then_trigger_panda: MagicMock,
-    mock_move_diffractometer_back: MagicMock,
+    mock_end_run: MagicMock,
     well_positions,
     detector_z: float,
     detector_two_theta: float,
@@ -98,7 +96,9 @@ async def test_run_serial_with_panda(
         )
     )
     mock_setup_then_trigger_panda.assert_called_once()
-    mock_move_diffractometer_back.assert_called_once_with(eh2_diffractometer, phi_start)
+    mock_end_run.assert_called_once_with(
+        mock_panda, eh2_eiger, eh2_diffractometer, phi_start
+    )
 
 
 @pytest.mark.parametrize(

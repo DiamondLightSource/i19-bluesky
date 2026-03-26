@@ -12,10 +12,8 @@ from dodal.devices.beamlines.i19.pin_col_stages import (
 from ophyd_async.fastcs.eiger import EigerDetector
 from ophyd_async.fastcs.panda import HDFPanda
 
-from i19_bluesky.serial.device_setup_plans.diffractometer_plans import (
-    move_diffractometer_back,
-)
 from i19_bluesky.serial.run_panda_plans.panda_serial_collection import (
+    end_run,
     run_on_collection_abort,
     trigger_panda,
 )
@@ -112,7 +110,7 @@ def run_serial_with_panda(
             yield from run_on_collection_abort(eh2_diffractometer, panda, eiger)
         ),
         final_plan=lambda: (
-            yield from move_diffractometer_back(eh2_diffractometer, phi_start)
+            yield from end_run(panda, eiger, eh2_diffractometer, phi_start)
         ),
         auto_raise=False,
     )

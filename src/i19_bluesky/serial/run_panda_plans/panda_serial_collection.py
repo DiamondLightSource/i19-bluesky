@@ -70,7 +70,6 @@ def trigger_panda(
         else:
             LOGGER.info(f"Rotating {phi_end} to {phi_start}")
             yield from bps.abs_set(diffractometer.phi, phi_start, wait=True)
-    yield from end_run(panda, eiger, diffractometer, phi_start)
 
 
 def end_run(
@@ -79,10 +78,10 @@ def end_run(
     diffractometer: FourCircleDiffractometer,
     phi_start: float,
 ):
-    LOGGER.info("Disarm panda")
-    yield from disarm_panda(panda)
     LOGGER.info("Disarm eiger")
     yield from bps.trigger(eiger.drv.detector.disarm)
+    LOGGER.info("Disarm panda")
+    yield from disarm_panda(panda)
     yield from reset_panda(panda)
     yield from move_diffractometer_back(diffractometer, phi_start)
 
@@ -92,5 +91,5 @@ def run_on_collection_abort(
 ) -> MsgGenerator:
     LOGGER.warning("ABORT")
     yield from bps.abs_set(diffractometer.phi.motor_stop, 1, wait=True)
-    yield from disarm_panda(panda)
     yield from bps.trigger(eiger.drv.detector.disarm)
+    yield from disarm_panda(panda)
