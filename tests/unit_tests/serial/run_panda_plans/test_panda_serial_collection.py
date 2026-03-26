@@ -13,8 +13,8 @@ from i19_bluesky.serial.device_setup_plans.diffractometer_plans import (
     setup_diffractometer,
 )
 from i19_bluesky.serial.run_panda_plans.panda_serial_collection import (
+    end_run,
     run_on_collection_abort,
-    shutdown_preparation,
     trigger_panda,
 )
 
@@ -105,7 +105,7 @@ async def test_trigger_panda(
 )
 @patch("i19_bluesky.serial.run_panda_plans.panda_serial_collection.bps.trigger")
 @patch("i19_bluesky.serial.run_panda_plans.panda_serial_collection.disarm_panda")
-async def test_shutdown_preparation(
+async def test_end_run(
     mock_disarm_panda: MagicMock,
     mock_disarm_eiger: MagicMock,
     mock_move_diffractometer_back: MagicMock,
@@ -114,7 +114,7 @@ async def test_shutdown_preparation(
     eh2_diffractometer: FourCircleDiffractometer,
     RE: RunEngine,
 ):
-    RE(shutdown_preparation(mock_panda, eh2_eiger, eh2_diffractometer, 0.0))
+    RE(end_run(mock_panda, eh2_eiger, eh2_diffractometer, 0.0))
     mock_disarm_eiger.assert_called_once_with(eh2_eiger.drv.detector.disarm)
     mock_disarm_panda.assert_called_once_with(mock_panda)
     mock_move_diffractometer_back.assert_called_once_with(eh2_diffractometer, 0)

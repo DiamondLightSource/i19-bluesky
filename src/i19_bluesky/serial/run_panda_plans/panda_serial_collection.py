@@ -70,10 +70,10 @@ def trigger_panda(
         else:
             LOGGER.info(f"Rotating {phi_end} to {phi_start}")
             yield from bps.abs_set(diffractometer.phi, phi_start, wait=True)
-    yield from shutdown_preparation(panda, eiger, diffractometer, phi_start)
+    yield from end_run(panda, eiger, diffractometer, phi_start)
 
 
-def shutdown_preparation(
+def end_run(
     panda: HDFPanda,
     eiger: EigerDetector,
     diffractometer: FourCircleDiffractometer,
