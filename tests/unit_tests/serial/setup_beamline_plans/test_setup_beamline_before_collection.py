@@ -11,7 +11,7 @@ from dodal.devices.beamlines.i19.pin_col_stages import (
 )
 from ophyd_async.core import set_mock_value
 
-from i19_bluesky.serial.setup_beamline_pre_collection import (
+from i19_bluesky.serial.setup_beamline_plans.setup_beamline_pre_collection import (
     setup_beamline_before_collection,
 )
 

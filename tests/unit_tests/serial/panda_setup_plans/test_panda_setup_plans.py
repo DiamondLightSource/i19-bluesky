@@ -4,7 +4,7 @@ from bluesky.run_engine import RunEngine
 from numpy.testing import assert_array_equal
 from ophyd_async.fastcs.panda import HDFPanda, SeqTable, SeqTrigger
 
-from i19_bluesky.serial.panda_setup_plans import (
+from i19_bluesky.serial.panda_setup_plans.panda_setup_plans import (
     reset_panda,
     setup_panda_for_rotation,
 )
@@ -14,8 +14,12 @@ async def test_wait_between_setting_table_and_arming(
     mock_panda: HDFPanda, RE: RunEngine
 ):
     with (
-        patch("i19_bluesky.serial.panda_setup_plans.load_panda_from_yaml"),
-        patch("i19_bluesky.serial.panda_setup_plans.bps.wait") as patch_wait,
+        patch(
+            "i19_bluesky.serial.panda_setup_plans.panda_setup_plans.load_panda_from_yaml"
+        ),
+        patch(
+            "i19_bluesky.serial.panda_setup_plans.panda_setup_plans.bps.wait"
+        ) as patch_wait,
     ):
         RE(setup_panda_for_rotation(mock_panda, 4, 5, 25, 10))
         patch_wait.assert_called_once_with(group="panda-setup", timeout=60)
@@ -23,7 +27,7 @@ async def test_wait_between_setting_table_and_arming(
 
 async def test_setup_panda_for_rotation(mock_panda: HDFPanda, RE: RunEngine):
     with patch(
-        "i19_bluesky.serial.panda_setup_plans.load_panda_from_yaml"
+        "i19_bluesky.serial.panda_setup_plans.panda_setup_plans.load_panda_from_yaml"
     ) as patch_load:
         RE(setup_panda_for_rotation(mock_panda, 4, 5, 25, 0.1), group="panda-setup")
         patch_load.assert_called_once()
@@ -54,7 +58,7 @@ async def test_setup_panda_for_rotation(mock_panda: HDFPanda, RE: RunEngine):
 
 async def test_reset_panda(mock_panda: HDFPanda, RE: RunEngine):
     with patch(
-        "i19_bluesky.serial.panda_setup_plans.load_panda_from_yaml"
+        "i19_bluesky.serial.panda_setup_plans.panda_setup_plans.load_panda_from_yaml"
     ) as patch_load:
         RE(reset_panda(mock_panda, group="reset panda"))
         patch_load.assert_called_once()
