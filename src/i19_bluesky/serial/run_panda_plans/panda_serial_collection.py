@@ -22,7 +22,7 @@ from i19_bluesky.serial.panda_setup_plans.panda_stubs import arm_panda, disarm_p
 def trigger_panda(
     well_positions: dict[
         int, tuple
-    ],  # Currently a test, will be modified as we solidify parameters
+    ],  # Currently a test, will be modified as we solidify the parameters
     phi_start: float,
     phi_end: float,
     phi_steps: int,
