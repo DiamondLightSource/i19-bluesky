@@ -23,7 +23,9 @@ from i19_bluesky.serial.setup_beamline_plans.setup_beamline_pre_collection impor
 
 
 def setup_then_trigger_panda(
-    well_positions,  # Currently a test, will be modified as we solidify parameters
+    well_positions: dict[
+        int, tuple
+    ],  # Currently a test, will be modified as we solidify parameters
     detector_z: float,
     detector_two_theta: float,
     phi_start: float,
@@ -76,7 +78,7 @@ def setup_then_trigger_panda(
 
 
 def run_serial_with_panda(
-    well_positions,
+    well_positions: dict[int, tuple],
     detector_z: float,
     detector_two_theta: float,
     phi_start: float,

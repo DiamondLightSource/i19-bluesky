@@ -63,7 +63,7 @@ from i19_bluesky.serial.run_panda_plans.run_serial_with_panda import (
 async def test_run_serial_with_panda(
     mock_setup_then_trigger_panda: MagicMock,
     mock_end_run: MagicMock,
-    well_positions,
+    well_positions: dict[int, tuple],
     detector_z: float,
     detector_two_theta: float,
     phi_start: float,
@@ -145,7 +145,7 @@ async def test_run_serial_with_panda(
 async def test_setup_then_trigger_panda(
     mock_trigger_panda: MagicMock,
     mock_setup_beamline_before_collection: MagicMock,
-    well_positions,
+    well_positions: dict[int, tuple],
     detector_z: float,
     detector_two_theta: float,
     phi_start: float,

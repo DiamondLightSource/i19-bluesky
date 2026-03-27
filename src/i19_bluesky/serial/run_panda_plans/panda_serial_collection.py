@@ -20,7 +20,9 @@ from i19_bluesky.serial.panda_setup_plans.panda_stubs import arm_panda, disarm_p
 
 
 def trigger_panda(
-    well_positions,  # Currently a test, will be modified as we solidify parameters
+    well_positions: dict[
+        int, tuple
+    ],  # Currently a test, will be modified as we solidify parameters
     phi_start: float,
     phi_end: float,
     phi_steps: int,
@@ -32,7 +34,7 @@ def trigger_panda(
     """Trigger panda for collection in both directions.
 
     Args:
-        well_positions: Input coordinates of the selected wells
+        well_positions dict: Input coordinates of the selected wells
             (Key=well (int), value=X,Y,Z coordinates (list of ints))
         phi_start (float): Starting phi position, in degrees.
         phi_end (float): Ending phi position, in degrees.

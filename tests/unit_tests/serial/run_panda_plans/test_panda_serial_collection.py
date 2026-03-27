@@ -58,7 +58,7 @@ async def test_trigger_panda(
     mock_panda: HDFPanda,
     eh2_eiger: EigerDetector,
     eh2_diffractometer: FourCircleDiffractometer,
-    well_positions,
+    well_positions: dict[int, tuple],
     phival: int,
     RE: RunEngine,
 ):
