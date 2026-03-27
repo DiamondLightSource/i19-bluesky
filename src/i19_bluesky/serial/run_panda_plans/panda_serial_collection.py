@@ -34,8 +34,8 @@ def trigger_panda(
     """Trigger panda for collection in both directions.
 
     Args:
-        well_positions dict: Input coordinates of the selected wells
-            (Key=well (int), value=X,Y,Z coordinates (list of ints))
+        well_positions (dict): Input coordinates of the selected wells
+            (Key=well (int), value=X,Y,Z coordinates (tuple))
         phi_start (float): Starting phi position, in degrees.
         phi_end (float): Ending phi position, in degrees.
         phi_steps (int): Number of images to take.
