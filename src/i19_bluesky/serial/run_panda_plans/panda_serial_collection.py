@@ -61,7 +61,7 @@ def trigger_panda(
     yield from arm_panda(panda)
     LOGGER.info("Arm eiger")
     yield from bps.trigger(eiger.drv.detector.arm)
-    # Currently a test, will be modified as we solidify parameters going forwards
+    # Currently a test, will be modified as we solidify the parameters going forwards
     # assumes a dictionary of integer keys and coordinates in a list
     for well_num, coords in well_positions.items():
         yield from move_stage_x_and_z(coords[0], coords[2], diffractometer)
