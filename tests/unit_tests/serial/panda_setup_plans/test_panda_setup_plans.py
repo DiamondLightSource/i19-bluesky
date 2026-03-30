@@ -4,6 +4,7 @@ from bluesky.run_engine import RunEngine
 from numpy.testing import assert_array_equal
 from ophyd_async.fastcs.panda import HDFPanda, SeqTable, SeqTrigger
 
+from i19_bluesky.parameters.serial_parameters import DeviceInput, SerialExperiment
 from i19_bluesky.serial.panda_setup_plans.panda_setup_plans import (
     reset_panda,
     setup_panda_for_rotation,
@@ -11,7 +12,7 @@ from i19_bluesky.serial.panda_setup_plans.panda_setup_plans import (
 
 
 async def test_wait_between_setting_table_and_arming(
-    mock_panda: HDFPanda, RE: RunEngine
+    mock_panda: HDFPanda, RE: RunEngine, parameters: SerialExperiment
 ):
     with (
         patch(
@@ -21,18 +22,25 @@ async def test_wait_between_setting_table_and_arming(
             "i19_bluesky.serial.panda_setup_plans.panda_setup_plans.bps.wait"
         ) as patch_wait,
     ):
-        RE(setup_panda_for_rotation(mock_panda, 4, 5, 25, 10))
+        RE(setup_panda_for_rotation(parameters, mock_panda))
+        # 4, 5, 25, 10
         patch_wait.assert_called_once_with(group="panda-setup", timeout=60)
 
 
-async def test_setup_panda_for_rotation(mock_panda: HDFPanda, RE: RunEngine):
+async def test_setup_panda_for_rotation(
+    devices: DeviceInput, parameters: SerialExperiment, RE: RunEngine
+):
     with patch(
         "i19_bluesky.serial.panda_setup_plans.panda_setup_plans.load_panda_from_yaml"
     ) as patch_load:
-        RE(setup_panda_for_rotation(mock_panda, 4, 5, 25, 0.1), group="panda-setup")
+        parameters["rot_axis_start"] = 4
+        parameters["rot_axis_end"] = 5
+        parameters["images_per_well"] = 25
+        parameters["exposure_time_s"] = 0.1
+        RE(setup_panda_for_rotation(parameters, devices.panda), group="panda-setup")
         patch_load.assert_called_once()
 
-    assert await mock_panda.inenc[1].setp.get_value() == 3500  # type: ignore
+    assert await devices.panda.inenc[1].setp.get_value() == 3500  # type: ignore
 
     expected_seq_table: SeqTable = SeqTable.row(
         trigger=SeqTrigger.POSA_GT,
@@ -48,7 +56,7 @@ async def test_setup_panda_for_rotation(mock_panda: HDFPanda, RE: RunEngine):
         outa1=True,
     )
 
-    test_table = await mock_panda.seq[1].table.get_value()
+    test_table = await devices.panda.seq[1].table.get_value()
     assert_array_equal(test_table.trigger, expected_seq_table.trigger)
     assert_array_equal(test_table.repeats, expected_seq_table.repeats)
     assert_array_equal(test_table.position, expected_seq_table.position)

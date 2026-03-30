@@ -1,5 +1,4 @@
 import os
-from pathlib import Path
 from typing import Any
 
 import pytest
@@ -16,6 +15,15 @@ from ophyd_async.core import Device, DeviceVector, init_devices, set_mock_value
 from ophyd_async.epics.core import epics_signal_rw
 from ophyd_async.fastcs.eiger import EigerDetector
 from ophyd_async.fastcs.panda import HDFPanda
+
+from i19_bluesky.parameters.components import Path
+from i19_bluesky.parameters.serial_parameters import (
+    DetectorType,
+    DeviceInput,
+    GridParameters,
+    PinColRequest,
+    SerialExperiment,
+)
 
 set_path_provider(
     StaticVisitPathProvider(
@@ -111,3 +119,112 @@ async def eh2_backlight(RE: RunEngine) -> BacklightPosition:
 async def eh2_eiger(RE: RunEngine) -> EigerDetector:
     eiger = EigerDetector(prefix="ixx-test-eiger", path_provider=get_path_provider())
     return eiger
+
+
+@pytest.fixture
+async def devices(
+    mock_panda, eh2_eiger, eh2_backlight, eh2_diffractometer, pincol
+) -> DeviceInput:
+    devices = DeviceInput(
+        diffractometer=eh2_diffractometer,
+        backlight=eh2_backlight,
+        pincol=pincol,
+        panda=mock_panda,
+        eiger=eh2_eiger,
+    )
+
+    return devices
+
+
+# @pytest.fixture
+# async def mock_parameters(
+#     GridParameters: GridParameters,
+#     WellsSelection: WellsSelection,
+# ) -> SerialExperiment:
+#     mock_parameters = SerialExperiment(
+#         hutch="",
+#         visit="/tmp/i19-2/cm12345-1",
+#         dataset="foo",
+#         filename_prefix="bar_01",
+#         images_per_well=0,
+#         exposure_time_s=0.2,
+#         image_width_deg=80,
+#         detector_distance_mm=100,
+#         two_theta_deg=0,
+#         transmission_fraction=0.05,
+#         grid=GridParameters,
+#         wells=WellsSelection,
+#         aperture_request=PinColRequest.PCOL100,
+#         detector_type=DetectorType.EIGER,
+#         well_position={1: (1, 2, 3), 2: (4, 5, 6)},
+#         rot_axis_start=10,
+#         rot_axis_increment=0.2,
+#         rot_axis_end=5,
+#     )
+#     return mock_parameters
+
+
+@pytest.fixture
+async def mock_parameters(parameters) -> SerialExperiment:
+    grid_params_instance = GridParameters(**parameters["grid"])
+    wells_selection_instance = parameters["wells"]
+
+    return SerialExperiment(
+        hutch=parameters["hutch"],
+        visit=parameters["visit"],
+        dataset=parameters["dataset"],
+        filename_prefix=parameters["filename_prefix"],
+        images_per_well=parameters["images_per_well"],
+        exposure_time_s=parameters["exposure_time_s"],
+        image_width_deg=parameters["image_width_deg"],
+        detector_distance_mm=parameters["detector_distance_mm"],
+        two_theta_deg=parameters["two_theta_deg"],
+        transmission_fraction=parameters["transmission_fraction"],
+        grid=grid_params_instance,
+        wells=wells_selection_instance,
+        aperture_request=PinColRequest.PCOL100,
+        detector_type=DetectorType.EIGER,
+        well_position=parameters["well_position"],
+        rot_axis_start=parameters["rot_axis_start"],
+        rot_axis_increment=parameters["rot_axis_increment"],
+        rot_axis_end=parameters["rot_axis_end"],
+    )
+
+
+@pytest.fixture
+def dummy_wells_settings():
+    return {
+        "first": 0,
+        "last": 5,
+        "selected": [1, 3, 5],
+        "series_length": 3,
+        "manual_selection_enabled": True,
+    }
+
+
+@pytest.fixture
+def parameters(dummy_wells_settings):
+    return {
+        "hutch": "EH2",
+        "visit": "/tmp/i19-2/cm12345-1",
+        "dataset": "foo",
+        "filename_prefix": "bar_01",
+        "images_per_well": 10,
+        "exposure_time_s": 0.1,
+        "image_width_deg": 0.1,
+        "detector_distance_mm": 320,
+        "two_theta_deg": 0,
+        "transmission_fraction": 0.3,
+        "grid": {
+            "grid_type": "Silicon",
+            "x_steps": 20,
+            "z_steps": 20,
+        },
+        "aperture_request": "100um",
+        "detector_type": "EIGER",
+        "well_position": {1: (1, 2, 3)},
+        "wells": dummy_wells_settings,
+        "rot_axis_start": -5,
+        "rot_axis_increment": 0.1,
+        "rot_axis_end": 10,
+    }

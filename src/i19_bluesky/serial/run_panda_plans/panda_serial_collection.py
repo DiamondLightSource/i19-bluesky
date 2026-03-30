@@ -1,12 +1,8 @@
 import bluesky.plan_stubs as bps
 from bluesky.utils import MsgGenerator
-from dodal.devices.beamlines.i19.diffractometer import (
-    FourCircleDiffractometer,
-)
-from ophyd_async.fastcs.eiger import EigerDetector
-from ophyd_async.fastcs.panda import HDFPanda
 
 from i19_bluesky.log import LOGGER
+from i19_bluesky.parameters.serial_parameters import DeviceInput, SerialExperiment
 from i19_bluesky.serial.device_setup_plans.diffractometer_plans import (
     move_diffractometer_back,
     move_stage_x_and_z,
@@ -20,16 +16,8 @@ from i19_bluesky.serial.panda_setup_plans.panda_stubs import arm_panda, disarm_p
 
 
 def trigger_panda(
-    well_positions: dict[
-        int, tuple
-    ],  # Currently a test, will be modified as we solidify parameters
-    phi_start: float,
-    phi_end: float,
-    phi_steps: int,
-    exposure_time: float,
-    diffractometer: FourCircleDiffractometer,
-    panda: HDFPanda,
-    eiger: EigerDetector,
+    parameters: SerialExperiment,
+    devices: DeviceInput,
 ) -> MsgGenerator:
     """Trigger panda for collection in both directions.
 
@@ -45,53 +33,58 @@ def trigger_panda(
         eiger (EigerDetector): The eiger detector device
     """
     yield from setup_diffractometer(
-        diffractometer,
-        phi_start,
-        phi_steps,
-        exposure_time,
+        parameters,
+        devices.diffractometer,
     )
     yield from setup_panda_for_rotation(
-        panda,
-        phi_start,
-        phi_end,
-        phi_steps,
-        exposure_time,
+        parameters,
+        devices.panda,
     )
     LOGGER.info("Arm panda and move phi")
-    yield from arm_panda(panda)
+    yield from arm_panda(devices.panda)
     LOGGER.info("Arm eiger")
-    yield from bps.trigger(eiger.drv.detector.arm)
+    yield from bps.trigger(devices.eiger.drv.detector.arm)
     # Currently a test, will be modified as we solidify parameters going forwards
     # assumes a dictionary of integer keys and coordinates in a list
-    for well_num, coords in well_positions.items():
-        yield from move_stage_x_and_z(coords[0], coords[2], diffractometer)
+    for well_num, coords in parameters["well_position"].items():
+        yield from move_stage_x_and_z(coords[0], coords[2], devices.diffractometer)
         LOGGER.info(f"Moved to well {well_num}")
         if well_num % 2 == 0:
-            LOGGER.info(f"Rotating {phi_start} to {phi_end}")
-            yield from bps.abs_set(diffractometer.phi, phi_end, wait=True)
+            LOGGER.info(
+                f"Rotating {parameters['rot_axis_start']} to {
+                    parameters['rot_axis_end']
+                }"
+            )
+            yield from bps.abs_set(
+                devices.diffractometer.phi, parameters["rot_axis_end"], wait=True
+            )
         else:
-            LOGGER.info(f"Rotating {phi_end} to {phi_start}")
-            yield from bps.abs_set(diffractometer.phi, phi_start, wait=True)
+            LOGGER.info(
+                f"Rotating {parameters['rot_axis_end']} to {
+                    parameters['rot_axis_start']
+                }"
+            )
+            yield from bps.abs_set(
+                devices.diffractometer.phi, parameters["rot_axis_start"], wait=True
+            )
 
 
 def end_run(
-    panda: HDFPanda,
-    eiger: EigerDetector,
-    diffractometer: FourCircleDiffractometer,
-    phi_start: float,
+    parameters: SerialExperiment,
+    devices: DeviceInput,
 ):
     LOGGER.info("Disarm eiger")
-    yield from bps.trigger(eiger.drv.detector.disarm)
+    yield from bps.trigger(devices.eiger.drv.detector.disarm)
     LOGGER.info("Disarm panda")
-    yield from disarm_panda(panda)
-    yield from reset_panda(panda)
-    yield from move_diffractometer_back(diffractometer, phi_start)
+    yield from disarm_panda(devices.panda)
+    yield from reset_panda(devices.panda)
+    yield from move_diffractometer_back(
+        devices.diffractometer, parameters["rot_axis_start"]
+    )
 
 
-def run_on_collection_abort(
-    diffractometer: FourCircleDiffractometer, panda: HDFPanda, eiger: EigerDetector
-) -> MsgGenerator:
+def run_on_collection_abort(devices: DeviceInput) -> MsgGenerator:
     LOGGER.warning("ABORT")
-    yield from bps.abs_set(diffractometer.phi.motor_stop, 1, wait=True)
-    yield from bps.trigger(eiger.drv.detector.disarm)
-    yield from disarm_panda(panda)
+    yield from bps.abs_set(devices.diffractometer.phi.motor_stop, 1, wait=True)
+    yield from bps.trigger(devices.eiger.drv.detector.disarm)
+    yield from disarm_panda(devices.panda)
