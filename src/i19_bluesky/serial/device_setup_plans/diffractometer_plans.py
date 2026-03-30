@@ -22,8 +22,8 @@ def setup_diffractometer(
             exposure_time_s (float): Time between images, in seconds.
         diffractometer (FourCircleDiffractometer): The diffractometer ophyd device.
     """
-    yield from bps.abs_set(diffractometer.phi, parameters["rot_axis_start"])
-    velocity = parameters["images_per_well"] / parameters["exposure_time_s"]
+    yield from bps.abs_set(diffractometer.phi, parameters.rot_axis_start)
+    velocity = parameters.images_per_well / parameters.exposure_time_s
     yield from bps.abs_set(diffractometer.phi.velocity, velocity)
 
 

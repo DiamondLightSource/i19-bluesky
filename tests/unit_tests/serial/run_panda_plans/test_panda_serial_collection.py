@@ -62,9 +62,9 @@ async def test_trigger_panda(
     devices: DeviceInput,
     RE: RunEngine,
 ):
-    parameters["well_position"] = well_positions
-    parameters["rot_axis_start"] = 5
-    parameters["rot_axis_end"] = 10
+    parameters.well_position = well_positions
+    parameters.rot_axis_start = 5
+    parameters.rot_axis_end = 10
     parent_mock = MagicMock()
     parent_mock.attach_mock(mock_set_value_for_params, "mock_set_value_for_params")
     parent_mock.attach_mock(mock_move_stage_x_and_z, "mock_move_stage_x_and_z")

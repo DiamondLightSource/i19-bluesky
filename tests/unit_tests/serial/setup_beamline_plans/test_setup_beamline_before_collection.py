@@ -30,9 +30,9 @@ async def test_setup_beamline_before_collection(
 ):
 
     size = int(eh2_aperture.value.strip("um"))
-    parameters["detector_distance_mm"] = detector_z
-    parameters["two_theta_deg"] = detector_two_theta
-    parameters["aperture_request"] = eh2_aperture
+    parameters.detector_distance_mm = detector_z
+    parameters.two_theta_deg = detector_two_theta
+    parameters.aperture_request = eh2_aperture
     set_mock_value(devices.pincol.mapt.pin_x.in_positions[size], in_positions[0])
     set_mock_value(devices.pincol.mapt.pin_y.in_positions[size], in_positions[1])
     set_mock_value(devices.pincol.mapt.col_x.in_positions[size], in_positions[2])

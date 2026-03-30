@@ -32,10 +32,10 @@ async def test_setup_panda_for_rotation(
     with patch(
         "i19_bluesky.serial.panda_setup_plans.panda_setup_plans.load_panda_from_yaml"
     ) as patch_load:
-        parameters["rot_axis_start"] = 4
-        parameters["rot_axis_end"] = 5
-        parameters["images_per_well"] = 25
-        parameters["exposure_time_s"] = 0.1
+        parameters.rot_axis_start = 4
+        parameters.rot_axis_end = 5
+        parameters.images_per_well = 25
+        parameters.exposure_time_s = 0.1
         RE(setup_panda_for_rotation(parameters, devices.panda), group="panda-setup")
         patch_load.assert_called_once()
 

@@ -10,15 +10,22 @@ from dodal.devices.beamlines.i19.backlight import BacklightPosition
 from dodal.devices.beamlines.i19.diffractometer import (
     FourCircleDiffractometer,
 )
-from dodal.devices.beamlines.i19.pin_col_stages import PinholeCollimatorControl
+from dodal.devices.beamlines.i19.pin_col_stages import (
+    PinColRequest,
+    PinholeCollimatorControl,
+)
 from ophyd_async.core import Device, DeviceVector, init_devices, set_mock_value
 from ophyd_async.epics.core import epics_signal_rw
 from ophyd_async.fastcs.eiger import EigerDetector
 from ophyd_async.fastcs.panda import HDFPanda
 
-from i19_bluesky.parameters.components import Path
+from i19_bluesky.parameters.components import HutchName, Path
 from i19_bluesky.parameters.serial_parameters import (
+    DetectorType,
     DeviceInput,
+    GridParameters,
+    GridType,
+    SerialExperiment,
 )
 
 set_path_provider(
@@ -145,27 +152,27 @@ def dummy_wells_settings():
 
 @pytest.fixture
 def parameters(dummy_wells_settings):
-    return {
-        "hutch": "EH2",
-        "visit": "/tmp/i19-2/cm12345-1",
-        "dataset": "foo",
-        "filename_prefix": "bar_01",
-        "images_per_well": 10,
-        "exposure_time_s": 0.1,
-        "image_width_deg": 0.1,
-        "detector_distance_mm": 320,
-        "two_theta_deg": 0,
-        "transmission_fraction": 0.3,
-        "grid": {
-            "grid_type": "Silicon",
-            "x_steps": 20,
-            "z_steps": 20,
-        },
-        "aperture_request": "100um",
-        "detector_type": "EIGER",
-        "well_position": {1: (1, 2, 3)},
-        "wells": dummy_wells_settings,
-        "rot_axis_start": -5,
-        "rot_axis_increment": 0.1,
-        "rot_axis_end": 10,
-    }
+    return SerialExperiment(
+        hutch=HutchName.EH2,
+        visit=Path("/tmp/i19-2/cm12345-1"),
+        dataset="foo",
+        filename_prefix="bar_01",
+        images_per_well=10,
+        exposure_time_s=0.1,
+        image_width_deg=0.1,
+        detector_distance_mm=320,
+        two_theta_deg=0,
+        transmission_fraction=0.3,
+        grid=GridParameters(
+            grid_type=GridType.SILICON,
+            x_steps=20,
+            z_steps=20,
+        ),
+        aperture_request=PinColRequest.PCOL100,
+        detector_type=DetectorType.EIGER,
+        well_position={1: (1, 2, 3)},
+        wells=dummy_wells_settings,
+        rot_axis_start=-5,
+        rot_axis_increment=0.1,
+        rot_axis_end=10,
+    )

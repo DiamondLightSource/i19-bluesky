@@ -42,7 +42,7 @@ def setup_panda_for_rotation(
         DeviceSettingsConstants.PANDA_PC_FILENAME,
         panda,
     )
-    gate_start = parameters["rot_axis_start"] - 0.5
+    gate_start = parameters.rot_axis_start - 0.5
     # Home the input encoder
     yield from bps.abs_set(
         panda.inenc[1].setp,  # type: ignore
@@ -52,10 +52,10 @@ def setup_panda_for_rotation(
     yield from setup_outenc_vals(panda)
 
     seq_table = generate_panda_seq_table(
-        parameters["rot_axis_start"],
-        parameters["rot_axis_end"],
-        parameters["images_per_well"],
-        parameters["exposure_time_s"],
+        parameters.rot_axis_start,
+        parameters.rot_axis_end,
+        parameters.images_per_well,
+        parameters.exposure_time_s,
     )
 
     yield from bps.abs_set(panda.seq[1].table, seq_table, group="panda-setup")

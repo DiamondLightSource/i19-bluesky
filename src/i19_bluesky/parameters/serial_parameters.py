@@ -120,6 +120,7 @@ class SerialExperiment(VisitParameters):
     rot_axis_increment: float
     rot_axis_end: float
     rotation_axis: RotationAxis = RotationAxis.PHI
+
     # The other positions can be read from device for now and then set to detector
 
     @computed_field

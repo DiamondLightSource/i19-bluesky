@@ -29,7 +29,7 @@ async def test_setup_diffractometer(
     parameters: SerialExperiment,
     RE: RunEngine,
 ):
-    parameters["rot_axis_start"] = 6.0
+    parameters.rot_axis_start = 6.0
     RE(setup_diffractometer(parameters, eh2_diffractometer))
     mock_phi = get_mock_put(eh2_diffractometer.phi.user_setpoint)
     mock_phi.assert_called_once_with(6.0)

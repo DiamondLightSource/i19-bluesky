@@ -48,22 +48,22 @@ def trigger_panda(
     yield from bps.trigger(devices.eiger.drv.detector.arm)
     # Currently a test, will be modified as we solidify parameters going forwards
     # assumes a dictionary of integer keys and coordinates in a list
-    for well_num, coords in parameters["well_position"].items():
+    for well_num, coords in parameters.well_position.items():
         yield from move_stage_x_and_z(coords[0], coords[2], devices.diffractometer)
         LOGGER.info(f"Moved to well {well_num}")
         if well_num % 2 == 0:
             LOGGER.info(
-                f"Rotate {parameters['rot_axis_start']} to {parameters['rot_axis_end']}"
+                f"Rotate {parameters.rot_axis_start} to {parameters.rot_axis_end}"
             )
             yield from bps.abs_set(
-                devices.diffractometer.phi, parameters["rot_axis_end"], wait=True
+                devices.diffractometer.phi, parameters.rot_axis_end, wait=True
             )
         else:
             LOGGER.info(
-                f"Rotate {parameters['rot_axis_end']} to {parameters['rot_axis_start']}"
+                f"Rotate {parameters.rot_axis_end} to {parameters.rot_axis_start}"
             )
             yield from bps.abs_set(
-                devices.diffractometer.phi, parameters["rot_axis_start"], wait=True
+                devices.diffractometer.phi, parameters.rot_axis_start, wait=True
             )
 
 
@@ -77,7 +77,7 @@ def end_run(
     yield from disarm_panda(devices.panda)
     yield from reset_panda(devices.panda)
     yield from move_diffractometer_back(
-        devices.diffractometer, parameters["rot_axis_start"]
+        devices.diffractometer, parameters.rot_axis_start
     )
 
 
