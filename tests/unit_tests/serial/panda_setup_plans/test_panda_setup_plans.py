@@ -23,7 +23,6 @@ async def test_wait_between_setting_table_and_arming(
         ) as patch_wait,
     ):
         RE(setup_panda_for_rotation(parameters, mock_panda))
-        # 4, 5, 25, 10
         patch_wait.assert_called_once_with(group="panda-setup", timeout=60)
 
 

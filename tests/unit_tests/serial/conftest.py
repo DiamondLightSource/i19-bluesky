@@ -18,11 +18,7 @@ from ophyd_async.fastcs.panda import HDFPanda
 
 from i19_bluesky.parameters.components import Path
 from i19_bluesky.parameters.serial_parameters import (
-    DetectorType,
     DeviceInput,
-    GridParameters,
-    PinColRequest,
-    SerialExperiment,
 )
 
 set_path_provider(
@@ -134,61 +130,6 @@ async def devices(
     )
 
     return devices
-
-
-# @pytest.fixture
-# async def mock_parameters(
-#     GridParameters: GridParameters,
-#     WellsSelection: WellsSelection,
-# ) -> SerialExperiment:
-#     mock_parameters = SerialExperiment(
-#         hutch="",
-#         visit="/tmp/i19-2/cm12345-1",
-#         dataset="foo",
-#         filename_prefix="bar_01",
-#         images_per_well=0,
-#         exposure_time_s=0.2,
-#         image_width_deg=80,
-#         detector_distance_mm=100,
-#         two_theta_deg=0,
-#         transmission_fraction=0.05,
-#         grid=GridParameters,
-#         wells=WellsSelection,
-#         aperture_request=PinColRequest.PCOL100,
-#         detector_type=DetectorType.EIGER,
-#         well_position={1: (1, 2, 3), 2: (4, 5, 6)},
-#         rot_axis_start=10,
-#         rot_axis_increment=0.2,
-#         rot_axis_end=5,
-#     )
-#     return mock_parameters
-
-
-@pytest.fixture
-async def mock_parameters(parameters) -> SerialExperiment:
-    grid_params_instance = GridParameters(**parameters["grid"])
-    wells_selection_instance = parameters["wells"]
-
-    return SerialExperiment(
-        hutch=parameters["hutch"],
-        visit=parameters["visit"],
-        dataset=parameters["dataset"],
-        filename_prefix=parameters["filename_prefix"],
-        images_per_well=parameters["images_per_well"],
-        exposure_time_s=parameters["exposure_time_s"],
-        image_width_deg=parameters["image_width_deg"],
-        detector_distance_mm=parameters["detector_distance_mm"],
-        two_theta_deg=parameters["two_theta_deg"],
-        transmission_fraction=parameters["transmission_fraction"],
-        grid=grid_params_instance,
-        wells=wells_selection_instance,
-        aperture_request=PinColRequest.PCOL100,
-        detector_type=DetectorType.EIGER,
-        well_position=parameters["well_position"],
-        rot_axis_start=parameters["rot_axis_start"],
-        rot_axis_increment=parameters["rot_axis_increment"],
-        rot_axis_end=parameters["rot_axis_end"],
-    )
 
 
 @pytest.fixture

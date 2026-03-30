@@ -51,18 +51,14 @@ def trigger_panda(
         LOGGER.info(f"Moved to well {well_num}")
         if well_num % 2 == 0:
             LOGGER.info(
-                f"Rotating {parameters['rot_axis_start']} to {
-                    parameters['rot_axis_end']
-                }"
+                f"Rotate {parameters['rot_axis_start']} to {parameters['rot_axis_end']}"
             )
             yield from bps.abs_set(
                 devices.diffractometer.phi, parameters["rot_axis_end"], wait=True
             )
         else:
             LOGGER.info(
-                f"Rotating {parameters['rot_axis_end']} to {
-                    parameters['rot_axis_start']
-                }"
+                f"Rotate {parameters['rot_axis_end']} to {parameters['rot_axis_start']}"
             )
             yield from bps.abs_set(
                 devices.diffractometer.phi, parameters["rot_axis_start"], wait=True
