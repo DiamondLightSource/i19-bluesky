@@ -41,9 +41,13 @@ def dummy_serial_params(dummy_wells_settings):
             "x_steps": 20,
             "z_steps": 20,
         },
+        "aperture_request": "100um",
+        "detector_type": "EIGER",
+        "well_position": {1: (1, 2, 3)},
         "wells": dummy_wells_settings,
         "rot_axis_start": -5,
         "rot_axis_increment": 0.1,
+        "rot_axis_end": 10,
     }
 
 

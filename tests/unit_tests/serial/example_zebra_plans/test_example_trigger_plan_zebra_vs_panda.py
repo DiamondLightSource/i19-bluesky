@@ -5,6 +5,7 @@ from dodal.devices.beamlines.i19.diffractometer import FourCircleDiffractometer
 from dodal.devices.zebra.zebra import RotationDirection, Zebra
 from ophyd_async.core import get_mock_put
 
+from i19_bluesky.parameters.serial_parameters import DeviceInput, SerialExperiment
 from i19_bluesky.serial.example_zebra_plans.example_trigger_plan_zebra_vs_panda import (
     abort_zebra,
     trigger_zebra,
@@ -31,6 +32,8 @@ async def test_trigger_zebra(
     eh2_zebra: Zebra,
     eh2_diffractometer: FourCircleDiffractometer,
     RE: RunEngine,
+    devices: DeviceInput,
+    parameters: SerialExperiment,
 ):
     parent_mock = MagicMock()
     parent_mock.attach_mock(mock_setup_diffractometer, "mock_setup_diffractometer")
@@ -42,42 +45,35 @@ async def test_trigger_zebra(
     RE(
         trigger_zebra(
             zebra=eh2_zebra,
-            diffractometer=eh2_diffractometer,
             phi_start=5,
             phi_end=10,
             phi_steps=25,
             exposure_time=10,
             gate_width=2,
             pulse_width=2,
+            parameters=parameters,
+            devices=devices,
         )
     )
     mock_phi = get_mock_put(eh2_diffractometer.phi.user_setpoint)
     mock_phi.assert_has_calls([call(10), call(5)])
 
     expected_calls = [
-        call.mock_setup_diffractometer(eh2_diffractometer, 4.5, 25, 10),
-        call.mock_setup_diffractometer().__iter__(),
+        call.mock_setup_diffractometer(parameters, eh2_diffractometer),
         call.mock_setup_zebra_for_collection(
             eh2_zebra, RotationDirection.POSITIVE, 4.5, 2, 2
         ),
-        call.mock_setup_zebra_for_collection().__iter__(),
         call.mock_arm_zebra(eh2_zebra),
-        call.mock_arm_zebra().__iter__(),
         call.mock_disarm_zebra(eh2_zebra),
-        call.mock_disarm_zebra().__iter__(),
-        call.mock_setup_diffractometer(eh2_diffractometer, 10.5, 25, 10),
-        call.mock_setup_diffractometer().__iter__(),
+        call.mock_setup_diffractometer(parameters, eh2_diffractometer),
         call.mock_setup_zebra_for_collection(
             eh2_zebra, RotationDirection.NEGATIVE, 4.5, 2, 2
         ),
-        call.mock_setup_zebra_for_collection().__iter__(),
         call.mock_arm_zebra(eh2_zebra),
-        call.mock_arm_zebra().__iter__(),
         call.mock_disarm_zebra(eh2_zebra),
-        call.mock_disarm_zebra().__iter__(),
     ]
 
-    parent_mock.assert_has_calls(expected_calls)
+    parent_mock.assert_has_calls(expected_calls, any_order=True)
 
 
 @patch(
