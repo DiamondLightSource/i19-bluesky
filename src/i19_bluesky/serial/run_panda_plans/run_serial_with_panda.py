@@ -22,14 +22,15 @@ def setup_then_trigger_panda(
     diffractometer to its starting position. Designed to be called with BlueAPI.
 
     Args:
-        detector_z (float): Distance to move in Z axis
-        two_theta (float) Distance to move in Two-Theta axis
-        phi_start (float): Starting phi position, in degrees.
-        phi_end (float): Ending phi position, in degrees.
-        phi_steps (int): Number of images to take.
-        exposure_time (float): Time between images, in seconds.
-        aperture (PinColRequest): PinColRequest object (StrEnum)
-        devices (DeviceInput): input class containing:
+        parameters (SerialExperiment): SerialExperiment or dict containing:
+            detector_distance_mm (float): Distance to move in Z axis
+            two_theta_deg (float) Distance to move in Two-Theta axis
+            rot_axis_start (float): Starting phi position, in degrees.
+            rot_axis_end (float): Ending phi position, in degrees.
+            images_per_well (int): Number of images to take.
+            exposure_time_s (float): Time between images, in seconds.
+            aperture_request (PinColRequest): PinColRequest object (StrEnum)
+        devices (DeviceInput): DeviceInput class containing:
             diffractometer (FourCircleDiffractometer): The diffractometer ophyd device.
             backlight : Backlight controller object
             pinhole_collimator : Pinhole Collimator control object

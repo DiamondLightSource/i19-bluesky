@@ -22,15 +22,17 @@ def trigger_panda(
     """Trigger panda for collection in both directions.
 
     Args:
-        well_positions dict: Input coordinates of the selected wells
-            (Key=well (int), value=X,Y,Z coordinates (list of ints))
-        phi_start (float): Starting phi position, in degrees.
-        phi_end (float): Ending phi position, in degrees.
-        phi_steps (int): Number of images to take.
-        exposure_time (float): Time between images, in seconds.
-        diffractometer (FourCircleDiffractometer): The diffractometer ophyd device.
-        panda (HDFPanda): The fastcs PandA ophyd device.
-        eiger (EigerDetector): The eiger detector device
+        parameters (SerialExperiment): SerialExperiment or dict containing:
+            well_positions (dict): Input coordinates of the selected wells
+                (Key=well (int), value=X,Y,Z coordinates (list of ints))
+            rot_axis_start (float): Starting phi position, in degrees.
+            rot_axis_end (float): Ending phi position, in degrees.
+            images_per_well (int): Number of images to take.
+            exposure_time_s (float): Time between images, in seconds.
+        devices (DeviceInput): DeviceInput object containing:
+            diffractometer (FourCircleDiffractometer): The diffractometer ophyd device.
+            panda (HDFPanda): The fastcs PandA ophyd device.
+            eiger (EigerDetector): The eiger detector device
     """
     yield from setup_diffractometer(
         parameters,
