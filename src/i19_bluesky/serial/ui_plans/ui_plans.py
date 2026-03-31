@@ -23,7 +23,13 @@ def move_backlight_in_via_ui_quick(
     yield from move_backlight_in(devices.backlight)
 
 
-def rotate_in_phi(parameters: SerialExperiment, devices: DeviceInput = inject("")):
+def rotate_in_phi(
+    parameters: SerialExperiment, devices: DeviceInput = inject("")
+) -> MsgGenerator:
+    parameters.rot_axis_start = yield from bps.rd(
+        devices.diffractometer.phi.user_readback
+    )
+    parameters.rot_axis_end = parameters.rot_axis_increment + parameters.rot_axis_start
     yield from bps.abs_set(
         devices.diffractometer.phi, parameters.rot_axis_end, wait=True
     )

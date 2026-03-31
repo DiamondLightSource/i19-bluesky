@@ -1,6 +1,8 @@
 from unittest.mock import MagicMock, patch
 
+import pytest
 from bluesky.run_engine import RunEngine
+from ophyd_async.core import set_mock_value
 
 from i19_bluesky.parameters.serial_parameters import DeviceInput, SerialExperiment
 from i19_bluesky.serial.ui_plans.ui_plans import (
@@ -41,13 +43,23 @@ async def test_move_backlight_in_via_ui(
     mock_move_backlight_in.assert_called_once_with(devices.backlight)
 
 
+@pytest.mark.parametrize(
+    "input_increment,result", [(10.0, 10.0), (100.0, 100.0), (4, 4)]
+)
 @patch("i19_bluesky.serial.ui_plans.ui_plans.bps.abs_set")
 async def test_rotate_in_phi(
     mock_abs_set: MagicMock,
+    input_increment: float,
+    result: float,
     RE: RunEngine,
     parameters: SerialExperiment,
     devices: DeviceInput,
 ):
-    parameters.rot_axis_end = 10
+    parameters.rot_axis_increment = input_increment
     RE(rotate_in_phi(parameters, devices))
-    mock_abs_set.assert_called_once_with(devices.diffractometer.phi, 10, wait=True)
+    mock_abs_set.assert_called_with(devices.diffractometer.phi, result, wait=True)
+    set_mock_value(devices.diffractometer.phi.user_readback, input_increment)
+    RE(rotate_in_phi(parameters, devices))
+    mock_abs_set.assert_called_with(
+        devices.diffractometer.phi, result + result, wait=True
+    )

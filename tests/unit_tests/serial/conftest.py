@@ -100,6 +100,7 @@ async def eh2_diffractometer(RE: RunEngine) -> FourCircleDiffractometer:
     set_mock_value(diffractometer.phi.velocity, 1)
     set_mock_value(diffractometer.det_stage.det_z.user_readback, 100)
     set_mock_value(diffractometer.det_stage.two_theta.user_readback, 0)
+    set_mock_value(diffractometer.phi.user_readback, 0)
     return diffractometer
 
 
