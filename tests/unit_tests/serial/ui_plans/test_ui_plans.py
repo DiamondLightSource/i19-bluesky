@@ -43,23 +43,22 @@ async def test_move_backlight_in_via_ui(
     mock_move_backlight_in.assert_called_once_with(devices.backlight)
 
 
-@pytest.mark.parametrize(
-    "input_increment,result", [(10.0, 10.0), (100.0, 100.0), (4, 4)]
-)
+@pytest.mark.parametrize("input_increment", [(10.0), (100.0), (-4)])
 @patch("i19_bluesky.serial.ui_plans.ui_plans.bps.abs_set")
 async def test_rotate_in_phi(
     mock_abs_set: MagicMock,
     input_increment: float,
-    result: float,
     RE: RunEngine,
     parameters: SerialExperiment,
     devices: DeviceInput,
 ):
     parameters.rot_axis_increment = input_increment
     RE(rotate_in_phi(parameters, devices))
-    mock_abs_set.assert_called_with(devices.diffractometer.phi, result, wait=True)
+    mock_abs_set.assert_called_with(
+        devices.diffractometer.phi, input_increment, wait=True
+    )
     set_mock_value(devices.diffractometer.phi.user_readback, input_increment)
     RE(rotate_in_phi(parameters, devices))
     mock_abs_set.assert_called_with(
-        devices.diffractometer.phi, result + result, wait=True
+        devices.diffractometer.phi, 2 * input_increment, wait=True
     )
