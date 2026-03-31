@@ -23,7 +23,7 @@ dependencies = [
     # as by default pip-install will not upgrade to a pre-release.
     # Blueapi pinned until GDA can be updated on the beamline to use latest version
     "blueapi >= 1.4.1",
-    "ophyd ==1.11.0",
+    "ophyd ==1.11.1",
     "ophyd-async[ca,pva] >= 0.16.0",
     "bluesky >= 1.13",
     "dls-dodal @ git+https://github.com/DiamondLightSource/dodal.git@main",

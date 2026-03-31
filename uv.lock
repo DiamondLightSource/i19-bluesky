@@ -2030,7 +2030,7 @@ requires-dist = [
     { name = "fastapi", extras = ["all"] },
     { name = "nexgen" },
     { name = "numpy" },
-    { name = "ophyd", specifier = "==1.11.0" },
+    { name = "ophyd", specifier = "==1.11.1" },
     { name = "ophyd-async", extras = ["ca", "pva"], specifier = ">=0.16.0" },
     { name = "pydantic" },
     { name = "pydantic-extra-types", specifier = ">=2.10.1" },
@@ -3365,7 +3365,7 @@ wheels = [
 
 [[package]]
 name = "ophyd"
-version = "1.11.0"
+version = "1.11.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "networkx" },
@@ -3374,9 +3374,9 @@ dependencies = [
     { name = "packaging" },
     { name = "pint" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/50/54/02465637d447291dd8596584c9b74e8f82cc527d3c0be8dd8ed267feec42/ophyd-1.11.0.tar.gz", hash = "sha256:75e0489436035fe7ba40476f2c2ea7fd08ed02d7cd462b722e347684447ec9cc", size = 312894, upload-time = "2025-09-04T15:34:38.221Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/3b/4a/d41c587299c62dcee80af425e29fddb96ba6ee8d8cd83d05acc959316554/ophyd-1.11.1.tar.gz", hash = "sha256:c813fa90f7d070b8da2a875ace9f50193a29d4c4555838c9c766947d971bbb9c", size = 313339, upload-time = "2026-03-31T19:03:33.948Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/46/59/e11136fe6db0b1f3aea14de7bc36122aaa0ca67b715e400d45974b8848be/ophyd-1.11.0-py3-none-any.whl", hash = "sha256:216ee73f61409550916aed03773ac5dbe0e43dc2e463d3b865212d1e7ca7b877", size = 279624, upload-time = "2025-09-04T15:34:36.865Z" },
+    { url = "https://files.pythonhosted.org/packages/6c/fc/a4bf334181e291ced9c9b09178394e6cd42ec6e8e0ef2e890c5b6c8e4ab5/ophyd-1.11.1-py3-none-any.whl", hash = "sha256:af3032fe4cc74a2f219d0dfd0c65454faff397b14b194ca3fc7a3b5ec89c1ceb", size = 280052, upload-time = "2026-03-31T19:03:32.394Z" },
 ]
 
 [[package]]
