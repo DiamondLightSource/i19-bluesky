@@ -6,23 +6,24 @@ from dodal.devices.beamlines.i19.diffractometer import (
 )
 
 from i19_bluesky.log import LOGGER
+from i19_bluesky.parameters.serial_parameters import SerialExperiment
 
 
 def setup_diffractometer(
+    parameters: SerialExperiment,
     diffractometer: FourCircleDiffractometer,
-    phi_start: float,
-    phi_steps: int,
-    exposure_time: float,
 ) -> MsgGenerator:
     """Setup phi start posistion and velocity on the diffractometer.
 
     Args:
+        parameters (SerialExperiment): Parameters object containing:
+            rot_axis_start (float): Starting phi position.
+            images_per_well (int): Number of images to take.
+            exposure_time_s (float): Time between images, in seconds.
         diffractometer (FourCircleDiffractometer): The diffractometer ophyd device.
-        phi_start (float): Starting phi position.
-        phi_steps (int): Number of images to take.
-        exposure_time(float): Time between images, in seconds."""
-    yield from bps.abs_set(diffractometer.phi, phi_start)
-    velocity = phi_steps / exposure_time
+    """
+    yield from bps.abs_set(diffractometer.phi, parameters.rot_axis_start)
+    velocity = parameters.images_per_well / parameters.exposure_time_s
     yield from bps.abs_set(diffractometer.phi.velocity, velocity)
 
 
