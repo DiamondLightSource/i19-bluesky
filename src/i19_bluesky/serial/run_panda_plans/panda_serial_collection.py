@@ -2,7 +2,8 @@ import bluesky.plan_stubs as bps
 from bluesky.utils import MsgGenerator
 
 from i19_bluesky.log import LOGGER
-from i19_bluesky.parameters.serial_parameters import DeviceInput, SerialExperiment
+from i19_bluesky.parameters.devices_composites import SerialCollectionEh2PandaComposite
+from i19_bluesky.parameters.serial_parameters import SerialExperimentEh2
 from i19_bluesky.serial.device_setup_plans.diffractometer_plans import (
     move_diffractometer_back,
     move_stage_x_and_z,
@@ -16,13 +17,13 @@ from i19_bluesky.serial.panda_setup_plans.panda_stubs import arm_panda, disarm_p
 
 
 def trigger_panda(
-    parameters: SerialExperiment,
-    devices: DeviceInput,
+    parameters: SerialExperimentEh2,
+    devices: SerialCollectionEh2PandaComposite,
 ) -> MsgGenerator:
     """Trigger panda for collection in both directions.
 
     Args:
-        parameters (SerialExperiment): SerialExperiment or dict containing:
+        parameters (SerialExperimentEh2): SerialExperimentEh2 object containing:
             well_positions (dict): Input coordinates of the selected wells
                 (Key=well (int), value=X,Y,Z coordinates (list of ints))
             rot_axis_start (float): Starting phi position, in degrees.
@@ -35,7 +36,7 @@ def trigger_panda(
             eiger (EigerDetector): The eiger detector device
     """
     yield from setup_diffractometer(
-        parameters,
+        parameters.panda_rotation_params,
         devices.diffractometer,
     )
     yield from setup_panda_for_rotation(
@@ -51,25 +52,24 @@ def trigger_panda(
     for well_num, coords in parameters.well_position.items():
         yield from move_stage_x_and_z(coords[0], coords[2], devices.diffractometer)
         LOGGER.info(f"Moved to well {well_num}")
+        rot_axis_end = (
+            parameters.images_per_well
+            + parameters.rot_axis_increment
+            + parameters.rot_axis_start
+        )
         if well_num % 2 == 0:
-            LOGGER.info(
-                f"Rotate {parameters.rot_axis_start} to {parameters.rot_axis_end}"
-            )
-            yield from bps.abs_set(
-                devices.diffractometer.phi, parameters.rot_axis_end, wait=True
-            )
+            LOGGER.info(f"Rotate {parameters.rot_axis_start} to {rot_axis_end}")
+            yield from bps.abs_set(devices.diffractometer.phi, rot_axis_end, wait=True)
         else:
-            LOGGER.info(
-                f"Rotate {parameters.rot_axis_end} to {parameters.rot_axis_start}"
-            )
+            LOGGER.info(f"Rotate {rot_axis_end} to {parameters.rot_axis_start}")
             yield from bps.abs_set(
                 devices.diffractometer.phi, parameters.rot_axis_start, wait=True
             )
 
 
 def end_run(
-    parameters: SerialExperiment,
-    devices: DeviceInput,
+    parameters: SerialExperimentEh2,
+    devices: SerialCollectionEh2PandaComposite,
 ):
     LOGGER.info("Disarm eiger")
     yield from bps.trigger(devices.eiger.drv.detector.disarm)
@@ -81,7 +81,7 @@ def end_run(
     )
 
 
-def run_on_collection_abort(devices: DeviceInput) -> MsgGenerator:
+def run_on_collection_abort(devices: SerialCollectionEh2PandaComposite) -> MsgGenerator:
     LOGGER.warning("ABORT")
     yield from bps.abs_set(devices.diffractometer.phi.motor_stop, 1, wait=True)
     yield from bps.trigger(devices.eiger.drv.detector.disarm)

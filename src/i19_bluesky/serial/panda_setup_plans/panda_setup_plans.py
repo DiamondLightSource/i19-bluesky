@@ -8,7 +8,7 @@ from dodal.plans.load_panda_yaml import load_panda_from_yaml
 from ophyd_async.fastcs.panda import HDFPanda
 
 from i19_bluesky.log import LOGGER
-from i19_bluesky.parameters.serial_parameters import SerialExperiment
+from i19_bluesky.parameters.serial_parameters import SerialExperimentEh2
 from i19_bluesky.serial.panda_setup_plans.panda_stubs import (
     DeviceSettingsConstants,
     arm_panda,
@@ -21,13 +21,13 @@ GENERAL_TIMEOUT = 60
 
 
 def setup_panda_for_rotation(
-    parameters: SerialExperiment,
+    parameters: SerialExperimentEh2,
     panda: HDFPanda,
 ) -> MsgGenerator:
     """Configures the PandA device for phi forward and backward rotation
 
     Args:
-        parameters (SerialExperiment): Serial Experiment class contains:
+        parameters (SerialExperimentEh2): Serial Experiment class contains:
             rot_axis_start (float): Starting phi position, in degrees.
             rot_axis_end (float): Ending phi position, in degrees.
             images_per_well (int): Number of images to take.
@@ -42,7 +42,14 @@ def setup_panda_for_rotation(
         DeviceSettingsConstants.PANDA_PC_FILENAME,
         panda,
     )
-    gate_start = parameters.rot_axis_start - 0.5
+    gate_start = (
+        parameters.rot_axis_start - parameters.panda_rotation_params.ramp_distance_deg
+    )
+    rot_axis_end = (
+        parameters.rot_axis_start
+        + parameters.images_per_well
+        + parameters.exposure_time_s
+    )
     # Home the input encoder
     yield from bps.abs_set(
         panda.inenc[1].setp,  # type: ignore
@@ -53,7 +60,7 @@ def setup_panda_for_rotation(
 
     seq_table = generate_panda_seq_table(
         parameters.rot_axis_start,
-        parameters.rot_axis_end,
+        rot_axis_end,
         parameters.images_per_well,
         parameters.exposure_time_s,
     )

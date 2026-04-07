@@ -2,7 +2,8 @@ import bluesky.preprocessors as bpp
 from bluesky.utils import MsgGenerator
 from dodal.common import inject
 
-from i19_bluesky.parameters.serial_parameters import DeviceInput, SerialExperiment
+from i19_bluesky.parameters.devices_composites import SerialCollectionEh2PandaComposite
+from i19_bluesky.parameters.serial_parameters import SerialExperimentEh2
 from i19_bluesky.serial.run_panda_plans.panda_serial_collection import (
     end_run,
     run_on_collection_abort,
@@ -14,15 +15,15 @@ from i19_bluesky.serial.setup_beamline_plans.setup_beamline_pre_collection impor
 
 
 def setup_then_trigger_panda(
-    parameters: SerialExperiment,
-    devices: DeviceInput = inject(""),
+    parameters: SerialExperimentEh2,
+    devices: SerialCollectionEh2PandaComposite = inject(""),
 ) -> MsgGenerator:
     """Run primary setup processes then trigger PandA to collect data from experiment.
     Has contingencies to abort if any stage produces errors, before moving the
     diffractometer to its starting position. Designed to be called with BlueAPI.
 
     Args:
-        parameters (SerialExperiment): SerialExperiment or dict containing:
+        parameters (SerialExperimentEh2): SerialExperimentEh2:
             detector_distance_mm (float): Distance to move in Z axis
             two_theta_deg (float) Distance to move in Two-Theta axis
             rot_axis_start (float): Starting phi position, in degrees.
@@ -43,8 +44,8 @@ def setup_then_trigger_panda(
 
 
 def run_serial_with_panda(
-    parameters: SerialExperiment,
-    devices: DeviceInput = inject(""),
+    parameters: SerialExperimentEh2,
+    devices: SerialCollectionEh2PandaComposite = inject(""),
 ) -> MsgGenerator:
     yield from bpp.contingency_wrapper(
         setup_then_trigger_panda(parameters, devices),

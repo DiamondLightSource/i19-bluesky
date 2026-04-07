@@ -3,15 +3,16 @@ from bluesky.utils import MsgGenerator
 from i19_bluesky.eh2.backlight_plan import move_backlight_out
 from i19_bluesky.eh2.pincol_control_plans import move_pin_col_to_requested_in_position
 from i19_bluesky.log import LOGGER
-from i19_bluesky.parameters.serial_parameters import DeviceInput, SerialExperiment
+from i19_bluesky.parameters.devices_composites import SerialCollectionEh2PandaComposite
+from i19_bluesky.parameters.serial_parameters import SerialExperimentEh2
 from i19_bluesky.serial.device_setup_plans.diffractometer_plans import (
     move_detector_stage,
 )
 
 
 def setup_beamline_before_collection(
-    parameters: SerialExperiment,
-    devices: DeviceInput,
+    parameters: SerialExperimentEh2,
+    devices: SerialCollectionEh2PandaComposite,
 ) -> MsgGenerator:
     """Runs setup tasks prior to data collection. Currently, moves the backlight to its\
         'out' position, then moves the pinhole collimator to position to record at the \

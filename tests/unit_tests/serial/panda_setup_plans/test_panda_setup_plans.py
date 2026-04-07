@@ -4,7 +4,8 @@ from bluesky.run_engine import RunEngine
 from numpy.testing import assert_array_equal
 from ophyd_async.fastcs.panda import HDFPanda, SeqTable, SeqTrigger
 
-from i19_bluesky.parameters.serial_parameters import DeviceInput, SerialExperiment
+from i19_bluesky.parameters.devices_composites import SerialCollectionEh2PandaComposite
+from i19_bluesky.parameters.serial_parameters import SerialExperimentEh2
 from i19_bluesky.serial.panda_setup_plans.panda_setup_plans import (
     reset_panda,
     setup_panda_for_rotation,
@@ -12,7 +13,7 @@ from i19_bluesky.serial.panda_setup_plans.panda_setup_plans import (
 
 
 async def test_wait_between_setting_table_and_arming(
-    mock_panda: HDFPanda, RE: RunEngine, parameters: SerialExperiment
+    mock_panda: HDFPanda, RE: RunEngine, parameters: SerialExperimentEh2
 ):
     with (
         patch(
@@ -27,13 +28,14 @@ async def test_wait_between_setting_table_and_arming(
 
 
 async def test_setup_panda_for_rotation(
-    devices: DeviceInput, parameters: SerialExperiment, RE: RunEngine
+    devices: SerialCollectionEh2PandaComposite,
+    parameters: SerialExperimentEh2,
+    RE: RunEngine,
 ):
     with patch(
         "i19_bluesky.serial.panda_setup_plans.panda_setup_plans.load_panda_from_yaml"
     ) as patch_load:
         parameters.rot_axis_start = 4
-        parameters.rot_axis_end = 5
         parameters.images_per_well = 25
         parameters.exposure_time_s = 0.1
         RE(setup_panda_for_rotation(parameters, devices.panda), group="panda-setup")
@@ -50,7 +52,7 @@ async def test_setup_panda_for_rotation(
     ) + SeqTable.row(
         trigger=SeqTrigger.POSA_LT,
         repeats=25000,
-        position=5000,
+        position=29100,
         time1=100,
         outa1=True,
     )

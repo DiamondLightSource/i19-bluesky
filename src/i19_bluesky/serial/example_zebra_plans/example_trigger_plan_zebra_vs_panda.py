@@ -11,7 +11,8 @@ from dodal.devices.zebra.zebra import RotationDirection, Zebra
 
 from i19_bluesky.eh2.zebra_arming_plan import arm_zebra, disarm_zebra
 from i19_bluesky.log import LOGGER
-from i19_bluesky.parameters.serial_parameters import DeviceInput, SerialExperiment
+from i19_bluesky.parameters.devices_composites import SerialCollectionEh2ZebraComposite
+from i19_bluesky.parameters.serial_parameters import SerialExperimentEh2
 from i19_bluesky.serial.device_setup_plans.diffractometer_plans import (
     move_diffractometer_back,
 )
@@ -33,8 +34,8 @@ def trigger_zebra(
     exposure_time: float,
     gate_width: float,
     pulse_width: float,
-    devices: DeviceInput,
-    parameters: SerialExperiment,
+    devices: SerialCollectionEh2ZebraComposite,
+    parameters: SerialExperimentEh2,
 ) -> MsgGenerator:
     """Trigger zebra for collection in the forward and backward direction.
     Gate start is calculated as phi start - 0.5.
@@ -53,9 +54,10 @@ def trigger_zebra(
 
     """
     gate_start = phi_start - RAMP
-    gate_end = phi_end + RAMP
-    parameters.rot_axis_start = gate_start
-    yield from setup_diffractometer(parameters, devices.diffractometer)
+    # gate_end = phi_end + RAMP
+    yield from setup_diffractometer(
+        parameters.zebra_rotation_params, devices.diffractometer
+    )
     LOGGER.info("Setup zebra for collection in the positive direction and arm")
     yield from setup_zebra_for_collection(
         zebra, RotationDirection.POSITIVE, gate_start, gate_width, pulse_width
@@ -64,9 +66,8 @@ def trigger_zebra(
     yield from bps.abs_set(devices.diffractometer.phi, phi_end, wait=True)
     LOGGER.info("Disarm zebra")
     yield from disarm_zebra(zebra)
-    parameters.rot_axis_end = gate_end
     yield from setup_diffractometer(
-        parameters,
+        parameters.zebra_rotation_params,
         devices.diffractometer,
     )
     LOGGER.info("Setup zebra for collection in the negative direction and arm")
@@ -92,9 +93,9 @@ def run_zebra_test(
     exposure_time: float,
     gate_width: float,
     pulse_width: float,
-    parameters: SerialExperiment,
+    parameters: SerialExperimentEh2,
     zebra: Zebra = inject("zebra"),
-    devices: DeviceInput = inject(""),
+    devices: SerialCollectionEh2ZebraComposite = inject(""),
 ) -> MsgGenerator:
     yield from bpp.contingency_wrapper(
         trigger_zebra(

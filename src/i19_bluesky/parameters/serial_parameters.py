@@ -1,20 +1,13 @@
 # from abc import abstractmethod
 from enum import StrEnum
 
-import pydantic
-from dodal.devices.beamlines.i19.backlight import BacklightPosition
-from dodal.devices.beamlines.i19.diffractometer import (
-    FourCircleDiffractometer,
-)
 from dodal.devices.beamlines.i19.pin_col_stages import (
     PinColRequest,
-    PinholeCollimatorControl,
 )
-from ophyd_async.fastcs.eiger import EigerDetector
-from ophyd_async.fastcs.panda import HDFPanda
 from pydantic import BaseModel, computed_field
 
 from i19_bluesky.parameters.components import (
+    DetectorType,
     PandaRotationParams,
     RotationAxis,
     VisitParameters,
@@ -27,10 +20,6 @@ class GridType(StrEnum):
     SILICON = "Silicon"
     KAPTON400 = "Kapton"
     FILM = "Film"
-
-
-class DetectorType(StrEnum):
-    EIGER = "EIGER"
 
 
 class GridParameters(BaseModel):
@@ -92,15 +81,6 @@ class WellsSelection(BaseModel):
         return len(self.selected)
 
 
-@pydantic.dataclasses.dataclass(config={"arbitrary_types_allowed": True})
-class DeviceInput:
-    diffractometer: FourCircleDiffractometer
-    backlight: BacklightPosition
-    pincol: PinholeCollimatorControl
-    panda: HDFPanda
-    eiger: EigerDetector
-
-
 class SerialExperiment(VisitParameters):
     """General, for both hutches"""
 
@@ -113,12 +93,10 @@ class SerialExperiment(VisitParameters):
     grid: GridParameters
     wells: WellsSelection
     # Missing: , , sample_stage, also axes values
-    aperture_request: PinColRequest
-    detector_type: DetectorType
     well_position: dict[int, tuple]
     rot_axis_start: float
     rot_axis_increment: float
-    rot_axis_end: float
+    # rot_axis_end: float
     rotation_axis: RotationAxis = RotationAxis.PHI
 
     # The other positions can be read from device for now and then set to detector
@@ -135,6 +113,9 @@ class SerialExperiment(VisitParameters):
 
 
 class SerialExperimentEh2(SerialExperiment):
+    aperture_request: PinColRequest
+    detector_type: DetectorType
+
     @property
     def zebra_rotation_params(self) -> ZebraRotationParams:
         return ZebraRotationParams(
