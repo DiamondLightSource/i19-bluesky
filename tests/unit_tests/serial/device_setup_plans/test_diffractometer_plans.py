@@ -35,7 +35,7 @@ async def test_setup_diffractometer(
     mock_phi.assert_called_once_with(6.0)
 
     mock_phi_velocity = get_mock_put(eh2_diffractometer.phi.velocity)
-    mock_phi_velocity.assert_called_once_with(100.0)
+    mock_phi_velocity.assert_called_once_with(1)
 
 
 @pytest.mark.parametrize(

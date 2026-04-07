@@ -30,11 +30,11 @@ async def test_setup_diffractometer(
     mock_phi.assert_called_once_with(-5.0)
 
     mock_phi_velocity = get_mock_put(eh2_diffractometer.phi.velocity)
-    mock_phi_velocity.assert_called_once_with(100.0)
+    mock_phi_velocity.assert_called_once_with(1.0)
 
 
 @pytest.mark.parametrize(
-    "well_positions,phival", [({1: [1, 2, 3]}, 5), ({2: [1, 2, 3]}, 15.1)]
+    "well_positions,phival", [({1: [1, 2, 3]}, 5), ({2: [1, 2, 3]}, 6)]
 )
 @patch("i19_bluesky.serial.run_panda_plans.panda_serial_collection.bps.trigger")
 @patch("i19_bluesky.serial.run_panda_plans.panda_serial_collection.bps.abs_set")
@@ -81,7 +81,9 @@ async def test_trigger_panda(
         call.mock_setup_diffractometer(
             parameters.panda_rotation_params, devices.diffractometer
         ),
-        call.mock_setup_panda_for_rotation(parameters, devices.panda),
+        call.mock_setup_panda_for_rotation(
+            parameters.panda_rotation_params, devices.panda
+        ),
         call.mock_arm_panda(devices.panda),
         call.mock_arm_or_disarm(devices.eiger.drv.detector.arm),
         call.mock_move_stage_x_and_z(1, 3, devices.diffractometer),

@@ -8,7 +8,7 @@ from dodal.plans.load_panda_yaml import load_panda_from_yaml
 from ophyd_async.fastcs.panda import HDFPanda
 
 from i19_bluesky.log import LOGGER
-from i19_bluesky.parameters.serial_parameters import SerialExperimentEh2
+from i19_bluesky.parameters.components import PandaRotationParams
 from i19_bluesky.serial.panda_setup_plans.panda_stubs import (
     DeviceSettingsConstants,
     arm_panda,
@@ -21,7 +21,7 @@ GENERAL_TIMEOUT = 60
 
 
 def setup_panda_for_rotation(
-    parameters: SerialExperimentEh2,
+    parameters: PandaRotationParams,
     panda: HDFPanda,
 ) -> MsgGenerator:
     """Configures the PandA device for phi forward and backward rotation
@@ -29,7 +29,6 @@ def setup_panda_for_rotation(
     Args:
         parameters (SerialExperimentEh2): Serial Experiment class contains:
             rot_axis_start (float): Starting phi position, in degrees.
-            rot_axis_end (float): Ending phi position, in degrees.
             images_per_well (int): Number of images to take.
             exposure_time_s (float): Time between images, in seconds.
         panda (HDFPanda): The fastcs PandA ophyd device.
@@ -42,14 +41,7 @@ def setup_panda_for_rotation(
         DeviceSettingsConstants.PANDA_PC_FILENAME,
         panda,
     )
-    gate_start = (
-        parameters.rot_axis_start - parameters.panda_rotation_params.ramp_distance_deg
-    )
-    rot_axis_end = (
-        parameters.rot_axis_start
-        + parameters.images_per_well
-        + parameters.exposure_time_s
-    )
+    gate_start = parameters.scan_start_deg - parameters.ramp_distance_deg
     # Home the input encoder
     yield from bps.abs_set(
         panda.inenc[1].setp,  # type: ignore
@@ -59,9 +51,9 @@ def setup_panda_for_rotation(
     yield from setup_outenc_vals(panda)
 
     seq_table = generate_panda_seq_table(
-        parameters.rot_axis_start,
-        rot_axis_end,
-        parameters.images_per_well,
+        parameters.scan_start_deg,
+        parameters.scan_end_deg,
+        parameters.scan_steps,
         parameters.exposure_time_s,
     )
 

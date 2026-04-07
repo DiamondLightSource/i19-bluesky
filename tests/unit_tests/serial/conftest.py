@@ -20,7 +20,10 @@ from ophyd_async.fastcs.eiger import EigerDetector
 from ophyd_async.fastcs.panda import HDFPanda
 
 from i19_bluesky.parameters.components import HutchName, Path
-from i19_bluesky.parameters.devices_composites import SerialCollectionEh2PandaComposite
+from i19_bluesky.parameters.devices_composites import (
+    SerialCollectionEh2PandaComposite,
+    SerialCollectionEh2ZebraComposite,
+)
 from i19_bluesky.parameters.serial_parameters import (
     DetectorType,
     GridParameters,
@@ -137,6 +140,21 @@ async def devices(
     )
 
     return devices
+
+
+@pytest.fixture
+async def devices_zebra(
+    eh2_zebra, eh2_eiger, eh2_backlight, eh2_diffractometer, pincol
+) -> SerialCollectionEh2ZebraComposite:
+    devices_zebra = SerialCollectionEh2ZebraComposite(
+        diffractometer=eh2_diffractometer,
+        backlight=eh2_backlight,
+        pincol=pincol,
+        zebra=eh2_zebra,
+        eiger=eh2_eiger,
+    )
+
+    return devices_zebra
 
 
 @pytest.fixture

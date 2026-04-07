@@ -16,7 +16,7 @@ from i19_bluesky.serial.setup_beamline_plans.setup_beamline_pre_collection impor
 
 def setup_then_trigger_panda(
     parameters: SerialExperimentEh2,
-    devices: SerialCollectionEh2PandaComposite = inject(""),
+    devices: SerialCollectionEh2PandaComposite = inject(),
 ) -> MsgGenerator:
     """Run primary setup processes then trigger PandA to collect data from experiment.
     Has contingencies to abort if any stage produces errors, before moving the
@@ -31,7 +31,8 @@ def setup_then_trigger_panda(
             images_per_well (int): Number of images to take.
             exposure_time_s (float): Time between images, in seconds.
             aperture_request (PinColRequest): PinColRequest object (StrEnum)
-        devices (DeviceInput): DeviceInput class containing:
+        devices (SerialCollectionEh2PandaComposite): SerialCollectionEh2PandaComposite \
+            class containing:
             diffractometer (FourCircleDiffractometer): The diffractometer ophyd device.
             backlight : Backlight controller object
             pinhole_collimator : Pinhole Collimator control object
@@ -45,7 +46,7 @@ def setup_then_trigger_panda(
 
 def run_serial_with_panda(
     parameters: SerialExperimentEh2,
-    devices: SerialCollectionEh2PandaComposite = inject(""),
+    devices: SerialCollectionEh2PandaComposite,
 ) -> MsgGenerator:
     yield from bpp.contingency_wrapper(
         setup_then_trigger_panda(parameters, devices),

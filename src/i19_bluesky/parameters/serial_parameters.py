@@ -96,7 +96,6 @@ class SerialExperiment(VisitParameters):
     well_position: dict[int, tuple]
     rot_axis_start: float
     rot_axis_increment: float
-    # rot_axis_end: float
     rotation_axis: RotationAxis = RotationAxis.PHI
 
     # The other positions can be read from device for now and then set to detector

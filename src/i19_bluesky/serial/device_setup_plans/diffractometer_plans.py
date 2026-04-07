@@ -10,21 +10,22 @@ from i19_bluesky.parameters.components import RotationParams
 
 
 def setup_diffractometer(
-    rot_parameters: RotationParams,
+    rotation_parameters: RotationParams,
     diffractometer: FourCircleDiffractometer,
 ) -> MsgGenerator:
     """Setup phi start posistion and velocity on the diffractometer.
 
     Args:
-        rot_parameters (RotationParams): Parameters object containing:
+        rotation_parameters (RotationParams): Parameters object containing:
             scan_start_deg (float): Starting phi position.
             scan_steps (int): Number of images to take.
             exposure_time_s (float): Time between images, in seconds.
         diffractometer (FourCircleDiffractometer): The diffractometer ophyd device.
     """
-    yield from bps.abs_set(diffractometer.phi, rot_parameters.scan_start_deg)
-    velocity = rot_parameters.scan_steps / rot_parameters.exposure_time_s
-    yield from bps.abs_set(diffractometer.phi.velocity, velocity)
+    yield from bps.abs_set(diffractometer.phi, rotation_parameters.scan_start_deg)
+    yield from bps.abs_set(
+        diffractometer.phi.velocity, rotation_parameters.rotation_axis_velocity
+    )
 
 
 def move_diffractometer_back(

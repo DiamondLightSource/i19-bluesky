@@ -23,7 +23,7 @@ async def test_wait_between_setting_table_and_arming(
             "i19_bluesky.serial.panda_setup_plans.panda_setup_plans.bps.wait"
         ) as patch_wait,
     ):
-        RE(setup_panda_for_rotation(parameters, mock_panda))
+        RE(setup_panda_for_rotation(parameters.panda_rotation_params, mock_panda))
         patch_wait.assert_called_once_with(group="panda-setup", timeout=60)
 
 
@@ -38,7 +38,10 @@ async def test_setup_panda_for_rotation(
         parameters.rot_axis_start = 4
         parameters.images_per_well = 25
         parameters.exposure_time_s = 0.1
-        RE(setup_panda_for_rotation(parameters, devices.panda), group="panda-setup")
+        RE(
+            setup_panda_for_rotation(parameters.panda_rotation_params, devices.panda),
+            group="panda-setup",
+        )
         patch_load.assert_called_once()
 
     assert await devices.panda.inenc[1].setp.get_value() == 3500  # type: ignore
@@ -52,7 +55,7 @@ async def test_setup_panda_for_rotation(
     ) + SeqTable.row(
         trigger=SeqTrigger.POSA_LT,
         repeats=25000,
-        position=29100,
+        position=6500,
         time1=100,
         outa1=True,
     )

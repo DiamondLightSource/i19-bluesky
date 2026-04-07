@@ -27,11 +27,6 @@ RAMP = 0.5
 
 
 def trigger_zebra(
-    zebra: Zebra,
-    phi_start: float,
-    phi_end: float,
-    phi_steps: int,
-    exposure_time: float,
     gate_width: float,
     pulse_width: float,
     devices: SerialCollectionEh2ZebraComposite,
@@ -53,31 +48,44 @@ def trigger_zebra(
         in seconds.
 
     """
-    gate_start = phi_start - RAMP
-    # gate_end = phi_end + RAMP
+
     yield from setup_diffractometer(
         parameters.zebra_rotation_params, devices.diffractometer
     )
     LOGGER.info("Setup zebra for collection in the positive direction and arm")
     yield from setup_zebra_for_collection(
-        zebra, RotationDirection.POSITIVE, gate_start, gate_width, pulse_width
+        devices.zebra,
+        RotationDirection.POSITIVE,
+        parameters.zebra_rotation_params.ramp_start,
+        gate_width,
+        pulse_width,
     )
-    yield from arm_zebra(zebra)
-    yield from bps.abs_set(devices.diffractometer.phi, phi_end, wait=True)
+    yield from arm_zebra(devices.zebra)
+    yield from bps.abs_set(
+        devices.diffractometer.phi,
+        parameters.zebra_rotation_params.scan_end_deg,
+        wait=True,
+    )
     LOGGER.info("Disarm zebra")
-    yield from disarm_zebra(zebra)
+    yield from disarm_zebra(devices.zebra)
     yield from setup_diffractometer(
         parameters.zebra_rotation_params,
         devices.diffractometer,
     )
     LOGGER.info("Setup zebra for collection in the negative direction and arm")
     yield from setup_zebra_for_collection(
-        zebra, RotationDirection.NEGATIVE, gate_start, gate_width, pulse_width
+        devices.zebra,
+        RotationDirection.NEGATIVE,
+        parameters.zebra_rotation_params.ramp_start,
+        gate_width,
+        pulse_width,
     )
-    yield from arm_zebra(zebra)
-    yield from bps.abs_set(devices.diffractometer.phi, phi_start, wait=True)
+    yield from arm_zebra(devices.zebra)
+    yield from bps.abs_set(
+        devices.diffractometer.phi, parameters.rot_axis_start, wait=True
+    )
     LOGGER.info("Disarm zebra")
-    yield from disarm_zebra(zebra)
+    yield from disarm_zebra(devices.zebra)
 
 
 def abort_zebra(diffractometer: FourCircleDiffractometer, zebra: Zebra) -> MsgGenerator:
@@ -87,23 +95,14 @@ def abort_zebra(diffractometer: FourCircleDiffractometer, zebra: Zebra) -> MsgGe
 
 
 def run_zebra_test(
-    phi_start: float,
-    phi_end: float,
-    phi_steps: int,
-    exposure_time: float,
     gate_width: float,
     pulse_width: float,
     parameters: SerialExperimentEh2,
     zebra: Zebra = inject("zebra"),
-    devices: SerialCollectionEh2ZebraComposite = inject(""),
+    devices: SerialCollectionEh2ZebraComposite = inject(),
 ) -> MsgGenerator:
     yield from bpp.contingency_wrapper(
         trigger_zebra(
-            zebra,
-            phi_start,
-            phi_end,
-            phi_steps,
-            exposure_time,
             gate_width,
             pulse_width,
             devices,
@@ -111,7 +110,9 @@ def run_zebra_test(
         ),
         except_plan=lambda: (yield from abort_zebra(devices.diffractometer, zebra)),
         final_plan=lambda: (
-            yield from move_diffractometer_back(devices.diffractometer, phi_start)
+            yield from move_diffractometer_back(
+                devices.diffractometer, parameters.zebra_rotation_params.scan_start_deg
+            )
         ),
         auto_raise=False,
     )

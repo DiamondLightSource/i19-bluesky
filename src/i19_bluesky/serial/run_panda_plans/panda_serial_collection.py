@@ -30,7 +30,8 @@ def trigger_panda(
             rot_axis_end (float): Ending phi position, in degrees.
             images_per_well (int): Number of images to take.
             exposure_time_s (float): Time between images, in seconds.
-        devices (DeviceInput): DeviceInput object containing:
+        devices (SerialCollectionEh2PandaComposite): SerialCollectionEh2PandaComposite \
+            object containing:
             diffractometer (FourCircleDiffractometer): The diffractometer ophyd device.
             panda (HDFPanda): The fastcs PandA ophyd device.
             eiger (EigerDetector): The eiger detector device
@@ -40,7 +41,7 @@ def trigger_panda(
         devices.diffractometer,
     )
     yield from setup_panda_for_rotation(
-        parameters,
+        parameters.panda_rotation_params,
         devices.panda,
     )
     LOGGER.info("Arm panda and move phi")
@@ -52,16 +53,21 @@ def trigger_panda(
     for well_num, coords in parameters.well_position.items():
         yield from move_stage_x_and_z(coords[0], coords[2], devices.diffractometer)
         LOGGER.info(f"Moved to well {well_num}")
-        rot_axis_end = (
-            parameters.images_per_well
-            + parameters.rot_axis_increment
-            + parameters.rot_axis_start
-        )
         if well_num % 2 == 0:
-            LOGGER.info(f"Rotate {parameters.rot_axis_start} to {rot_axis_end}")
-            yield from bps.abs_set(devices.diffractometer.phi, rot_axis_end, wait=True)
+            LOGGER.info(
+                f"Rotate {parameters.rot_axis_start} to\
+                {parameters.panda_rotation_params.scan_end_deg}"
+            )
+            yield from bps.abs_set(
+                devices.diffractometer.phi,
+                parameters.panda_rotation_params.scan_end_deg,
+                wait=True,
+            )
         else:
-            LOGGER.info(f"Rotate {rot_axis_end} to {parameters.rot_axis_start}")
+            LOGGER.info(
+                f"Rotate {parameters.panda_rotation_params.scan_end_deg} to\
+                    {parameters.rot_axis_start}"
+            )
             yield from bps.abs_set(
                 devices.diffractometer.phi, parameters.rot_axis_start, wait=True
             )
