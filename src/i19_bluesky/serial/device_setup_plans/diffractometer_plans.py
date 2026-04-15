@@ -6,24 +6,26 @@ from dodal.devices.beamlines.i19.diffractometer import (
 )
 
 from i19_bluesky.log import LOGGER
+from i19_bluesky.parameters.components import RotationParams
 
 
 def setup_diffractometer(
+    rotation_parameters: RotationParams,
     diffractometer: FourCircleDiffractometer,
-    phi_start: float,
-    phi_steps: int,
-    exposure_time: float,
 ) -> MsgGenerator:
     """Setup phi start posistion and velocity on the diffractometer.
 
     Args:
+        rotation_parameters (RotationParams): Parameters object containing:
+            scan_start_deg (float): Starting phi position.
+            scan_steps (int): Number of images to take.
+            exposure_time_s (float): Time between images, in seconds.
         diffractometer (FourCircleDiffractometer): The diffractometer ophyd device.
-        phi_start (float): Starting phi position.
-        phi_steps (int): Number of images to take.
-        exposure_time(float): Time between images, in seconds."""
-    yield from bps.abs_set(diffractometer.phi, phi_start)
-    velocity = phi_steps / exposure_time
-    yield from bps.abs_set(diffractometer.phi.velocity, velocity)
+    """
+    yield from bps.abs_set(diffractometer.phi, rotation_parameters.scan_start_deg)
+    yield from bps.abs_set(
+        diffractometer.phi.velocity, rotation_parameters.rotation_axis_velocity
+    )
 
 
 def move_diffractometer_back(

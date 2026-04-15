@@ -1,9 +1,13 @@
 # from abc import abstractmethod
 from enum import StrEnum
 
+from dodal.devices.beamlines.i19.pin_col_stages import (
+    PinColRequest,
+)
 from pydantic import BaseModel, computed_field
 
 from i19_bluesky.parameters.components import (
+    DetectorType,
     PandaRotationParams,
     RotationAxis,
     VisitParameters,
@@ -88,10 +92,12 @@ class SerialExperiment(VisitParameters):
     transmission_fraction: float
     grid: GridParameters
     wells: WellsSelection
-    # Missing: detector_name, pinhole_size, sample_stage, also axes values
+    # Missing: , , sample_stage, also axes values
+    well_position: dict[int, tuple]
     rot_axis_start: float
     rot_axis_increment: float
     rotation_axis: RotationAxis = RotationAxis.PHI
+
     # The other positions can be read from device for now and then set to detector
 
     @computed_field
@@ -106,6 +112,9 @@ class SerialExperiment(VisitParameters):
 
 
 class SerialExperimentEh2(SerialExperiment):
+    aperture_request: PinColRequest
+    detector_type: DetectorType
+
     @property
     def zebra_rotation_params(self) -> ZebraRotationParams:
         return ZebraRotationParams(
