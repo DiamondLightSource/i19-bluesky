@@ -14,22 +14,17 @@ def setup_beamline_before_collection(
     parameters: SerialExperimentEh2,
     devices: SerialCollectionEh2PandaComposite,
 ) -> MsgGenerator:
-    """Runs setup tasks prior to data collection. Currently, moves the backlight to its\
-        'out' position, then moves the pinhole collimator to position to record at the \
-        requested aperture, a placeholder for moving the attenutator wedge, followed by\
-        a command to move the diffractometer an inputted distance in the X and Two-Theta
-        axis.
-        Args:
-            det_z : Float
-                Distance to move in Z axis
-            two_theta : Float
-                (default 0.0)
-                Distance to move in Two-Theta axis
-            backlight : Backlight controller object
-            diffractometer : Diffractometer object
-            pinhole_collimator : Pinhole Collimator control object
-            aperture : PinColRequest object (StrEnum)
-"""
+    """Runs setup tasks prior to data collection. Currently, moves the backlight to its
+    'out' position, then moves the pinhole collimator to position to record at the
+    requested aperture, a placeholder for moving the attenutator wedge, followed by
+    a command to move the diffractometer an inputted distance in the X and Two-Theta
+    axis.
+
+    Args:
+        parameters (SerialExperimentEh2) : SerialExperimentEh2 object
+        devices (SerialCollectionEh2PandaComposite) : SerialCollectionEh2PandaComposite
+        object
+    """
     LOGGER.info("Moving backlight out")
     yield from move_backlight_out(devices.backlight)
     LOGGER.info("Moving pinhole collimator into position")

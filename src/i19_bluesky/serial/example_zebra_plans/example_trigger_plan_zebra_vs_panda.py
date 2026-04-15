@@ -37,16 +37,12 @@ def trigger_zebra(
     Gate end is calculated as phi end + 0.5.
 
     Args:
-        zebra (Zebra): The zebra ophyd device.
-        diffractometer (FourCircleDiffractometer): The diffractometer ophyd device.
-        phi_start (float): Starting phi position, in degrees.
-        phi_end (float): Ending phi position, in degrees.
-        phi_steps (int): Number of images to take.
-        exposure_time (float): Time between images, in seconds.
         gate_width (float): Total distance from gate_start to gate_end, in degrees.
         pulse_width (float): Value comes from change in degrees of scan/velocity,\
         in seconds.
-
+        devices (SerialCollectionEh2ZebraComposite) : SerialCollectionEh2ZebraComposite\
+        object
+        parameters: (SerialExperimentEh2) : SerialExperimentEh2 object
     """
 
     yield from setup_diffractometer(

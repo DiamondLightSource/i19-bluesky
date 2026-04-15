@@ -27,10 +27,7 @@ def setup_panda_for_rotation(
     """Configures the PandA device for phi forward and backward rotation
 
     Args:
-        parameters (SerialExperimentEh2): Serial Experiment class contains:
-            rot_axis_start (float): Starting phi position, in degrees.
-            images_per_well (int): Number of images to take.
-            exposure_time_s (float): Time between images, in seconds.
+        parameters (PandaRotationParams): PandaRotationParams object
         panda (HDFPanda): The fastcs PandA ophyd device.
     """
 
