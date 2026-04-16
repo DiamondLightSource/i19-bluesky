@@ -22,6 +22,7 @@ from i19_bluesky.serial.ui_plans.ui_plans import (
             100,
             0,
         ),
+        ({"option": "???"}, 0, 0),
     ],
 )
 @patch("i19_bluesky.serial.ui_plans.ui_plans.move_detector_stage")
