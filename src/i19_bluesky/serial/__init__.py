@@ -9,7 +9,6 @@ from i19_bluesky.serial.run_panda_plans.run_serial_with_panda import (
 )
 from i19_bluesky.serial.ui_plans.ui_plans import (
     move_backlight_in_via_ui,
-    move_backlight_in_via_ui_quick,
     rotate_in_phi,
 )
 
@@ -17,7 +16,6 @@ __all__ = [
     "run_zebra_test",
     "run_serial_with_panda",
     "rotate_in_phi",
-    "move_backlight_in_via_ui_quick",
     "move_backlight_in_via_ui",
     "move_backlight_out",
 ]
