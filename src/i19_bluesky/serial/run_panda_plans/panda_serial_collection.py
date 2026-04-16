@@ -27,7 +27,6 @@ def trigger_panda(
             well_positions (dict): Input coordinates of the selected wells
                 (Key=well (int), value=X,Y,Z coordinates (list of ints))
             rot_axis_start (float): Starting phi position, in degrees.
-            rot_axis_end (float): Ending phi position, in degrees.
             images_per_well (int): Number of images to take.
             exposure_time_s (float): Time between images, in seconds.
         devices (SerialCollectionEh2PandaComposite): SerialCollectionEh2PandaComposite \
