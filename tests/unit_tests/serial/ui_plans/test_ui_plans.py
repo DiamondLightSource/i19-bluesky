@@ -45,31 +45,31 @@ async def test_move_backlight_in_via_ui(
 
 
 @pytest.mark.parametrize(
-    "params",
+    "rot_increment",
     [
-        ({"rot_axis_increment": 10.0}),
-        ({"rot_axis_increment": 50.0}),
-        ({"rot_axis_increment": -4.0}),
+        (10.0),
+        (50.0),
+        (-4.0),
     ],
 )
 @patch("i19_bluesky.serial.ui_plans.ui_plans.bps.abs_set")
 async def test_rotate_in_phi(
     mock_abs_set: MagicMock,
     RE: RunEngine,
-    params: dict,
+    rot_increment: float,
     parameters: SerialExperimentEh2,
     devices: SerialCollectionEh2PandaComposite,
 ):
-
-    rot_axis_end = params["rot_axis_increment"] + parameters.rot_axis_start
-    RE(rotate_in_phi(params, devices))
+    parameters.rot_axis_increment = rot_increment
+    rot_axis_end = parameters.rot_axis_increment + parameters.rot_axis_start
+    RE(rotate_in_phi(parameters, devices))
     mock_abs_set.assert_called_with(
         devices.diffractometer.phi,
         rot_axis_end,
         wait=True,
     )
     set_mock_value(devices.diffractometer.phi.user_readback, rot_axis_end)
-    RE(rotate_in_phi(params, devices))
+    RE(rotate_in_phi(parameters, devices))
     mock_abs_set.assert_called_with(
         devices.diffractometer.phi, rot_axis_end + rot_axis_end, wait=True
     )
