@@ -4,7 +4,6 @@ from dodal.common import inject
 
 from i19_bluesky.eh2.backlight_plan import move_backlight_in
 from i19_bluesky.parameters.devices_composites import SerialCollectionEh2PandaComposite
-from i19_bluesky.parameters.serial_parameters import SerialExperimentEh2
 from i19_bluesky.serial.device_setup_plans.diffractometer_plans import (
     move_detector_stage,
 )
@@ -25,11 +24,9 @@ def move_backlight_in_via_ui_quick(
 
 
 def rotate_in_phi(
-    parameters: SerialExperimentEh2,
+    parameters: dict,
     devices: SerialCollectionEh2PandaComposite = inject(""),
 ) -> MsgGenerator:
-    parameters.rot_axis_start = yield from bps.rd(
-        devices.diffractometer.phi.user_readback
-    )
-    rot_axis_end = parameters.rot_axis_increment + parameters.rot_axis_start
+    rot_axis_start = yield from bps.rd(devices.diffractometer.phi.user_readback)
+    rot_axis_end = parameters["rot_axis_increment"] + rot_axis_start
     yield from bps.abs_set(devices.diffractometer.phi, rot_axis_end, wait=True)
