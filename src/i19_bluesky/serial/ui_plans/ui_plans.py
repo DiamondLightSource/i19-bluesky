@@ -13,12 +13,13 @@ def move_backlight_in_via_ui(
     param: dict,
     devices: SerialCollectionEh2PandaComposite = inject(""),
 ) -> MsgGenerator:
-    if param["option"] == "slow":
-        det_z, two_theta = 250.0, 90.0
-    elif param["option"] == "quick":
-        det_z, two_theta = 100.0, 0.0
-    else:
-        det_z, two_theta = 0.0, 0.0
+    match param["option"]:
+        case "slow":
+            det_z, two_theta = 250.0, 90.0
+        case "quick":
+            det_z, two_theta = 100.0, 0.0
+        case _:
+            det_z, two_theta = 0.0, 0.0
     yield from move_detector_stage(devices.diffractometer.det_stage, det_z, two_theta)
     yield from move_backlight_in(devices.backlight)
 
