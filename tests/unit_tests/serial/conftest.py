@@ -20,12 +20,15 @@ from ophyd_async.fastcs.eiger import EigerDetector
 from ophyd_async.fastcs.panda import HDFPanda
 
 from i19_bluesky.parameters.components import HutchName, Path
+from i19_bluesky.parameters.devices_composites import (
+    SerialCollectionEh2PandaComposite,
+    SerialCollectionEh2ZebraComposite,
+)
 from i19_bluesky.parameters.serial_parameters import (
     DetectorType,
-    DeviceInput,
     GridParameters,
     GridType,
-    SerialExperiment,
+    SerialExperimentEh2,
 )
 
 set_path_provider(
@@ -128,8 +131,8 @@ async def eh2_eiger(RE: RunEngine) -> EigerDetector:
 @pytest.fixture
 async def devices(
     mock_panda, eh2_eiger, eh2_backlight, eh2_diffractometer, pincol
-) -> DeviceInput:
-    devices = DeviceInput(
+) -> SerialCollectionEh2PandaComposite:
+    devices = SerialCollectionEh2PandaComposite(
         diffractometer=eh2_diffractometer,
         backlight=eh2_backlight,
         pincol=pincol,
@@ -138,6 +141,21 @@ async def devices(
     )
 
     return devices
+
+
+@pytest.fixture
+async def devices_zebra(
+    eh2_zebra, eh2_eiger, eh2_backlight, eh2_diffractometer, pincol
+) -> SerialCollectionEh2ZebraComposite:
+    devices_zebra = SerialCollectionEh2ZebraComposite(
+        diffractometer=eh2_diffractometer,
+        backlight=eh2_backlight,
+        pincol=pincol,
+        zebra=eh2_zebra,
+        eiger=eh2_eiger,
+    )
+
+    return devices_zebra
 
 
 @pytest.fixture
@@ -153,7 +171,7 @@ def dummy_wells_settings():
 
 @pytest.fixture
 def parameters(dummy_wells_settings):
-    return SerialExperiment(
+    return SerialExperimentEh2(
         hutch=HutchName.EH2,
         visit=Path("/tmp/i19-2/cm12345-1"),
         dataset="foo",
@@ -175,5 +193,4 @@ def parameters(dummy_wells_settings):
         wells=dummy_wells_settings,
         rot_axis_start=-5,
         rot_axis_increment=0.1,
-        rot_axis_end=10,
     )

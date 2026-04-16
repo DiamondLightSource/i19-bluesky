@@ -6,7 +6,8 @@ from dodal.devices.beamlines.i19.pin_col_stages import (
 )
 from ophyd_async.core import set_mock_value
 
-from i19_bluesky.parameters.serial_parameters import DeviceInput, SerialExperiment
+from i19_bluesky.parameters.devices_composites import SerialCollectionEh2PandaComposite
+from i19_bluesky.parameters.serial_parameters import SerialExperimentEh2
 from i19_bluesky.serial.setup_beamline_plans.setup_beamline_pre_collection import (
     setup_beamline_before_collection,
 )
@@ -25,8 +26,8 @@ async def test_setup_beamline_before_collection(
     eh2_aperture: PinColRequest,
     in_positions: list[float],
     RE: RunEngine,
-    parameters: SerialExperiment,
-    devices: DeviceInput,
+    parameters: SerialExperimentEh2,
+    devices: SerialCollectionEh2PandaComposite,
 ):
 
     size = int(eh2_aperture.value.strip("um"))

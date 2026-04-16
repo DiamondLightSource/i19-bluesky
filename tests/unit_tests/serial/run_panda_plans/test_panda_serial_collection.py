@@ -7,7 +7,8 @@ from dodal.devices.beamlines.i19.diffractometer import (
 )
 from ophyd_async.core import get_mock_put
 
-from i19_bluesky.parameters.serial_parameters import DeviceInput, SerialExperiment
+from i19_bluesky.parameters.devices_composites import SerialCollectionEh2PandaComposite
+from i19_bluesky.parameters.serial_parameters import SerialExperimentEh2
 from i19_bluesky.serial.device_setup_plans.diffractometer_plans import (
     setup_diffractometer,
 )
@@ -21,19 +22,19 @@ from i19_bluesky.serial.run_panda_plans.panda_serial_collection import (
 async def test_setup_diffractometer(
     eh2_diffractometer: FourCircleDiffractometer,
     RE: RunEngine,
-    parameters: SerialExperiment,
+    parameters: SerialExperimentEh2,
 ):
 
-    RE(setup_diffractometer(parameters, eh2_diffractometer))
+    RE(setup_diffractometer(parameters.panda_rotation_params, eh2_diffractometer))
     mock_phi = get_mock_put(eh2_diffractometer.phi.user_setpoint)
     mock_phi.assert_called_once_with(-5.0)
 
     mock_phi_velocity = get_mock_put(eh2_diffractometer.phi.velocity)
-    mock_phi_velocity.assert_called_once_with(100.0)
+    mock_phi_velocity.assert_called_once_with(1.0)
 
 
 @pytest.mark.parametrize(
-    "well_positions,phival", [({1: [1, 2, 3]}, 5), ({2: [1, 2, 3]}, 10)]
+    "well_positions,phival", [({1: [1, 2, 3]}, 5), ({2: [1, 2, 3]}, 6)]
 )
 @patch("i19_bluesky.serial.run_panda_plans.panda_serial_collection.bps.trigger")
 @patch("i19_bluesky.serial.run_panda_plans.panda_serial_collection.bps.abs_set")
@@ -58,13 +59,12 @@ async def test_trigger_panda(
     mock_arm_or_disarm: MagicMock,
     well_positions: dict[int, tuple],
     phival: int,
-    parameters: SerialExperiment,
-    devices: DeviceInput,
+    parameters: SerialExperimentEh2,
+    devices: SerialCollectionEh2PandaComposite,
     RE: RunEngine,
 ):
     parameters.well_position = well_positions
     parameters.rot_axis_start = 5
-    parameters.rot_axis_end = 10
     parent_mock = MagicMock()
     parent_mock.attach_mock(mock_set_value_for_params, "mock_set_value_for_params")
     parent_mock.attach_mock(mock_move_stage_x_and_z, "mock_move_stage_x_and_z")
@@ -78,8 +78,12 @@ async def test_trigger_panda(
     parent_mock.attach_mock(mock_arm_or_disarm, "mock_arm_or_disarm")
     RE(trigger_panda(parameters, devices))
     expected_calls = [
-        call.mock_setup_diffractometer(parameters, devices.diffractometer),
-        call.mock_setup_panda_for_rotation(parameters, devices.panda),
+        call.mock_setup_diffractometer(
+            parameters.panda_rotation_params, devices.diffractometer
+        ),
+        call.mock_setup_panda_for_rotation(
+            parameters.panda_rotation_params, devices.panda
+        ),
         call.mock_arm_panda(devices.panda),
         call.mock_arm_or_disarm(devices.eiger.drv.detector.arm),
         call.mock_move_stage_x_and_z(1, 3, devices.diffractometer),
@@ -100,8 +104,8 @@ async def test_end_run(
     mock_disarm_eiger: MagicMock,
     mock_move_diffractometer_back: MagicMock,
     mock_reset_panda: MagicMock,
-    parameters: SerialExperiment,
-    devices: DeviceInput,
+    parameters: SerialExperimentEh2,
+    devices: SerialCollectionEh2PandaComposite,
     RE: RunEngine,
 ):
     RE(end_run(parameters, devices))
@@ -117,7 +121,7 @@ async def test_run_on_collection_abort(
     mock_disarm_panda: MagicMock,
     mock_disarm_eiger: MagicMock,
     RE: RunEngine,
-    devices: DeviceInput,
+    devices: SerialCollectionEh2PandaComposite,
 ):
     RE(run_on_collection_abort(devices))
     get_mock_put(devices.diffractometer.phi.motor_stop).assert_called_once_with(1)
