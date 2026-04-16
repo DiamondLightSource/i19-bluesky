@@ -17,8 +17,6 @@ def move_backlight_in_via_ui(
         det_z, two_theta = 250.0, 90.0
     elif param["option"] == "quick":
         det_z, two_theta = 100.0, 0.0
-    else:
-        det_z, two_theta = 0, 0
     yield from move_detector_stage(devices.diffractometer.det_stage, det_z, two_theta)
     yield from move_backlight_in(devices.backlight)
 
