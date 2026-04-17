@@ -2,6 +2,9 @@ from collections.abc import Generator
 
 import bluesky.plan_stubs as bps
 from bluesky.utils import Msg, MsgGenerator
+from dodal.common.beamlines.beamline_utils import (
+    get_config_client,
+)
 from dodal.devices.beamlines.i19.pin_tip import PinTipCentreHolder
 from dodal.devices.oav.oav_parameters import OAVParameters
 from dodal.devices.oav.pin_image_recognition import PinTipDetection, Tip
@@ -51,7 +54,8 @@ def pin_tip_detection_plan(
     The workaround will be removed once this is done
     https://github.com/DiamondLightSource/blueapi/issues/1349
     """
-    oav_parameters = OAVParameters(centring_context, oav_config)
+    config_client = get_config_client()
+    oav_parameters = OAVParameters(config_client, centring_context, oav_config)
 
     yield from setup_pin_tip_detection_params(pin_tip_detection, oav_parameters)
 
