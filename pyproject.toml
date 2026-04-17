@@ -26,7 +26,7 @@ dependencies = [
     "ophyd ==1.11.0",
     "ophyd-async[ca,pva] >= 0.16.0",
     "bluesky >= 1.13",
-    "dls-dodal @ git+https://github.com/DiamondLightSource/dodal.git@82911d1e01db6e4ed438a48b6dd825f201819461",
+    "dls-dodal @ git+https://github.com/DiamondLightSource/dodal.git@main",
 ]
 dynamic = ["version"]
 license.file = "LICENSE"
