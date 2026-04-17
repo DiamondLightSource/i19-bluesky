@@ -7,11 +7,6 @@ from pydantic import BaseModel, Field, field_validator
 RAMP_UP_DEG = 0.5
 
 
-class BacklightOption(StrEnum):
-    SLOW = "Slow"
-    QUICK = "Quick"
-
-
 class HutchName(StrEnum):
     EH1 = "EH1"
     EH2 = "EH2"

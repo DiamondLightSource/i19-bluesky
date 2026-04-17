@@ -4,10 +4,10 @@ import pytest
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import set_mock_value
 
-from i19_bluesky.parameters.components import BacklightOption
 from i19_bluesky.parameters.devices_composites import SerialCollectionEh2PandaComposite
 from i19_bluesky.parameters.serial_parameters import SerialExperimentEh2
 from i19_bluesky.serial.ui_plans.ui_plans import (
+    BacklightOption,
     move_backlight_in_via_ui,
     rotate_in_phi,
 )

@@ -1,13 +1,19 @@
+from enum import StrEnum
+
 import bluesky.plan_stubs as bps
 from bluesky.utils import MsgGenerator
 from dodal.common import inject
 
 from i19_bluesky.eh2.backlight_plan import move_backlight_in
-from i19_bluesky.parameters.components import BacklightOption
 from i19_bluesky.parameters.devices_composites import SerialCollectionEh2PandaComposite
 from i19_bluesky.serial.device_setup_plans.diffractometer_plans import (
     move_detector_stage,
 )
+
+
+class BacklightOption(StrEnum):
+    SLOW = "Slow"
+    QUICK = "Quick"
 
 
 def move_backlight_in_via_ui(
