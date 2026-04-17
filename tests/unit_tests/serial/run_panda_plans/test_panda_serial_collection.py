@@ -27,7 +27,7 @@ async def test_setup_diffractometer(
 
     RE(setup_diffractometer(parameters.panda_rotation_params, eh2_diffractometer))
     mock_phi = get_mock_put(eh2_diffractometer.phi.user_setpoint)
-    mock_phi.assert_called_once_with(-5.0)
+    mock_phi.assert_called_once_with(0.0)
 
     mock_phi_velocity = get_mock_put(eh2_diffractometer.phi.velocity)
     mock_phi_velocity.assert_called_once_with(1.0)
@@ -110,7 +110,7 @@ async def test_end_run(
 ):
     RE(end_run(parameters, devices))
     mock_disarm_eiger.assert_called_once_with(devices.eiger.drv.detector.disarm)
-    mock_move_diffractometer_back.assert_called_once_with(devices.diffractometer, -5)
+    mock_move_diffractometer_back.assert_called_once_with(devices.diffractometer, 0)
     mock_disarm_panda.assert_called_once_with(devices.panda)
     mock_reset_panda.assert_called_once_with(devices.panda)
 

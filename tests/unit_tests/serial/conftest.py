@@ -103,6 +103,7 @@ async def eh2_diffractometer(RE: RunEngine) -> FourCircleDiffractometer:
     set_mock_value(diffractometer.phi.velocity, 1)
     set_mock_value(diffractometer.det_stage.det_z.user_readback, 100)
     set_mock_value(diffractometer.det_stage.two_theta.user_readback, 0)
+    set_mock_value(diffractometer.phi.user_readback, 0)
     return diffractometer
 
 
@@ -190,6 +191,6 @@ def parameters(dummy_wells_settings):
         detector_type=DetectorType.EIGER,
         well_position={1: (1, 2, 3)},
         wells=dummy_wells_settings,
-        rot_axis_start=-5,
+        rot_axis_start=0,
         rot_axis_increment=0.1,
     )
