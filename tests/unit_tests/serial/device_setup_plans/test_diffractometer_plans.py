@@ -11,27 +11,27 @@ from ophyd_async.core import get_mock_put
 from i19_bluesky.parameters.serial_parameters import SerialExperimentEh2
 from i19_bluesky.serial.device_setup_plans.diffractometer_plans import (
     move_detector_stage,
-    move_diffractometer_back,
-    setup_diffractometer,
+    move_sample_stage_back,
+    setup_sample_stage,
 )
 
 
-async def test_move_diffractometer_back(
+async def test_move_sample_stage_back(
     serial_stages: XYZPhiStage,
     RE: RunEngine,
 ):
-    RE(move_diffractometer_back(serial_stages, 4.0))
+    RE(move_sample_stage_back(serial_stages, 4.0))
     mock_phi = get_mock_put(serial_stages.phi.user_setpoint)
     mock_phi.assert_called_once_with(4.0)
 
 
-async def test_setup_diffractometer(
+async def test_setup_sample_stage(
     serial_stages: XYZPhiStage,
     parameters: SerialExperimentEh2,
     RE: RunEngine,
 ):
     parameters.rot_axis_start = 6.0
-    RE(setup_diffractometer(parameters.panda_rotation_params, serial_stages))
+    RE(setup_sample_stage(parameters.panda_rotation_params, serial_stages))
     mock_phi = get_mock_put(serial_stages.phi.user_setpoint)
     mock_phi.assert_called_once_with(6.0)
 

@@ -2,7 +2,6 @@ import bluesky.plan_stubs as bps
 from bluesky.utils import MsgGenerator
 from dodal.devices.beamlines.i19.diffractometer import (
     DetectorMotion,
-    FourCircleDiffractometer,
 )
 from dodal.devices.motors import XYZPhiStage
 
@@ -10,7 +9,7 @@ from i19_bluesky.log import LOGGER
 from i19_bluesky.parameters.components import RotationParams
 
 
-def setup_diffractometer(
+def setup_sample_stage(
     rotation_parameters: RotationParams,
     serial_stages: XYZPhiStage,
 ) -> MsgGenerator:
@@ -21,8 +20,7 @@ def setup_diffractometer(
             scan_start_deg (float): Starting phi position.
             scan_steps (int): Number of images to take.
             exposure_time_s (float): Time between images, in seconds.
-        devices (SerialCollectionEh2PandaComposite): SerialCollectionEh2PandaComposite
-        object
+        serial_stages (XYZPhiStage): XYZPhiStage object representing the sample stage
     """
     yield from bps.abs_set(serial_stages.phi, rotation_parameters.scan_start_deg)
     yield from bps.abs_set(
@@ -30,7 +28,7 @@ def setup_diffractometer(
     )
 
 
-def move_diffractometer_back(
+def move_sample_stage_back(
     serial_stages: XYZPhiStage, phi_start: float
 ) -> MsgGenerator:
     LOGGER.info("Move diffractometer back to start position")
@@ -40,7 +38,7 @@ def move_diffractometer_back(
 def move_stage_x_and_z(
     well_x: float,
     well_z: float,
-    diffractometer: FourCircleDiffractometer,
+    serial_stages: XYZPhiStage,
 ):
     """Moves the sample stage a distance of well_x and well_z in the respective\
                 directions. Order dependant on position of detector when \
@@ -52,7 +50,7 @@ def move_stage_x_and_z(
                 Distance to move in Z axis
             diffractometer : FourCircleDiffractometer object
     """
-    yield from bps.mv(diffractometer.x, well_x, diffractometer.z, well_z)
+    yield from bps.mv(serial_stages.x, well_x, serial_stages.z, well_z)
 
 
 def move_detector_stage(

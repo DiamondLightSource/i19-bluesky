@@ -5,9 +5,9 @@ from i19_bluesky.log import LOGGER
 from i19_bluesky.parameters.devices_composites import SerialCollectionEh2PandaComposite
 from i19_bluesky.parameters.serial_parameters import SerialExperimentEh2
 from i19_bluesky.serial.device_setup_plans.diffractometer_plans import (
-    move_diffractometer_back,
+    move_sample_stage_back,
     move_stage_x_and_z,
-    setup_diffractometer,
+    setup_sample_stage,
 )
 from i19_bluesky.serial.panda_setup_plans.panda_setup_plans import (
     reset_panda,
@@ -35,7 +35,7 @@ def trigger_panda(
             panda (HDFPanda): The fastcs PandA ophyd device.
             eiger (EigerDetector): The eiger detector device
     """
-    yield from setup_diffractometer(
+    yield from setup_sample_stage(
         parameters.panda_rotation_params,
         devices.serial_stages,
     )
@@ -50,7 +50,7 @@ def trigger_panda(
     # Currently a test, will be modified as we solidify parameters going forwards
     # assumes a dictionary of integer keys and coordinates in a list
     for well_num, coords in parameters.well_position.items():
-        yield from move_stage_x_and_z(coords[0], coords[2], devices.diffractometer)
+        yield from move_stage_x_and_z(coords[0], coords[2], devices.serial_stages)
         LOGGER.info(f"Moved to well {well_num}")
         if well_num % 2 == 0:
             LOGGER.info(
@@ -81,9 +81,7 @@ def end_run(
     LOGGER.info("Disarm panda")
     yield from disarm_panda(devices.panda)
     yield from reset_panda(devices.panda)
-    yield from move_diffractometer_back(
-        devices.serial_stages, parameters.rot_axis_start
-    )
+    yield from move_sample_stage_back(devices.serial_stages, parameters.rot_axis_start)
 
 
 def run_on_collection_abort(devices: SerialCollectionEh2PandaComposite) -> MsgGenerator:
