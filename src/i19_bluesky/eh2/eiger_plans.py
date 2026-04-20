@@ -33,21 +33,28 @@ from dodal.devices.eiger import (
 #         False  # Remove in https://github.com/DiamondLightSource/hyperion/issues/1395
 #     )
 
-# def setup_eiger(parameters: SerialExperimentEh2, eiger: EigerDetector):
-#     eiger.do_arming_chain()
 
-
-def run_eiger(detector_params: DetectorParams, eiger: EigerDetector):
-    # change odin file directory
+def setup_eiger(detector_params: DetectorParams, eiger: EigerDetector):
     eiger.set_detector_parameters(detector_params)
     eiger.do_arming_chain()
     eiger.odin.check_and_wait_for_odin_state(timeout=EigerTimeouts)
-    # manual_trigger=true
+    # make sure is actually 'ready'
+
+
+def run_eiger(detector_params: DetectorParams, eiger: EigerDetector):
+    # TODO make sure the manual trigger is set
     match detector_params.trigger_mode:
         case InternalEigerTriggerMode.INTERNAL_SERIES:
+            # make sure we only do this when manual is on, and then, when manual is trig
+            # gered
             yield from bps.trigger(eiger.drv.detector.arm)
+            # is this even the right trigger?
         case InternalEigerTriggerMode.EXTERNAL_SERIES:
+            # make sure this only works when recieving a TTL signal from Panda
             yield from bps.trigger(eiger.drv.detector.arm)
+
+            # extra stuff - frame_count = exp images * num_images
+            # "rising edge" stuff
 
 
 # Exp: 0.2
