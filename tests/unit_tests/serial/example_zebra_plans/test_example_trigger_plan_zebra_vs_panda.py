@@ -59,7 +59,7 @@ async def test_trigger_zebra(
 
     expected_calls = [
         call.mock_setup_diffractometer(
-            parameters.zebra_rotation_params, devices_zebra.diffractometer
+            parameters.zebra_rotation_params, devices_zebra.serial_stages
         ),
         call.mock_setup_zebra_for_collection(
             devices_zebra.zebra,
@@ -71,7 +71,7 @@ async def test_trigger_zebra(
         call.mock_arm_zebra(devices_zebra.zebra),
         call.mock_disarm_zebra(devices_zebra.zebra),
         call.mock_setup_diffractometer(
-            parameters.zebra_rotation_params, devices_zebra.diffractometer
+            parameters.zebra_rotation_params, devices_zebra.serial_stages
         ),
         call.mock_setup_zebra_for_collection(
             devices_zebra.zebra,

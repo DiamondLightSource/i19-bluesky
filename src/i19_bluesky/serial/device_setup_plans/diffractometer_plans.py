@@ -4,6 +4,7 @@ from dodal.devices.beamlines.i19.diffractometer import (
     DetectorMotion,
     FourCircleDiffractometer,
 )
+from dodal.devices.motors import XYZPhiStage
 
 from i19_bluesky.log import LOGGER
 from i19_bluesky.parameters.components import RotationParams
@@ -11,7 +12,7 @@ from i19_bluesky.parameters.components import RotationParams
 
 def setup_diffractometer(
     rotation_parameters: RotationParams,
-    diffractometer: FourCircleDiffractometer,
+    serial_stages: XYZPhiStage,
 ) -> MsgGenerator:
     """Setup phi start posistion and velocity on the diffractometer.
 
@@ -20,19 +21,20 @@ def setup_diffractometer(
             scan_start_deg (float): Starting phi position.
             scan_steps (int): Number of images to take.
             exposure_time_s (float): Time between images, in seconds.
-        diffractometer (FourCircleDiffractometer): The diffractometer ophyd device.
+        devices (SerialCollectionEh2PandaComposite): SerialCollectionEh2PandaComposite
+        object
     """
-    yield from bps.abs_set(diffractometer.phi, rotation_parameters.scan_start_deg)
+    yield from bps.abs_set(serial_stages.phi, rotation_parameters.scan_start_deg)
     yield from bps.abs_set(
-        diffractometer.phi.velocity, rotation_parameters.rotation_axis_velocity
+        serial_stages.phi.velocity, rotation_parameters.rotation_axis_velocity
     )
 
 
 def move_diffractometer_back(
-    diffractometer: FourCircleDiffractometer, phi_start: float
+    serial_stages: XYZPhiStage, phi_start: float
 ) -> MsgGenerator:
     LOGGER.info("Move diffractometer back to start position")
-    yield from bps.abs_set(diffractometer.phi, phi_start, wait=True)
+    yield from bps.abs_set(serial_stages.phi, phi_start, wait=True)
 
 
 def move_stage_x_and_z(

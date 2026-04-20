@@ -37,7 +37,7 @@ def trigger_panda(
     """
     yield from setup_diffractometer(
         parameters.panda_rotation_params,
-        devices.diffractometer,
+        devices.serial_stages,
     )
     yield from setup_panda_for_rotation(
         parameters.panda_rotation_params,
@@ -82,7 +82,7 @@ def end_run(
     yield from disarm_panda(devices.panda)
     yield from reset_panda(devices.panda)
     yield from move_diffractometer_back(
-        devices.diffractometer, parameters.rot_axis_start
+        devices.serial_stages, parameters.rot_axis_start
     )
 
 

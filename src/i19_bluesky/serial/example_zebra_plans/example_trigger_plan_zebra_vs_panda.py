@@ -46,7 +46,7 @@ def trigger_zebra(
     """
 
     yield from setup_diffractometer(
-        parameters.zebra_rotation_params, devices.diffractometer
+        parameters.zebra_rotation_params, devices.serial_stages
     )
     LOGGER.info("Setup zebra for collection in the positive direction and arm")
     yield from setup_zebra_for_collection(
@@ -66,7 +66,7 @@ def trigger_zebra(
     yield from disarm_zebra(devices.zebra)
     yield from setup_diffractometer(
         parameters.zebra_rotation_params,
-        devices.diffractometer,
+        devices.serial_stages,
     )
     LOGGER.info("Setup zebra for collection in the negative direction and arm")
     yield from setup_zebra_for_collection(
@@ -107,7 +107,7 @@ def run_zebra_test(
         except_plan=lambda: (yield from abort_zebra(devices.diffractometer, zebra)),
         final_plan=lambda: (
             yield from move_diffractometer_back(
-                devices.diffractometer, parameters.zebra_rotation_params.scan_start_deg
+                devices.serial_stages, parameters.zebra_rotation_params.scan_start_deg
             )
         ),
         auto_raise=False,
