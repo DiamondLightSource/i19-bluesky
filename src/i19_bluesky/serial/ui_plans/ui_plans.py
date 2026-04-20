@@ -33,6 +33,6 @@ def rotate_in_phi(
     rot_increment: float,
     devices: SerialCollectionEh2PandaComposite = inject(""),
 ) -> MsgGenerator:
-    rot_axis_start = yield from bps.rd(devices.diffractometer.phi.user_readback)
+    rot_axis_start = yield from bps.rd(devices.serial_stages.phi.user_readback)
     rot_axis_end = rot_increment + rot_axis_start
-    yield from bps.abs_set(devices.diffractometer.phi, rot_axis_end, wait=True)
+    yield from bps.abs_set(devices.serial_stages.phi, rot_axis_end, wait=True)

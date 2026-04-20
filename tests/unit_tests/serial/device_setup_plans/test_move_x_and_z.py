@@ -1,8 +1,6 @@
 import pytest
 from bluesky.run_engine import RunEngine
-from dodal.devices.beamlines.i19.diffractometer import (
-    FourCircleDiffractometer,
-)
+from dodal.devices.motors import XYZPhiStage
 
 from i19_bluesky.serial.device_setup_plans.diffractometer_plans import (
     move_stage_x_and_z,
@@ -13,9 +11,9 @@ from i19_bluesky.serial.device_setup_plans.diffractometer_plans import (
 async def test_move_stage_x_and_z(
     detector_x: float,
     detector_z: float,
-    eh2_diffractometer: FourCircleDiffractometer,
+    serial_stages: XYZPhiStage,
     RE: RunEngine,
 ):
-    RE(move_stage_x_and_z(detector_x, detector_z, eh2_diffractometer))
-    assert await eh2_diffractometer.x.user_readback.get_value() == detector_x
-    assert await eh2_diffractometer.z.user_readback.get_value() == detector_z
+    RE(move_stage_x_and_z(detector_x, detector_z, serial_stages))
+    assert await serial_stages.x.user_readback.get_value() == detector_x
+    assert await serial_stages.z.user_readback.get_value() == detector_z
