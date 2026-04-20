@@ -55,12 +55,12 @@ async def test_rotate_in_phi(
     rot_axis_end = rot_increment + parameters.rot_axis_start
     RE(rotate_in_phi(rot_increment, devices))
     mock_abs_set.assert_called_with(
-        devices.diffractometer.phi,
+        devices.serial_stages.phi,
         rot_axis_end,
         wait=True,
     )
-    set_mock_value(devices.diffractometer.phi.user_readback, rot_axis_end)
+    set_mock_value(devices.serial_stages.phi.user_readback, rot_axis_end)
     RE(rotate_in_phi(rot_increment, devices))
     mock_abs_set.assert_called_with(
-        devices.diffractometer.phi, rot_axis_end + rot_axis_end, wait=True
+        devices.serial_stages.phi, rot_axis_end + rot_axis_end, wait=True
     )

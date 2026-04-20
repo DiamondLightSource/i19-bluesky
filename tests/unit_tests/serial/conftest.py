@@ -14,6 +14,7 @@ from dodal.devices.beamlines.i19.pin_col_stages import (
     PinColRequest,
     PinholeCollimatorControl,
 )
+from dodal.devices.motors import XYZPhiStage
 from ophyd_async.core import Device, DeviceVector, init_devices, set_mock_value
 from ophyd_async.epics.core import epics_signal_rw
 from ophyd_async.fastcs.eiger import EigerDetector
@@ -98,6 +99,17 @@ async def mock_panda() -> HDFPanda:
 
 
 @pytest.fixture
+async def serial_stages(RE: RunEngine) -> XYZPhiStage:
+    serial_stages = i19_2.serial_stages.build(connect_immediately=True, mock=True)
+    set_mock_value(serial_stages.phi.velocity, 1)
+    set_mock_value(serial_stages.z.user_readback, 100)
+    set_mock_value(serial_stages.x.user_readback, 0)
+    set_mock_value(serial_stages.y.user_readback, 0)
+    set_mock_value(serial_stages.phi.user_readback, 0)
+    return serial_stages
+
+
+@pytest.fixture
 async def eh2_diffractometer(RE: RunEngine) -> FourCircleDiffractometer:
     diffractometer = i19_2.diffractometer.build(connect_immediately=True, mock=True)
     set_mock_value(diffractometer.phi.velocity, 1)
@@ -130,7 +142,7 @@ async def eh2_eiger(RE: RunEngine) -> EigerDetector:
 
 @pytest.fixture
 async def devices(
-    mock_panda, eh2_eiger, eh2_backlight, eh2_diffractometer, pincol
+    mock_panda, eh2_eiger, eh2_backlight, eh2_diffractometer, serial_stages, pincol
 ) -> SerialCollectionEh2PandaComposite:
     devices = SerialCollectionEh2PandaComposite(
         diffractometer=eh2_diffractometer,
@@ -138,6 +150,7 @@ async def devices(
         pincol=pincol,
         panda=mock_panda,
         eiger=eh2_eiger,
+        serial_stages=serial_stages,
     )
 
     return devices
@@ -145,7 +158,7 @@ async def devices(
 
 @pytest.fixture
 async def devices_zebra(
-    eh2_zebra, eh2_eiger, eh2_backlight, eh2_diffractometer, pincol
+    eh2_zebra, eh2_eiger, eh2_backlight, eh2_diffractometer, serial_stages, pincol
 ) -> SerialCollectionEh2ZebraComposite:
     devices_zebra = SerialCollectionEh2ZebraComposite(
         diffractometer=eh2_diffractometer,
@@ -153,6 +166,7 @@ async def devices_zebra(
         pincol=pincol,
         zebra=eh2_zebra,
         eiger=eh2_eiger,
+        serial_stages=serial_stages,
     )
 
     return devices_zebra
