@@ -23,10 +23,10 @@ from i19_bluesky.serial.example_zebra_plans.example_trigger_plan_zebra_vs_panda 
     "i19_bluesky.serial.example_zebra_plans.example_trigger_plan_zebra_vs_panda.setup_zebra_for_collection"
 )
 @patch(
-    "i19_bluesky.serial.example_zebra_plans.example_trigger_plan_zebra_vs_panda.setup_diffractometer"
+    "i19_bluesky.serial.example_zebra_plans.example_trigger_plan_zebra_vs_panda.setup_sample_stage"
 )
 async def test_trigger_zebra(
-    mock_setup_diffractometer: MagicMock,
+    mock_setup_sample_stage: MagicMock,
     mock_setup_zebra_for_collection: MagicMock,
     mock_arm_zebra: MagicMock,
     mock_disarm_zebra: MagicMock,
@@ -35,7 +35,7 @@ async def test_trigger_zebra(
     parameters: SerialExperimentEh2,
 ):
     parent_mock = MagicMock()
-    parent_mock.attach_mock(mock_setup_diffractometer, "mock_setup_diffractometer")
+    parent_mock.attach_mock(mock_setup_sample_stage, "mock_setup_sample_stage")
     parent_mock.attach_mock(
         mock_setup_zebra_for_collection, "mock_setup_zebra_for_collection"
     )
@@ -58,8 +58,8 @@ async def test_trigger_zebra(
     )
 
     expected_calls = [
-        call.mock_setup_diffractometer(
-            parameters.zebra_rotation_params, devices_zebra.diffractometer
+        call.mock_setup_sample_stage(
+            parameters.zebra_rotation_params, devices_zebra.serial_stages
         ),
         call.mock_setup_zebra_for_collection(
             devices_zebra.zebra,
@@ -70,8 +70,8 @@ async def test_trigger_zebra(
         ),
         call.mock_arm_zebra(devices_zebra.zebra),
         call.mock_disarm_zebra(devices_zebra.zebra),
-        call.mock_setup_diffractometer(
-            parameters.zebra_rotation_params, devices_zebra.diffractometer
+        call.mock_setup_sample_stage(
+            parameters.zebra_rotation_params, devices_zebra.serial_stages
         ),
         call.mock_setup_zebra_for_collection(
             devices_zebra.zebra,

@@ -14,13 +14,13 @@ from i19_bluesky.log import LOGGER
 from i19_bluesky.parameters.devices_composites import SerialCollectionEh2ZebraComposite
 from i19_bluesky.parameters.serial_parameters import SerialExperimentEh2
 from i19_bluesky.serial.device_setup_plans.diffractometer_plans import (
-    move_diffractometer_back,
+    move_sample_stage_back,
 )
 from i19_bluesky.serial.example_zebra_plans.zebra_collection_setup_plan import (
     setup_zebra_for_collection,
 )
 from i19_bluesky.serial.run_panda_plans.panda_serial_collection import (
-    setup_diffractometer,
+    setup_sample_stage,
 )
 
 RAMP = 0.5
@@ -45,8 +45,8 @@ def trigger_zebra(
         parameters: (SerialExperimentEh2) : SerialExperimentEh2 object
     """
 
-    yield from setup_diffractometer(
-        parameters.zebra_rotation_params, devices.diffractometer
+    yield from setup_sample_stage(
+        parameters.zebra_rotation_params, devices.serial_stages
     )
     LOGGER.info("Setup zebra for collection in the positive direction and arm")
     yield from setup_zebra_for_collection(
@@ -64,9 +64,9 @@ def trigger_zebra(
     )
     LOGGER.info("Disarm zebra")
     yield from disarm_zebra(devices.zebra)
-    yield from setup_diffractometer(
+    yield from setup_sample_stage(
         parameters.zebra_rotation_params,
-        devices.diffractometer,
+        devices.serial_stages,
     )
     LOGGER.info("Setup zebra for collection in the negative direction and arm")
     yield from setup_zebra_for_collection(
@@ -106,8 +106,8 @@ def run_zebra_test(
         ),
         except_plan=lambda: (yield from abort_zebra(devices.diffractometer, zebra)),
         final_plan=lambda: (
-            yield from move_diffractometer_back(
-                devices.diffractometer, parameters.zebra_rotation_params.scan_start_deg
+            yield from move_sample_stage_back(
+                devices.serial_stages, parameters.zebra_rotation_params.scan_start_deg
             )
         ),
         auto_raise=False,
