@@ -5,6 +5,7 @@ from bluesky.run_engine import RunEngine
 from dodal.devices.beamlines.i19.diffractometer import (
     FourCircleDiffractometer,
 )
+from dodal.devices.motors import XYZPhiStage
 from ophyd_async.core import get_mock_put
 
 from i19_bluesky.parameters.serial_parameters import SerialExperimentEh2
@@ -16,25 +17,25 @@ from i19_bluesky.serial.device_setup_plans.diffractometer_plans import (
 
 
 async def test_move_diffractometer_back(
-    eh2_diffractometer: FourCircleDiffractometer,
+    serial_stages: XYZPhiStage,
     RE: RunEngine,
 ):
-    RE(move_diffractometer_back(eh2_diffractometer, 4.0))
-    mock_phi = get_mock_put(eh2_diffractometer.phi.user_setpoint)
+    RE(move_diffractometer_back(serial_stages, 4.0))
+    mock_phi = get_mock_put(serial_stages.phi.user_setpoint)
     mock_phi.assert_called_once_with(4.0)
 
 
 async def test_setup_diffractometer(
-    eh2_diffractometer: FourCircleDiffractometer,
+    serial_stages: XYZPhiStage,
     parameters: SerialExperimentEh2,
     RE: RunEngine,
 ):
     parameters.rot_axis_start = 6.0
-    RE(setup_diffractometer(parameters.panda_rotation_params, eh2_diffractometer))
-    mock_phi = get_mock_put(eh2_diffractometer.phi.user_setpoint)
+    RE(setup_diffractometer(parameters.panda_rotation_params, serial_stages))
+    mock_phi = get_mock_put(serial_stages.phi.user_setpoint)
     mock_phi.assert_called_once_with(6.0)
 
-    mock_phi_velocity = get_mock_put(eh2_diffractometer.phi.velocity)
+    mock_phi_velocity = get_mock_put(serial_stages.phi.velocity)
     mock_phi_velocity.assert_called_once_with(1)
 
 
