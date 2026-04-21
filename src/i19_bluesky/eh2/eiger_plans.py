@@ -1,78 +1,132 @@
 import bluesky.plan_stubs as bps
-from dodal.devices.eiger import (
-    DetectorParams,
-    EigerDetector,
-    EigerTimeouts,
-    InternalEigerTriggerMode,
+import bluesky.preprocessors as bpp
+from bluesky.utils import MsgGenerator
+from dodal.devices.beamlines.i19.diffractometer import (
+    FourCircleDiffractometer,
 )
+from dodal.devices.motors import XYZPhiStage
+from ophyd_async.fastcs.eiger import EigerDetector
+from ophyd_async.fastcs.panda import HDFPanda
 
-# class DetectorParams(BaseModel):
-#     """Holds parameters for the detector. Provides access to a list of Dectris detecto
-# r
-#     sizes and a converter for distance to beam centre.
-#     """
-
-#     # https://github.com/pydantic/pydantic/issues/8379
-#     # Must use model_dump(by_alias=True) if serialising!
-
-#     expected_energy_ev: float | None = None
-#     exposure_time_s: float
-#     directory: str  # : Path https://github.com/DiamondLightSource/dodal/issues/774
-#     prefix: str
-#     detector_distance: float
-#     omega_start: float
-#     omega_increment: float
-#     num_images_per_trigger: int
-#     num_triggers: int
-#     use_roi_mode: bool
-#     det_dist_to_beam_converter_path: str
-#     override_run_number: int | None = Field(default=None, alias="run_number")
-#     trigger_mode: TriggerMode = TriggerMode.SET_FRAMES
-#     detector_size_constants: DetectorSizeConstants = EIGER2_X_16M_SIZE
-#     enable_dev_shm: bool = (
-#         False  # Remove in https://github.com/DiamondLightSource/hyperion/issues/1395
-#     )
+from i19_bluesky.log import LOGGER
+from i19_bluesky.parameters.components import PandaRotationParams
+from i19_bluesky.parameters.serial_parameters import SerialExperimentEh2
+from i19_bluesky.serial.device_setup_plans.diffractometer_plans import (
+    move_sample_stage_back,
+    move_stage_x_and_z,
+    setup_sample_stage,
+)
+from i19_bluesky.serial.panda_setup_plans.panda_setup_plans import (
+    reset_panda,
+    setup_panda_for_rotation,
+)
+from i19_bluesky.serial.panda_setup_plans.panda_stubs import disarm_panda
 
 
-def setup_eiger(detector_params: DetectorParams, eiger: EigerDetector):
-    eiger.set_detector_parameters(detector_params)
-    eiger.do_arming_chain()
-    eiger.odin.check_and_wait_for_odin_state(timeout=EigerTimeouts)
-    # make sure is actually 'ready'
+# TODO: change away from serialexperiment? or hard code in some values.
+def end_simple_run(
+    parameters: SerialExperimentEh2,
+    serial_stages: XYZPhiStage,
+    panda: HDFPanda,
+    eiger: EigerDetector,
+):
+    LOGGER.info("Disarm eiger")
+    yield from bps.trigger(eiger.drv.detector.disarm)
+    LOGGER.info("Disarm panda")
+    yield from disarm_panda(panda)
+    yield from reset_panda(panda)
+    yield from move_sample_stage_back(serial_stages, parameters.rot_axis_start)
 
 
-def run_eiger(detector_params: DetectorParams, eiger: EigerDetector):
-    # TODO make sure the manual trigger is set
-    match detector_params.trigger_mode:
-        case InternalEigerTriggerMode.INTERNAL_SERIES:
-            # make sure we only do this when manual is on, and then, when manual is trig
-            # gered
-            yield from bps.trigger(eiger.drv.detector.arm)
-            # is this even the right trigger?
-        case InternalEigerTriggerMode.EXTERNAL_SERIES:
-            # make sure this only works when recieving a TTL signal from Panda
-            yield from bps.trigger(eiger.drv.detector.arm)
-
-            # extra stuff - frame_count = exp images * num_images
-            # "rising edge" stuff
+def abort_simple_run(
+    diffractometer: FourCircleDiffractometer,
+    panda: HDFPanda,
+    eiger: EigerDetector,
+) -> MsgGenerator:
+    LOGGER.warning("ABORT")
+    yield from bps.abs_set(diffractometer.phi.motor_stop, 1, wait=True)
+    yield from bps.trigger(eiger.drv.detector.disarm)
+    yield from disarm_panda(panda)
 
 
-# Exp: 0.2
-# Period: 0.2
-# # Exp/Image: 1
-# # images: 20
-# Image mode: multiple
-# Trigger mode: Internal Series
-# Ancillary Data: Manual trigger to Yes
-#     Change Odin file directory:  caput -S BL19I-EA-EIGER-01:OD:FilePath /dls/i19-2/dat
-# a/2026/cm44169-2/eiger_testing/test3/
-#     Change file name:  caput -S BL19I-EA-EIGER-01:OD:FileName test3
-#     Odin Frame count:  20 (match to number set in Eiger TOP)
-#     Odin Start (caput BL19I-EA-EIGER-01:OD:Capture 1)
+def setup_small_plan(
+    PandaParams: PandaRotationParams,
+    eiger: EigerDetector,
+    panda: HDFPanda,
+    serial_stages: XYZPhiStage,
+):
+    yield from bps.stage(eiger)
+    setup_panda_for_rotation(PandaParams, panda)
+    yield from setup_sample_stage(
+        PandaParams,
+        serial_stages,
+    )
+    yield from bps.prepare(eiger, wait=True)
 
-# generate files ready for collection: test3_000001.h5  test3_meta.h5
-# 5. Eiger Top: Start (caput BL19I-EA-EIGER-01:CAM:Acquire 1)
-# waiting for manual trigger
-# 6. Eiger Top → Ancillary Data: Trigger
-# will take 4 s to collect (0.2 x 20)
-# can see image current acquisition increase
+
+def loop_plan(
+    parameters: SerialExperimentEh2,
+    eiger: EigerDetector,
+    diffractometer: FourCircleDiffractometer,
+    well_num: int,
+):
+    yield from bps.kickoff(eiger, wait=True)
+    if well_num % 2 == 0:
+        LOGGER.info(
+            f"Rotate {parameters.rot_axis_start} to\
+                {parameters.panda_rotation_params.scan_end_deg}"
+        )
+        yield from bps.abs_set(
+            diffractometer.phi,
+            parameters.panda_rotation_params.scan_end_deg,
+            wait=True,
+        )
+    else:
+        LOGGER.info(
+            f"Rotate {parameters.panda_rotation_params.scan_end_deg} to\
+                    {parameters.rot_axis_start}"
+        )
+        yield from bps.abs_set(diffractometer.phi, parameters.rot_axis_start, wait=True)
+    bps.complete(eiger, wait=True)
+
+
+def run_eiger(
+    parameters: SerialExperimentEh2,
+    eiger: EigerDetector,
+    serial_stages: XYZPhiStage,
+    diffractometer: FourCircleDiffractometer,
+):
+    for well_num, coords in parameters.well_position.items():
+        yield from move_stage_x_and_z(coords[0], coords[2], serial_stages)
+        LOGGER.info(f"Moved to well {well_num}")
+        loop_plan(parameters, eiger, diffractometer, well_num)
+
+
+def run_small_plan(
+    parameters: SerialExperimentEh2,
+    PandaParams: PandaRotationParams,
+    eiger: EigerDetector,
+    panda: HDFPanda,
+    serial_stages: XYZPhiStage,
+    diffractometer: FourCircleDiffractometer,
+):
+    setup_small_plan(PandaParams, eiger, panda, serial_stages)
+    run_eiger(parameters, eiger, serial_stages, diffractometer)
+
+
+def run_serial_small_plan(
+    parameters: SerialExperimentEh2,
+    PandaParams: PandaRotationParams,
+    eiger: EigerDetector,
+    panda: HDFPanda,
+    serial_stages: XYZPhiStage,
+    diffractometer: FourCircleDiffractometer,
+):
+    yield from bpp.contingency_wrapper(
+        run_small_plan(
+            parameters, PandaParams, eiger, panda, serial_stages, diffractometer
+        ),
+        except_plan=abort_simple_run(diffractometer, panda, eiger),
+        final_plan=end_simple_run(parameters, serial_stages, panda, eiger),
+        auto_raise=False,
+    )
