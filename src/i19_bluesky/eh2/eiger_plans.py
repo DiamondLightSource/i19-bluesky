@@ -21,12 +21,6 @@ from i19_bluesky.serial.panda_setup_plans.panda_setup_plans import (
 )
 from i19_bluesky.serial.panda_setup_plans.panda_stubs import disarm_panda
 
-well_position = {1: [1, 2, 3], 2: [1, 2, 3]}
-# Need to add in the rotation params
-# Need: parameters.panda_rotation_params.scan_end_deg
-# params.panda_rotation_params
-# parameters.rot_axis_start
-
 
 # TODO: change away from serialexperiment? or hard code in some values.
 def end_simple_run(
@@ -35,8 +29,8 @@ def end_simple_run(
     panda: HDFPanda,
     eiger: EigerDetector,
 ):
-    LOGGER.info("Disarm eiger")
-    yield from bps.trigger(eiger.drv.detector.disarm)
+    LOGGER.info("Unstage eiger")
+    yield from bps.unstage(eiger)
     LOGGER.info("Disarm panda")
     yield from disarm_panda(panda)
     yield from reset_panda(panda)
@@ -49,6 +43,7 @@ def abort_simple_run(
     eiger: EigerDetector,
 ) -> MsgGenerator:
     LOGGER.warning("ABORT")
+    yield from bps.unstage(eiger)
     yield from bps.abs_set(diffractometer.phi.motor_stop, 1, wait=True)
     yield from bps.trigger(eiger.drv.detector.disarm)
     yield from disarm_panda(panda)
@@ -111,9 +106,6 @@ def run_eiger(
         loop_plan(parameters, eiger, diffractometer, well_num)
 
 
-# ^^^ needs well_positions to be set
-
-
 def run_small_plan(
     parameters: SerialExperimentEh2,
     well_position: dict,
@@ -133,6 +125,11 @@ def run_serial_small_plan(
     serial_stages: XYZPhiStage,
     diffractometer: FourCircleDiffractometer,
 ):
+    parameters.rot_axis_increment = 0.1
+    parameters.images_per_well = 1
+    parameters.exposure_time_s = 0.2
+    parameters.rot_axis_start = 5
+    well_position = {1: [1, 2, 3], 2: [1, 2, 3]}
     yield from bpp.contingency_wrapper(
         run_small_plan(
             parameters, well_position, eiger, panda, serial_stages, diffractometer
