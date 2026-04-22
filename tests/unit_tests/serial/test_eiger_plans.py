@@ -9,7 +9,7 @@ from dodal.devices.motors import XYZPhiStage
 from ophyd_async.fastcs.eiger import EigerDetector
 from ophyd_async.fastcs.panda import HDFPanda
 
-from i19_bluesky.parameters.serial_parameters import SerialExperimentEh2
+from i19_bluesky.parameters.serial_parameters import PandaRotationParams
 from i19_bluesky.serial.eiger_plans import (
     abort_simple_run,
     end_simple_run,
@@ -29,13 +29,20 @@ async def test_end_simple_run(
     mock_reset_panda: MagicMock,
     mock_move_sample_stage_back: MagicMock,
     mock_unstage_eiger: MagicMock,
-    parameters: SerialExperimentEh2,
+    panda_rotation_params: PandaRotationParams,
     serial_stages: XYZPhiStage,
     mock_panda: HDFPanda,
     eh2_eiger: EigerDetector,
     RE: RunEngine,
 ):
-    RE(end_simple_run(parameters, serial_stages, mock_panda, eh2_eiger))
+    RE(
+        end_simple_run(
+            panda_rotation_params.scan_start_deg,
+            serial_stages,
+            mock_panda,
+            eh2_eiger,
+        )
+    )
     mock_unstage_eiger.assert_called_once_with(eh2_eiger)
     mock_move_sample_stage_back.assert_called_once_with(serial_stages, 0)
     mock_disarm_panda.assert_called_once_with(mock_panda)
@@ -74,18 +81,18 @@ def test_setup_small_plan(
     mock_setup_panda_for_rotation: MagicMock,
     mock_setup_sample_stage: MagicMock,
     mock_bps_prepare: MagicMock,
-    parameters: SerialExperimentEh2,
+    panda_rotation_params: PandaRotationParams,
     eh2_eiger: EigerDetector,
     mock_panda: HDFPanda,
     serial_stages: XYZPhiStage,
     RE: RunEngine,
 ):
-    RE(setup_small_plan(parameters, eh2_eiger, mock_panda, serial_stages))
+    RE(setup_small_plan(panda_rotation_params, eh2_eiger, mock_panda, serial_stages))
     mock_bps_stage.assert_called_once_with(eh2_eiger)
     mock_setup_panda_for_rotation.assert_called_once_with(
-        parameters.panda_rotation_params, mock_panda
+        panda_rotation_params, mock_panda
     )
-    mock_setup_sample_stage(parameters.panda_rotation_params, serial_stages)
+    mock_setup_sample_stage(panda_rotation_params, serial_stages)
     mock_bps_prepare.assert_called_once_with(eh2_eiger, wait=True)
 
 
@@ -97,14 +104,14 @@ def test_loop_plan(
     mock_bps_kickoff: MagicMock,
     mock_abs_set: MagicMock,
     mock_bps_complete: MagicMock,
-    parameters: SerialExperimentEh2,
+    panda_rotation_params: PandaRotationParams,
     eh2_eiger: EigerDetector,
     eh2_diffractometer: FourCircleDiffractometer,
     well_num: int,
     phival: float,
     RE: RunEngine,
 ):
-    RE(loop_plan(parameters, eh2_eiger, eh2_diffractometer, well_num))
+    RE(loop_plan(panda_rotation_params, eh2_eiger, eh2_diffractometer, well_num))
     mock_bps_kickoff.assert_called_once_with(eh2_eiger, wait=True)
     mock_abs_set.assert_called_once_with(
         eh2_diffractometer.phi,
@@ -124,7 +131,7 @@ def test_run_eiger(
     mock_loop_plan: MagicMock,
     well_position: dict,
     well_int: int,
-    parameters: SerialExperimentEh2,
+    panda_rotation_params: PandaRotationParams,
     eh2_eiger: EigerDetector,
     serial_stages: XYZPhiStage,
     eh2_diffractometer: FourCircleDiffractometer,
@@ -132,12 +139,16 @@ def test_run_eiger(
 ):
     RE(
         run_eiger(
-            well_position, parameters, eh2_eiger, serial_stages, eh2_diffractometer
+            well_position,
+            panda_rotation_params,
+            eh2_eiger,
+            serial_stages,
+            eh2_diffractometer,
         )
     )
     mock_move_stage_x_and_z.assert_called_once_with(1, 3, serial_stages)
     mock_loop_plan.assert_called_once_with(
-        parameters, eh2_eiger, eh2_diffractometer, well_int
+        panda_rotation_params, eh2_eiger, eh2_diffractometer, well_int
     )
 
 
@@ -147,7 +158,7 @@ def test_run_eiger(
 def test_run_small_plan(
     mock_setup_small_plan: MagicMock,
     mock_run_eiger: MagicMock,
-    parameters: SerialExperimentEh2,
+    panda_rotation_params: PandaRotationParams,
     well_position: dict,
     eh2_eiger: EigerDetector,
     mock_panda: HDFPanda,
@@ -157,7 +168,7 @@ def test_run_small_plan(
 ):
     RE(
         run_small_plan(
-            parameters,
+            panda_rotation_params,
             well_position,
             eh2_eiger,
             mock_panda,
@@ -166,8 +177,12 @@ def test_run_small_plan(
         )
     )
     mock_setup_small_plan.assert_called_once_with(
-        parameters, eh2_eiger, mock_panda, serial_stages
+        panda_rotation_params, eh2_eiger, mock_panda, serial_stages
     )
     mock_run_eiger.assert_called_once_with(
-        well_position, parameters, eh2_eiger, serial_stages, eh2_diffractometer
+        well_position,
+        panda_rotation_params,
+        eh2_eiger,
+        serial_stages,
+        eh2_diffractometer,
     )

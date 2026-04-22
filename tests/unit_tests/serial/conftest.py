@@ -29,6 +29,7 @@ from i19_bluesky.parameters.serial_parameters import (
     DetectorType,
     GridParameters,
     GridType,
+    PandaRotationParams,
     SerialExperimentEh2,
 )
 
@@ -207,4 +208,14 @@ def parameters(dummy_wells_settings):
         wells=dummy_wells_settings,
         rot_axis_start=0,
         rot_axis_increment=0.1,
+    )
+
+
+@pytest.fixture
+def panda_rotation_params():
+    return PandaRotationParams(
+        scan_start_deg=0,
+        scan_increment_deg=0.1,
+        scan_steps=10,
+        exposure_time_s=0.2,
     )
