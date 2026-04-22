@@ -1,5 +1,6 @@
 """A place for eh2 specific plans."""
 
+from i19_bluesky.eh2.eiger_plans import run_serial_small_plan
 from i19_bluesky.eh2.pincol_control_plans import (
     move_pin_col_out_of_beam,
     move_pin_col_to_requested_in_position,
@@ -16,4 +17,5 @@ __all__ = [
     "move_pin_col_out_of_beam",
     "move_pin_col_to_requested_in_position",
     "apply_voltage_to_piezo_actuators",
+    "run_serial_small_plan",
 ]
