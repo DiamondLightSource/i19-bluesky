@@ -27,7 +27,7 @@ def end_simple_run(
     serial_stages: XYZPhiStage,
     panda: HDFPanda,
     eiger: EigerDetector,
-):
+) -> MsgGenerator:
     LOGGER.info("Unstage eiger")
     yield from bps.unstage(eiger)
     LOGGER.info("Disarm panda")
@@ -53,9 +53,9 @@ def setup_small_plan(
     eiger: EigerDetector,
     panda: HDFPanda,
     serial_stages: XYZPhiStage,
-):
+) -> MsgGenerator:
     yield from bps.stage(eiger)
-    setup_panda_for_rotation(params.panda_rotation_params, panda)
+    yield from setup_panda_for_rotation(params.panda_rotation_params, panda)
     yield from setup_sample_stage(
         params.panda_rotation_params,
         serial_stages,
@@ -68,7 +68,7 @@ def loop_plan(
     eiger: EigerDetector,
     diffractometer: FourCircleDiffractometer,
     well_num: int,
-):
+) -> MsgGenerator:
     yield from bps.kickoff(eiger, wait=True)
     if well_num % 2 == 0:
         LOGGER.info(
@@ -86,7 +86,7 @@ def loop_plan(
                     {parameters.rot_axis_start}"
         )
         yield from bps.abs_set(diffractometer.phi, parameters.rot_axis_start, wait=True)
-    bps.complete(eiger, wait=True)
+    yield from bps.complete(eiger, wait=True)
 
 
 def run_eiger(
@@ -95,11 +95,11 @@ def run_eiger(
     eiger: EigerDetector,
     serial_stages: XYZPhiStage,
     diffractometer: FourCircleDiffractometer,
-):
+) -> MsgGenerator:
     for well_num, coords in well_position.items():
         yield from move_stage_x_and_z(coords[0], coords[2], serial_stages)
         LOGGER.info(f"Moved to well {well_num}")
-        loop_plan(parameters, eiger, diffractometer, well_num)
+        yield from loop_plan(parameters, eiger, diffractometer, well_num)
 
 
 def run_small_plan(
@@ -109,9 +109,11 @@ def run_small_plan(
     panda: HDFPanda,
     serial_stages: XYZPhiStage,
     diffractometer: FourCircleDiffractometer,
-):
-    setup_small_plan(parameters, eiger, panda, serial_stages)
-    run_eiger(well_position, parameters, eiger, serial_stages, diffractometer)
+) -> MsgGenerator:
+    yield from setup_small_plan(parameters, eiger, panda, serial_stages)
+    yield from run_eiger(
+        well_position, parameters, eiger, serial_stages, diffractometer
+    )
 
 
 def run_serial_small_plan(
@@ -120,7 +122,7 @@ def run_serial_small_plan(
     panda: HDFPanda,
     serial_stages: XYZPhiStage,
     diffractometer: FourCircleDiffractometer,
-):
+) -> MsgGenerator:
     # not sure if this will work?
     parameters.rot_axis_increment = 0.1
     parameters.images_per_well = 1

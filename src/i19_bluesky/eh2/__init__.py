@@ -1,6 +1,5 @@
 """A place for eh2 specific plans."""
 
-from i19_bluesky.eh2.eiger_plans import run_serial_small_plan
 from i19_bluesky.eh2.pincol_control_plans import (
     move_pin_col_out_of_beam,
     move_pin_col_to_requested_in_position,
@@ -10,6 +9,7 @@ from i19_bluesky.plans.optics_hutch_control_plans import (
     close_experiment_shutter,
     open_experiment_shutter,
 )
+from i19_bluesky.serial.eiger_plans import run_serial_small_plan
 
 __all__ = [
     "open_experiment_shutter",
