@@ -22,7 +22,6 @@ from i19_bluesky.serial.panda_setup_plans.panda_setup_plans import (
 from i19_bluesky.serial.panda_setup_plans.panda_stubs import disarm_panda
 
 
-# TODO: change away from serialexperiment? or hard code in some values.
 def end_simple_run(
     parameters: SerialExperimentEh2,
     serial_stages: XYZPhiStage,
@@ -90,9 +89,6 @@ def loop_plan(
     bps.complete(eiger, wait=True)
 
 
-# ^^^ needs start, increment, steps, to be set
-
-
 def run_eiger(
     well_position: dict,
     parameters: SerialExperimentEh2,
@@ -125,6 +121,7 @@ def run_serial_small_plan(
     serial_stages: XYZPhiStage,
     diffractometer: FourCircleDiffractometer,
 ):
+    # not sure if this will work?
     parameters.rot_axis_increment = 0.1
     parameters.images_per_well = 1
     parameters.exposure_time_s = 0.2
