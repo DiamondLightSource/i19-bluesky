@@ -13,7 +13,7 @@ from i19_bluesky.parameters.serial_parameters import PandaRotationParams
 from i19_bluesky.serial.eiger_plans import (
     abort_simple_run,
     end_simple_run,
-    loop_plan,
+    loop_plan_for_testing,
     run_eiger,
     run_small_plan,
     setup_small_plan,
@@ -100,7 +100,7 @@ def test_setup_small_plan(
 @patch("i19_bluesky.serial.eiger_plans.bps.abs_set")
 @patch("i19_bluesky.serial.eiger_plans.bps.kickoff")
 @pytest.mark.parametrize("well_num,phival", [(1, 0), (2, 1)])
-def test_loop_plan(
+def test_loop_plan_for_testing(
     mock_bps_kickoff: MagicMock,
     mock_abs_set: MagicMock,
     mock_bps_complete: MagicMock,
@@ -111,7 +111,11 @@ def test_loop_plan(
     phival: float,
     RE: RunEngine,
 ):
-    RE(loop_plan(panda_rotation_params, eh2_eiger, eh2_diffractometer, well_num))
+    RE(
+        loop_plan_for_testing(
+            panda_rotation_params, eh2_eiger, eh2_diffractometer, well_num
+        )
+    )
     mock_bps_kickoff.assert_called_once_with(eh2_eiger, wait=True)
     mock_abs_set.assert_called_once_with(
         eh2_diffractometer.phi,
@@ -121,16 +125,20 @@ def test_loop_plan(
     mock_bps_complete.assert_called_once_with(eh2_eiger, wait=True)
 
 
-@patch("i19_bluesky.serial.eiger_plans.loop_plan")
+@patch("i19_bluesky.serial.eiger_plans.bps.abs_set")
+@patch("i19_bluesky.serial.eiger_plans.bps.complete")
+@patch("i19_bluesky.serial.eiger_plans.bps.kickoff")
 @patch("i19_bluesky.serial.eiger_plans.move_stage_x_and_z")
 @pytest.mark.parametrize(
-    "well_position,well_int", [({1: [1, 2, 3]}, 1), ({2: [1, 2, 3]}, 2)]
+    "well_position,well_num", [({1: [1, 2, 3]}, 1), ({2: [1, 2, 3]}, 2)]
 )
 def test_run_eiger(
     mock_move_stage_x_and_z: MagicMock,
-    mock_loop_plan: MagicMock,
+    mock_bps_kickoff: MagicMock,
+    mock_bps_complete: MagicMock,
+    mock_bps_abs_set: MagicMock,
     well_position: dict,
-    well_int: int,
+    well_num: int,
     panda_rotation_params: PandaRotationParams,
     eh2_eiger: EigerDetector,
     serial_stages: XYZPhiStage,
@@ -147,9 +155,18 @@ def test_run_eiger(
         )
     )
     mock_move_stage_x_and_z.assert_called_once_with(1, 3, serial_stages)
-    mock_loop_plan.assert_called_once_with(
-        panda_rotation_params, eh2_eiger, eh2_diffractometer, well_int
-    )
+    if well_num % 2 == 0:
+        mock_bps_abs_set.assert_called_once_with(
+            eh2_diffractometer.phi,
+            panda_rotation_params.scan_end_deg,
+            wait=True,
+        )
+    else:
+        mock_bps_abs_set.assert_called_once_with(
+            eh2_diffractometer.phi,
+            panda_rotation_params.scan_start_deg,
+            wait=True,
+        )
 
 
 @patch("i19_bluesky.serial.eiger_plans.run_eiger")

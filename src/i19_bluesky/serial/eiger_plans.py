@@ -63,7 +63,7 @@ def setup_small_plan(
     yield from bps.prepare(eiger, wait=True)
 
 
-def loop_plan(
+def loop_plan_for_testing(
     panda_rotation_params: PandaRotationParams,
     eiger: EigerDetector,
     diffractometer: FourCircleDiffractometer,
@@ -97,7 +97,37 @@ def run_eiger(
     eiger: EigerDetector,
     serial_stages: XYZPhiStage,
     diffractometer: FourCircleDiffractometer,
-) -> MsgGenerator:
+):
+    # define loop plan here
+    # Must make sure that we are actually prepared
+    @bpp.run_decorator(md={"subplan_name": "loop_plan"})
+    def loop_plan(
+        panda_rotation_params: PandaRotationParams,
+        eiger: EigerDetector,
+        diffractometer: FourCircleDiffractometer,
+        well_num: int,
+    ) -> MsgGenerator:
+        yield from bps.kickoff(eiger, wait=True)
+        if well_num % 2 == 0:
+            LOGGER.info(
+                f"Rotate {panda_rotation_params.scan_start_deg} to\
+                    {panda_rotation_params.scan_end_deg}"
+            )
+            yield from bps.abs_set(
+                diffractometer.phi,
+                panda_rotation_params.scan_end_deg,
+                wait=True,
+            )
+        else:
+            LOGGER.info(
+                f"Rotate {panda_rotation_params.scan_end_deg} to\
+                        {panda_rotation_params.scan_start_deg}"
+            )
+            yield from bps.abs_set(
+                diffractometer.phi, panda_rotation_params.scan_start_deg, wait=True
+            )
+        yield from bps.complete(eiger, wait=True)
+
     for well_num, coords in well_position.items():
         yield from move_stage_x_and_z(coords[0], coords[2], serial_stages)
         LOGGER.info(f"Moved to well {well_num}")
@@ -123,12 +153,19 @@ def run_serial_small_plan(
     panda: HDFPanda,
     serial_stages: XYZPhiStage,
     diffractometer: FourCircleDiffractometer,
+    scan_start_deg: float = 0,
+    scan_increment_deg: float = 0.1,
+    scan_steps: int = 10,
+    exposure_time_s: float = 0.2,
 ) -> MsgGenerator:
     # These are all the default values in the panda rotation params class (bar the scan
     # steps, which i've gone to 10, so we rotate 1 full degree), should provide somethi-
     # ng we can actually measure, and can be altered here
     panda_rotation_params = PandaRotationParams(
-        scan_start_deg=0, scan_increment_deg=0.1, scan_steps=10, exposure_time_s=0.2
+        scan_start_deg=scan_start_deg,
+        scan_increment_deg=scan_increment_deg,
+        scan_steps=scan_steps,
+        exposure_time_s=exposure_time_s,
     )
     # These are just random numbers. Should move to position 1,3 (x,z) then 3,5 and go
     # from right to left then left to right before ending the run, rotating 1 degree
