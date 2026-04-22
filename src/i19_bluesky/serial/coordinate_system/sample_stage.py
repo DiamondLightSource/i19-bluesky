@@ -23,21 +23,30 @@ def read_current_sample_stage_xyz_position(
     return (x, y, z)
 
 
-def move_sample_stage_to_corners(
-    corner_coord: tuple[float, float, float],
+def move_sample_stage(
+    coord: tuple[float, float, float],
     sample_stage: XYZPhiStage = inject("serial_stages"),
 ) -> MsgGenerator:
     """Move the x,y,z motors of the sample stage to the fiducial positions.
 
     Args:
-        corner_coord (tuple[float, float, float]): Coordinates of the fiducial corner.
+        coord (tuple[float, float, float]): Coordinates to move to.
         sample_stage (XYZPhiStage, optional): The serial sample stage device.
     """
     yield from bps.mv(
         sample_stage.x,
-        corner_coord[0],
+        coord[0],
         sample_stage.y,
-        corner_coord[1],
+        coord[1],
         sample_stage.z,
-        corner_coord[2],
+        coord[2],
     )
+
+
+def run_coordinate_system_test(
+    coord_list: list[tuple], sample_stage: XYZPhiStage = inject("serial_stages")
+) -> MsgGenerator:
+    """Utility function to run a test from the UI to check that the coordinates for the
+    chip are all correct"""
+    for coords in coord_list:
+        yield from move_sample_stage(coords, sample_stage)
