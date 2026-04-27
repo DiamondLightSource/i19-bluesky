@@ -28,7 +28,7 @@ async def test_move_backlight_in_via_ui(
     RE: RunEngine,
     devices: SerialCollectionEh2PandaComposite,
 ):
-    RE(move_backlight_in_via_ui(option, devices))
+    RE(move_backlight_in_via_ui(option, devices.diffractometer, devices.backlight))
     mock_move_detector_stage.assert_called_once_with(
         devices.diffractometer.det_stage, det_z, two_theta
     )
@@ -53,14 +53,14 @@ async def test_rotate_in_phi(
 ):
 
     rot_axis_end = rot_increment + parameters.rot_axis_start
-    RE(rotate_in_phi(rot_increment, devices))
+    RE(rotate_in_phi(rot_increment, devices.serial_stages))
     mock_abs_set.assert_called_with(
         devices.serial_stages.phi,
         rot_axis_end,
         wait=True,
     )
     set_mock_value(devices.serial_stages.phi.user_readback, rot_axis_end)
-    RE(rotate_in_phi(rot_increment, devices))
+    RE(rotate_in_phi(rot_increment, devices.serial_stages))
     mock_abs_set.assert_called_with(
         devices.serial_stages.phi, rot_axis_end + rot_axis_end, wait=True
     )

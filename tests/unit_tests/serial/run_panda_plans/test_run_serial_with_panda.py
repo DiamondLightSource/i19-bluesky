@@ -23,7 +23,12 @@ async def test_run_serial_with_panda(
 ):
     RE(run_serial_with_panda(parameters, devices))
     mock_setup_then_trigger_panda.assert_called_once()
-    mock_end_run.assert_called_once_with(parameters, devices)
+    mock_end_run.assert_called_once_with(
+        parameters.rot_axis_start,
+        devices.panda,
+        devices.eiger,
+        devices.serial_stages,
+    )
 
 
 @patch(

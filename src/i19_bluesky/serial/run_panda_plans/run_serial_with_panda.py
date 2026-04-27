@@ -38,7 +38,18 @@ def run_serial_with_panda(
 ) -> MsgGenerator:
     yield from bpp.contingency_wrapper(
         setup_then_trigger_panda(parameters, devices),
-        except_plan=lambda: (yield from run_on_collection_abort(devices)),
-        final_plan=lambda: (yield from end_run(parameters, devices)),
+        except_plan=lambda: (
+            yield from run_on_collection_abort(
+                devices.panda, devices.eiger, devices.diffractometer
+            )
+        ),
+        final_plan=lambda: (
+            yield from end_run(
+                parameters.rot_axis_start,
+                devices.panda,
+                devices.eiger,
+                devices.serial_stages,
+            )
+        ),
         auto_raise=False,
     )
