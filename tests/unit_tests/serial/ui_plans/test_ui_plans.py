@@ -1,11 +1,10 @@
-from unittest.mock import MagicMock, patch
-
 import pytest
 from bluesky.run_engine import RunEngine
+from dodal.devices.beamlines.i19.backlight import BacklightPosition
+from dodal.devices.beamlines.i19.diffractometer import FourCircleDiffractometer
+from dodal.devices.motors import XYZPhiStage
 from ophyd_async.core import set_mock_value
 
-from i19_bluesky.parameters.devices_composites import SerialCollectionEh2PandaComposite
-from i19_bluesky.parameters.serial_parameters import SerialExperimentEh2
 from i19_bluesky.serial.ui_plans.ui_plans import (
     BacklightOption,
     move_backlight_in_via_ui,
@@ -14,53 +13,47 @@ from i19_bluesky.serial.ui_plans.ui_plans import (
 
 
 @pytest.mark.parametrize(
-    "option,det_z,two_theta",
+    "option, expected_det_z, expected_two_theta",
     [(BacklightOption.SLOW, 250, 90), (BacklightOption.QUICK, 100, 0)],
 )
-@patch("i19_bluesky.serial.ui_plans.ui_plans.move_detector_stage")
-@patch("i19_bluesky.serial.ui_plans.ui_plans.move_backlight_in")
 async def test_move_backlight_in_via_ui(
-    mock_move_backlight_in: MagicMock,
-    mock_move_detector_stage: MagicMock,
     option: BacklightOption,
-    det_z: float,
-    two_theta: float,
+    expected_det_z: float,
+    expected_two_theta: float,
     RE: RunEngine,
-    devices: SerialCollectionEh2PandaComposite,
+    eh2_backlight: BacklightPosition,
+    eh2_diffractometer: FourCircleDiffractometer,
 ):
-    RE(move_backlight_in_via_ui(option, devices.diffractometer, devices.backlight))
-    mock_move_detector_stage.assert_called_once_with(
-        devices.diffractometer.det_stage, det_z, two_theta
+    RE(move_backlight_in_via_ui(option, eh2_backlight, eh2_diffractometer))
+
+    assert (
+        await eh2_diffractometer.det_stage.det_z.user_readback.get_value()
+        == expected_det_z
     )
-    mock_move_backlight_in.assert_called_once_with(devices.backlight)
+    assert (
+        await eh2_diffractometer.det_stage.two_theta.user_readback.get_value()
+        == expected_two_theta
+    )
+    assert await eh2_backlight.position.get_value() == "IN"
 
 
 @pytest.mark.parametrize(
-    "rot_increment",
+    "rot_start, rot_increment, expected_end",
     [
-        (10.0),
-        (50.0),
-        (-4.0),
+        (-90.0, 10.0, -80.0),
+        (0.0, -5.0, -5.0),
+        (20.0, 4.0, 24.0),
     ],
 )
-@patch("i19_bluesky.serial.ui_plans.ui_plans.bps.abs_set")
 async def test_rotate_in_phi(
-    mock_abs_set: MagicMock,
-    RE: RunEngine,
+    rot_start: float,
     rot_increment: float,
-    parameters: SerialExperimentEh2,
-    devices: SerialCollectionEh2PandaComposite,
+    expected_end: float,
+    serial_stages: XYZPhiStage,
+    RE: RunEngine,
 ):
+    set_mock_value(serial_stages.phi.user_readback, rot_start)
 
-    rot_axis_end = rot_increment + parameters.rot_axis_start
-    RE(rotate_in_phi(rot_increment, devices.serial_stages))
-    mock_abs_set.assert_called_with(
-        devices.serial_stages.phi,
-        rot_axis_end,
-        wait=True,
-    )
-    set_mock_value(devices.serial_stages.phi.user_readback, rot_axis_end)
-    RE(rotate_in_phi(rot_increment, devices.serial_stages))
-    mock_abs_set.assert_called_with(
-        devices.serial_stages.phi, rot_axis_end + rot_axis_end, wait=True
-    )
+    RE(rotate_in_phi(rot_increment, serial_stages))
+
+    assert await serial_stages.phi.user_readback.get_value() == expected_end

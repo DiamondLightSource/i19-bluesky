@@ -4,9 +4,7 @@ import bluesky.plan_stubs as bps
 from bluesky.utils import MsgGenerator
 from dodal.common import inject
 from dodal.devices.beamlines.i19.backlight import BacklightPosition
-from dodal.devices.beamlines.i19.diffractometer import (
-    FourCircleDiffractometer,
-)
+from dodal.devices.beamlines.i19.diffractometer import FourCircleDiffractometer
 from dodal.devices.motors import XYZPhiStage
 
 from i19_bluesky.eh2.backlight_plan import move_backlight_in
@@ -22,8 +20,8 @@ class BacklightOption(StrEnum):
 
 def move_backlight_in_via_ui(
     option: BacklightOption,
-    diffractometer: FourCircleDiffractometer = inject("diffractometer"),
     backlight: BacklightPosition = inject("backlight"),
+    diffractometer: FourCircleDiffractometer = inject("diffractometer"),
 ) -> MsgGenerator:
     match option:
         case option.SLOW:
