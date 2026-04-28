@@ -5,6 +5,7 @@ from dodal.devices.beamlines.i19.diffractometer import (
     FourCircleDiffractometer,
 )
 from dodal.devices.motors import XYZPhiStage
+from ophyd_async.core import DetectorTrigger, TriggerInfo
 from ophyd_async.fastcs.eiger import EigerDetector
 from ophyd_async.fastcs.panda import HDFPanda
 
@@ -60,7 +61,13 @@ def setup_small_plan(
         panda_rotation_params,
         serial_stages,
     )
-    yield from bps.prepare(eiger, wait=True)
+    yield from bps.prepare(
+        eiger,
+        TriggerInfo(
+            number_of_events=1, trigger=DetectorTrigger.INTERNAL, deadtime=0.0001
+        ),
+        wait=True,
+    )
 
 
 def loop_plan_for_testing(
