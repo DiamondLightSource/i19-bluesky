@@ -103,10 +103,10 @@ async def mock_panda() -> HDFPanda:
 async def serial_stages(RE: RunEngine) -> XYZPhiStage:
     serial_stages = i19_2.serial_stages.build(connect_immediately=True, mock=True)
     set_mock_value(serial_stages.phi.velocity, 1)
-    set_mock_value(serial_stages.z.user_readback, 100)
+    set_mock_value(serial_stages.z.user_readback, 0)
     set_mock_value(serial_stages.x.user_readback, 0)
     set_mock_value(serial_stages.y.user_readback, 0)
-    set_mock_value(serial_stages.phi.user_readback, 0)
+    set_mock_value(serial_stages.phi.user_readback, -90)
     return serial_stages
 
 
