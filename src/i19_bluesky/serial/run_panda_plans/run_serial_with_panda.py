@@ -16,7 +16,7 @@ from i19_bluesky.serial.setup_beamline_plans.setup_beamline_pre_collection impor
 
 def setup_then_trigger_panda(
     parameters: SerialExperimentEh2,
-    devices: SerialCollectionEh2PandaComposite = inject(),
+    devices: SerialCollectionEh2PandaComposite,
 ) -> MsgGenerator:
     """Run primary setup processes then trigger PandA to collect data from experiment.
     Has contingencies to abort if any stage produces errors, before moving the
@@ -34,7 +34,7 @@ def setup_then_trigger_panda(
 
 def run_serial_with_panda(
     parameters: SerialExperimentEh2,
-    devices: SerialCollectionEh2PandaComposite,
+    devices: SerialCollectionEh2PandaComposite = inject(),
 ) -> MsgGenerator:
     yield from bpp.contingency_wrapper(
         setup_then_trigger_panda(parameters, devices),
