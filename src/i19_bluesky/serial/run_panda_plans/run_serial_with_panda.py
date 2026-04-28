@@ -28,7 +28,14 @@ def setup_then_trigger_panda(
         object
     """
 
-    yield from setup_beamline_before_collection(parameters, devices)
+    yield from setup_beamline_before_collection(
+        parameters.aperture_request,
+        parameters.detector_distance_mm,
+        parameters.two_theta_deg,
+        devices.backlight,
+        devices.pincol,
+        devices.diffractometer,
+    )
     yield from trigger_panda(parameters, devices)
 
 

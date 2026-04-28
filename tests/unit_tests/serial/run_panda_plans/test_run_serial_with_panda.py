@@ -42,6 +42,14 @@ async def test_setup_then_trigger_panda(
     devices: SerialCollectionEh2PandaComposite,
     RE: RunEngine,
 ):
+
     RE(setup_then_trigger_panda(parameters, devices))
-    mock_setup_beamline_before_collection.assert_called_once_with(parameters, devices)
+    mock_setup_beamline_before_collection.assert_called_once_with(
+        parameters.aperture_request,
+        parameters.detector_distance_mm,
+        parameters.two_theta_deg,
+        devices.backlight,
+        devices.pincol,
+        devices.diffractometer,
+    )
     mock_trigger_panda.assert_called_once_with(parameters, devices)
