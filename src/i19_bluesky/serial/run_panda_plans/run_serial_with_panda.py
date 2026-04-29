@@ -24,7 +24,7 @@ def setup_then_trigger_panda(
 
     Args:
         parameters (SerialExperimentEh2): SerialExperimentEh2 object
-        devices (SerialCollectionEh2PandaComposite): SerialCollectionEh2PandaComposite \
+        devices (SerialCollectionEh2PandaComposite): SerialCollectionEh2PandaComposite
         object
     """
 

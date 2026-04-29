@@ -40,15 +40,16 @@ def move_stage_x_and_z(
     well_z: float,
     serial_stages: XYZPhiStage,
 ):
-    """Moves the sample stage a distance of well_x and well_z in the respective\
-                directions. Order dependant on position of detector when \
-                called.
-        Args:
-            well_x : Float
-                Distance to move in X axis
-            well_z : Float
-                Distance to move in Z axis
-            diffractometer : FourCircleDiffractometer object
+    """Moves the sample stage a distance of well_x and well_z in the respective
+            directions. Order dependant on position of detector when
+            called
+    Args:
+        well_x (float):
+            Distance to move in X axis
+        well_z (float):
+            Distance to move in Z axis
+        diffractometer (XYZPhiStage):
+            XYZPhiStage object
     """
     yield from bps.mv(serial_stages.x, well_x, serial_stages.z, well_z)
 
@@ -61,9 +62,9 @@ def move_detector_stage(
                 called.
         Args:
             detector_stage : DetectorMotion object
-            det_z : Float
+            det_z (float):
                 Distance to move in Z axis
-            two_theta : Float
+            two_theta (float):
                 (default 0.0)
                 Distance to move in Two-Theta axis
     """

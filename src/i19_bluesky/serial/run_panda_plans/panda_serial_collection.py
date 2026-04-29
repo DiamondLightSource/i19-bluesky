@@ -35,7 +35,7 @@ def trigger_panda(
             rot_axis_start (float): Starting phi position, in degrees.
             images_per_well (int): Number of images to take.
             exposure_time_s (float): Time between images, in seconds.
-        devices (SerialCollectionEh2PandaComposite): SerialCollectionEh2PandaComposite \
+        devices (SerialCollectionEh2PandaComposite): SerialCollectionEh2PandaComposite
             object containing:
             diffractometer (FourCircleDiffractometer): The diffractometer ophyd device.
             panda (HDFPanda): The fastcs PandA ophyd device.
