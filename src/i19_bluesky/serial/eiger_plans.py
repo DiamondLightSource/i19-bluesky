@@ -155,6 +155,7 @@ def run_small_plan(
     )
 
 
+@bpp.run_decorator()
 def run_serial_small_plan(
     eiger: EigerDetector,
     panda: HDFPanda,
