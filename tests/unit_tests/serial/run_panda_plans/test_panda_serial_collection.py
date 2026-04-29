@@ -102,7 +102,14 @@ async def test_end_run(
     devices: SerialCollectionEh2PandaComposite,
     RE: RunEngine,
 ):
-    RE(end_run(parameters, devices))
+    RE(
+        end_run(
+            parameters.rot_axis_start,
+            devices.panda,
+            devices.eiger,
+            devices.serial_stages,
+        )
+    )
     mock_disarm_eiger.assert_called_once_with(devices.eiger.drv.detector.disarm)
     mock_move_sample_stage_back.assert_called_once_with(devices.serial_stages, 0)
     mock_disarm_panda.assert_called_once_with(devices.panda)
@@ -117,7 +124,7 @@ async def test_run_on_collection_abort(
     RE: RunEngine,
     devices: SerialCollectionEh2PandaComposite,
 ):
-    RE(run_on_collection_abort(devices))
+    RE(run_on_collection_abort(devices.panda, devices.eiger, devices.diffractometer))
     get_mock_put(devices.diffractometer.phi.motor_stop).assert_called_once_with(1)
     mock_disarm_eiger.assert_called_once_with(devices.eiger.drv.detector.disarm)
     mock_disarm_panda.assert_called_once_with(devices.panda)

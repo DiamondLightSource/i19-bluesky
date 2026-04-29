@@ -1,5 +1,11 @@
 import bluesky.plan_stubs as bps
 from bluesky.utils import MsgGenerator
+from dodal.devices.beamlines.i19.diffractometer import (
+    FourCircleDiffractometer,
+)
+from dodal.devices.motors import XYZPhiStage
+from ophyd_async.fastcs.eiger import EigerDetector
+from ophyd_async.fastcs.panda import HDFPanda
 
 from i19_bluesky.log import LOGGER
 from i19_bluesky.parameters.devices_composites import SerialCollectionEh2PandaComposite
@@ -29,7 +35,7 @@ def trigger_panda(
             rot_axis_start (float): Starting phi position, in degrees.
             images_per_well (int): Number of images to take.
             exposure_time_s (float): Time between images, in seconds.
-        devices (SerialCollectionEh2PandaComposite): SerialCollectionEh2PandaComposite \
+        devices (SerialCollectionEh2PandaComposite): SerialCollectionEh2PandaComposite
             object containing:
             diffractometer (FourCircleDiffractometer): The diffractometer ophyd device.
             panda (HDFPanda): The fastcs PandA ophyd device.
@@ -73,19 +79,25 @@ def trigger_panda(
 
 
 def end_run(
-    parameters: SerialExperimentEh2,
-    devices: SerialCollectionEh2PandaComposite,
+    rot_axis_start: float,
+    panda: HDFPanda,
+    eiger: EigerDetector,
+    serial_stages: XYZPhiStage,
 ):
     LOGGER.info("Disarm eiger")
-    yield from bps.trigger(devices.eiger.drv.detector.disarm)
+    yield from bps.trigger(eiger.drv.detector.disarm)
     LOGGER.info("Disarm panda")
-    yield from disarm_panda(devices.panda)
-    yield from reset_panda(devices.panda)
-    yield from move_sample_stage_back(devices.serial_stages, parameters.rot_axis_start)
+    yield from disarm_panda(panda)
+    yield from reset_panda(panda)
+    yield from move_sample_stage_back(serial_stages, rot_axis_start)
 
 
-def run_on_collection_abort(devices: SerialCollectionEh2PandaComposite) -> MsgGenerator:
+def run_on_collection_abort(
+    panda: HDFPanda,
+    eiger: EigerDetector,
+    diffractometer: FourCircleDiffractometer,
+) -> MsgGenerator:
     LOGGER.warning("ABORT")
-    yield from bps.abs_set(devices.diffractometer.phi.motor_stop, 1, wait=True)
-    yield from bps.trigger(devices.eiger.drv.detector.disarm)
-    yield from disarm_panda(devices.panda)
+    yield from bps.abs_set(diffractometer.phi.motor_stop, 1, wait=True)
+    yield from bps.trigger(eiger.drv.detector.disarm)
+    yield from disarm_panda(panda)

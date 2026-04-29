@@ -38,7 +38,16 @@ async def test_setup_beamline_before_collection(
     set_mock_value(devices.pincol.mapt.pin_y.in_positions[size], in_positions[1])
     set_mock_value(devices.pincol.mapt.col_x.in_positions[size], in_positions[2])
     set_mock_value(devices.pincol.mapt.col_y.in_positions[size], in_positions[3])
-    RE(setup_beamline_before_collection(parameters, devices))
+    RE(
+        setup_beamline_before_collection(
+            parameters.aperture_request,
+            parameters.detector_distance_mm,
+            parameters.two_theta_deg,
+            devices.backlight,
+            devices.pincol,
+            devices.diffractometer,
+        )
+    )
     assert (
         await devices.diffractometer.det_stage.det_z.user_readback.get_value()
         == detector_z
