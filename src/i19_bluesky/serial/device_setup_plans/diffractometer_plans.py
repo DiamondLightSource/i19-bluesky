@@ -49,7 +49,7 @@ def move_stage_x_and_z(
         well_z (float):
             Distance to move in Z axis
         diffractometer (XYZPhiStage):
-            XYZPhiStage object
+            Serial stage object
     """
     yield from bps.mv(serial_stages.x, well_x, serial_stages.z, well_z)
 
@@ -61,7 +61,7 @@ def move_detector_stage(
                 directions. Order dependant on position of detector when \
                 called.
         Args:
-            detector_stage : DetectorMotion object
+            detector_stage (DetectorMotion): DetectorMotion object
             det_z (float):
                 Distance to move in Z axis
             two_theta (float):

@@ -31,12 +31,18 @@ def setup_beamline_before_collection(
     axis.
 
     Args:
-        aperture_request: (PinColRequest)
-        detector_distance_mm: (float)
-        two_theta_deg: (float)
-        backlight: (BacklightPosition)
-        pincol: (PinholeCollimatorControl)
-        diffractometer: (FourCircleDiffractometer)
+        aperture_request (PinColRequest):
+            Requested position of aperture
+        detector_distance_mm (float):
+            Distance to move in the X axis
+        two_theta_deg (float):
+            Angle to move to in the theta axis
+        backlight (BacklightPosition):
+            Backlight device
+        pincol (PinholeCollimatorControl):
+            Pinhole Collimator device
+        diffractometer (FourCircleDiffractometer):
+            Diffractometer device
     """
     LOGGER.info("Moving backlight out")
     yield from move_backlight_out(backlight)
