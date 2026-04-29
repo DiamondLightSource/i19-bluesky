@@ -39,6 +39,7 @@ def setup_then_trigger_panda(
     yield from trigger_panda(parameters, devices)
 
 
+@bpp.run_decorator()
 def run_serial_with_panda(
     parameters: SerialExperimentEh2,
     devices: SerialCollectionEh2PandaComposite,
