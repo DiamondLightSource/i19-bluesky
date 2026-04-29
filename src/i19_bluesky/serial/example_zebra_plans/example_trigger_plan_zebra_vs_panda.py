@@ -94,7 +94,6 @@ def run_zebra_test(
     gate_width: float,
     pulse_width: float,
     parameters: SerialExperimentEh2,
-    zebra: Zebra = inject("zebra"),
     devices: SerialCollectionEh2ZebraComposite = inject(),
 ) -> MsgGenerator:
     yield from bpp.contingency_wrapper(
@@ -104,7 +103,9 @@ def run_zebra_test(
             devices,
             parameters,
         ),
-        except_plan=lambda: (yield from abort_zebra(devices.diffractometer, zebra)),
+        except_plan=lambda: (
+            yield from abort_zebra(devices.diffractometer, devices.zebra)
+        ),
         final_plan=lambda: (
             yield from move_sample_stage_back(
                 devices.serial_stages, parameters.zebra_rotation_params.scan_start_deg
