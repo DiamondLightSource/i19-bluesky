@@ -16,7 +16,7 @@ from i19_bluesky.serial.setup_beamline_plans.setup_beamline_pre_collection impor
 
 def setup_then_trigger_panda(
     parameters: SerialExperimentEh2,
-    devices: SerialCollectionEh2PandaComposite = inject(),
+    devices: SerialCollectionEh2PandaComposite,
 ) -> MsgGenerator:
     """Run primary setup processes then trigger PandA to collect data from experiment.
     Has contingencies to abort if any stage produces errors, before moving the
@@ -24,22 +24,40 @@ def setup_then_trigger_panda(
 
     Args:
         parameters (SerialExperimentEh2): SerialExperimentEh2 object
-        devices (SerialCollectionEh2PandaComposite): SerialCollectionEh2PandaComposite \
+        devices (SerialCollectionEh2PandaComposite): SerialCollectionEh2PandaComposite
         object
     """
 
-    yield from setup_beamline_before_collection(parameters, devices)
+    yield from setup_beamline_before_collection(
+        parameters.aperture_request,
+        parameters.detector_distance_mm,
+        parameters.two_theta_deg,
+        devices.backlight,
+        devices.pincol,
+        devices.diffractometer,
+    )
     yield from trigger_panda(parameters, devices)
 
 
 @bpp.run_decorator()
 def run_serial_with_panda(
     parameters: SerialExperimentEh2,
-    devices: SerialCollectionEh2PandaComposite,
+    devices: SerialCollectionEh2PandaComposite = inject(),
 ) -> MsgGenerator:
     yield from bpp.contingency_wrapper(
         setup_then_trigger_panda(parameters, devices),
-        except_plan=lambda: (yield from run_on_collection_abort(devices)),
-        final_plan=lambda: (yield from end_run(parameters, devices)),
+        except_plan=lambda: (
+            yield from run_on_collection_abort(
+                devices.panda, devices.eiger, devices.diffractometer
+            )
+        ),
+        final_plan=lambda: (
+            yield from end_run(
+                parameters.rot_axis_start,
+                devices.panda,
+                devices.eiger,
+                devices.serial_stages,
+            )
+        ),
         auto_raise=False,
     )
