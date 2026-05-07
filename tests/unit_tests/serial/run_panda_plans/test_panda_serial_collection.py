@@ -58,7 +58,7 @@ async def test_trigger_panda(
     devices: SerialCollectionEh2PandaComposite,
     RE: RunEngine,
 ):
-    parameters.well_position = well_positions
+    parameters.wells_to_collect = well_positions
     parameters.rot_axis_start = 5
     parent_mock = MagicMock()
     parent_mock.attach_mock(mock_set_value_for_params, "mock_set_value_for_params")

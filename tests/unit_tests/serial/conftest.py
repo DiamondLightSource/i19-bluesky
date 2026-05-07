@@ -27,8 +27,6 @@ from i19_bluesky.parameters.devices_composites import (
 )
 from i19_bluesky.parameters.serial_parameters import (
     DetectorType,
-    GridParameters,
-    GridType,
     SerialExperimentEh2,
 )
 
@@ -173,18 +171,7 @@ async def devices_zebra(
 
 
 @pytest.fixture
-def dummy_wells_settings():
-    return {
-        "first": 0,
-        "last": 5,
-        "selected": [1, 3, 5],
-        "series_length": 3,
-        "manual_selection_enabled": True,
-    }
-
-
-@pytest.fixture
-def parameters(dummy_wells_settings):
+def parameters():
     return SerialExperimentEh2(
         hutch=HutchName.EH2,
         visit=Path("/tmp/i19-2/cm12345-1"),
@@ -196,15 +183,9 @@ def parameters(dummy_wells_settings):
         detector_distance_mm=320,
         two_theta_deg=0,
         transmission_fraction=0.3,
-        grid=GridParameters(
-            grid_type=GridType.SILICON,
-            x_steps=20,
-            z_steps=20,
-        ),
         aperture_request=PinColRequest.PCOL100,
         detector_type=DetectorType.EIGER,
-        well_position={1: (1, 2, 3)},
-        wells=dummy_wells_settings,
+        wells_to_collect={"1": (1, 2, 3)},
         rot_axis_start=0,
         rot_axis_increment=0.1,
     )

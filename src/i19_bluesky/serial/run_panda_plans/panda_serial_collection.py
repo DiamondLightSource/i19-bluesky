@@ -55,7 +55,7 @@ def trigger_panda(
     yield from bps.trigger(devices.eiger.drv.detector.arm)
     # Currently a test, will be modified as we solidify parameters going forwards
     # assumes a dictionary of integer keys and coordinates in a list
-    for well_num, coords in parameters.well_position.items():
+    for well_num, coords in parameters.wells_to_collect.items():
         yield from move_stage_x_and_z(coords[0], coords[2], devices.serial_stages)
         LOGGER.info(f"Moved to well {well_num}")
         if well_num % 2 == 0:
