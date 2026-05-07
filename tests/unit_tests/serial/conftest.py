@@ -186,6 +186,7 @@ def parameters():
         aperture_request=PinColRequest.PCOL100,
         detector_type=DetectorType.EIGER,
         wells_to_collect={"1": (1, 2, 3)},
+        wells_series_len=1,
         rot_axis_start=0,
         rot_axis_increment=0.1,
     )

@@ -24,6 +24,7 @@ class SerialExperiment(VisitParameters):
     two_theta_deg: float
     transmission_fraction: float
     wells_to_collect: dict[str, tuple]
+    wells_series_len: int  # how many wells to collect each arm
     rot_axis_start: float
     rot_axis_increment: float
     rotation_axis: RotationAxis = RotationAxis.PHI
@@ -36,6 +37,21 @@ class SerialExperiment(VisitParameters):
     @property
     def total_num_images(self) -> int:
         return self.images_per_well * self.total_num_wells
+
+    def split_wells_per_run(self) -> list[dict]:
+        """Divide wells into serirun list: each to be collected in one detector arm."""
+        wells = list(self.wells_to_collect.items())
+        run_list = [
+            dict(wells[i : i + self.wells_series_len])
+            for i in range(0, self.total_num_wells, self.wells_series_len)
+        ]
+        return run_list
+
+    def get_number_of_runs(self) -> int:
+        if self.total_num_wells // self.wells_series_len == 0:
+            return self.total_num_wells // self.wells_series_len
+        else:
+            return self.total_num_wells // self.wells_series_len + 1
 
     # @property
     # @abstractmethod

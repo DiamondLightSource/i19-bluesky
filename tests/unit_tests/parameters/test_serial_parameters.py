@@ -23,6 +23,7 @@ def dummy_serial_params():
         "two_theta_deg": 0,
         "transmission_fraction": 0.3,
         "wells_to_collect": {"01": (0, 0, 0), "02": (0.1, 0, 0)},
+        "wells_series_len": 2,
         "rot_axis_start": -5,
         "rot_axis_increment": 0.1,
         "rot_axis_end": 10,
@@ -51,6 +52,71 @@ def test_serial_parameters(dummy_serial_params):
 
     assert params.total_num_wells == 2
     assert params.total_num_images == 20
+
+
+@pytest.mark.parametrize(
+    "wells_to_collect, series_length, expected_run_list, expected_run_num",
+    [
+        (
+            {"01": (0, 0, 0), "02": (0.1, 0, 0)},
+            2,
+            [{"01": (0, 0, 0), "02": (0.1, 0, 0)}],
+            1,
+        ),
+        (
+            {"01": (0, 0, 0), "02": (0.1, 0, 0)},
+            1,
+            [{"01": (0, 0, 0)}, {"02": (0.1, 0, 0)}],
+            2,
+        ),
+        (
+            {
+                "01": (0, 0, 0),
+                "02": (0.1, 0, 0),
+                "05": (0.4, 0.0, 0.0),
+                "06": (0.0, 0.0, 0.1),
+                "08": (0.2, 0.0, 0.1),
+            },
+            3,
+            [
+                {"01": (0, 0, 0), "02": (0.1, 0, 0), "05": (0.4, 0.0, 0.0)},
+                {"06": (0.0, 0.0, 0.1), "08": (0.2, 0.0, 0.1)},
+            ],
+            2,
+        ),
+        (
+            {
+                "01": (0, 0, 0),
+                "02": (0.1, 0, 0),
+                "05": (0.4, 0.0, 0.0),
+                "06": (0.0, 0.0, 0.1),
+                "08": (0.2, 0.0, 0.1),
+            },
+            2,
+            [
+                {"01": (0, 0, 0), "02": (0.1, 0, 0)},
+                {"05": (0.4, 0.0, 0.0), "06": (0.0, 0.0, 0.1)},
+                {"08": (0.2, 0.0, 0.1)},
+            ],
+            3,
+        ),
+    ],
+)
+def test_split_wells_into_run_list_for_collection(
+    wells_to_collect,
+    series_length,
+    expected_run_list,
+    expected_run_num,
+    dummy_serial_params,
+):
+    params = SerialExperiment(**dummy_serial_params)
+    params.wells_to_collect = wells_to_collect
+    params.wells_series_len = series_length
+
+    wells_per_run = params.split_wells_per_run()
+
+    assert wells_per_run == expected_run_list
+    assert len(wells_per_run) == expected_run_num
 
 
 def test_serial_parameter_model_for_eh2(dummy_serial_params_eh2):
