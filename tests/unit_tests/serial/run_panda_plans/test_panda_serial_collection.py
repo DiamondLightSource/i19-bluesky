@@ -31,7 +31,7 @@ async def test_setup_sample_stage(
 
 
 @pytest.mark.parametrize(
-    "well_positions,phival", [({1: [1, 2, 3]}, 5.0), ({2: [1, 2, 3]}, 6.0)]
+    "well_positions,phival", [({"01": [1, 2, 3]}, 5.0), ({"02": [1, 2, 3]}, 6.0)]
 )
 @patch("i19_bluesky.serial.run_panda_plans.panda_serial_collection.bps.trigger")
 @patch("i19_bluesky.serial.run_panda_plans.panda_serial_collection.bps.abs_set")
@@ -52,7 +52,7 @@ async def test_trigger_panda(
     mock_move_stage_x_and_z: MagicMock,
     mock_set_value_for_params: MagicMock,
     mock_arm_or_disarm: MagicMock,
-    well_positions: dict[int, tuple],
+    well_positions: dict[str, tuple],
     phival: int,
     parameters: SerialExperimentEh2,
     devices: SerialCollectionEh2PandaComposite,
