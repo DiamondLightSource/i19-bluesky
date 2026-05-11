@@ -137,6 +137,12 @@ async def eh2_backlight(RE: RunEngine) -> BacklightPosition:
 @pytest.fixture
 async def eh2_eiger(RE: RunEngine) -> EigerDetector:
     eiger = EigerDetector(prefix="ixx-test-eiger", path_provider=get_path_provider())
+    await eiger.connect(mock=True)
+    set_mock_value(eiger.drv.detector.photon_energy, 100)
+    set_mock_value(eiger.drv.detector.detector_distance, 100)
+    set_mock_value(eiger.drv.detector.beam_center_y, 100)
+    set_mock_value(eiger.drv.detector.beam_center_x, 100)
+    set_mock_value(eiger.drv.detector.omega_start, 0)
     return eiger
 
 
