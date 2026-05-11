@@ -58,22 +58,22 @@ def trigger_panda(
         LOGGER.info(f"Moved to well {well_num}")
         if i % 2 == 0:  # even in list
             LOGGER.info(
-                f"Rotate {parameters.panda_rotation_params.scan_end_deg} to\
-                    {parameters.panda_rotation_params.scan_start_deg}"
-            )
-            yield from bps.abs_set(
-                devices.diffractometer.phi,
-                parameters.panda_rotation_params.scan_start_deg,
-                wait=True,
-            )
-        else:  # odd idx in list
-            LOGGER.info(
                 f"Rotate {parameters.panda_rotation_params.scan_start_deg} to\
                 {parameters.panda_rotation_params.scan_end_deg}"
             )
             yield from bps.abs_set(
                 devices.diffractometer.phi,
                 parameters.panda_rotation_params.scan_end_deg,
+                wait=True,
+            )
+        else:  # odd idx in list
+            LOGGER.info(
+                f"Rotate {parameters.panda_rotation_params.scan_end_deg} to\
+                    {parameters.panda_rotation_params.scan_start_deg}"
+            )
+            yield from bps.abs_set(
+                devices.diffractometer.phi,
+                parameters.panda_rotation_params.scan_start_deg,
                 wait=True,
             )
 
