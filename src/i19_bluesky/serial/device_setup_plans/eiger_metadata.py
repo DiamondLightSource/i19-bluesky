@@ -12,7 +12,7 @@ def write_eiger_params(
     energy: float,
     eiger: EigerDetector,
 ):
-    yield from bps.abs_set(eiger.drv.detector.photon_energy, energy, wait=True)
+    yield from bps.abs_set(eiger.drv.detector.photon_energy, energy)
     yield from bps.abs_set(eiger.drv.detector.detector_distance, detector_distance_mm)
     yield from bps.abs_set(eiger.drv.detector.beam_center_x, beam_center_x)
     yield from bps.abs_set(eiger.drv.detector.beam_center_y, beam_center_y)
