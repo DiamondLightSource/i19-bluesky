@@ -1,22 +1,40 @@
+import pytest
+from bluesky.run_engine import RunEngine
 from ophyd_async.fastcs.eiger import EigerDetector
 
 from i19_bluesky.serial.device_setup_plans.eiger_metadata import (
-    read_metadata_from_eiger,
+    write_eiger_params,
 )
 
 
-async def test_read_metadata_from_eiger(
+@pytest.mark.parametrize(
+    "detector_distance_mm,two_theta_deg,phi_start,phi_increment,beam_center_x,beam_center_y,energy",
+    [(100, 2, 2, 2, 2, 2, 2)],
+)
+async def test_write_eiger_params(
+    detector_distance_mm: float,
+    two_theta_deg: float,
+    phi_start: float,
+    phi_increment: float,
+    beam_center_x: float,
+    beam_center_y: float,
+    energy: float,
     eh2_eiger: EigerDetector,
+    RE: RunEngine,
 ):
-    r = await read_metadata_from_eiger(eh2_eiger)
-    assert r == {
-        "Wavelength": 123.98419299999999,
-        "beam_centre_x": 100.0,
-        "beam_centre_y": 100.0,
-        "chi": 0,
-        "chi_increment": 0,
-        "detector_distance": 100.0,
-        "kappa_increment": 0,
-        "omega_increment": 0,
-        "omega_position": 0,
-    }
+    RE(
+        write_eiger_params(
+            detector_distance_mm,
+            two_theta_deg,
+            phi_start,
+            phi_increment,
+            beam_center_x,
+            beam_center_y,
+            energy,
+            eh2_eiger,
+        )
+    )
+    assert (await eh2_eiger.drv.detector.detector_distance.get_value()) == 100
+    assert (await eh2_eiger.drv.detector.beam_center_x.get_value()) == 2
+    assert (await eh2_eiger.drv.detector.beam_center_y.get_value()) == 2
+    assert (await eh2_eiger.drv.detector.photon_energy.get_value()) == 2
