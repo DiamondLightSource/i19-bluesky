@@ -8,14 +8,17 @@ from i19_bluesky.serial.device_setup_plans.eiger_metadata import (
 
 
 @pytest.mark.parametrize(
-    "detector_distance_mm,two_theta_deg,phi_start,phi_increment,beam_center_x,beam_center_y,energy",
-    [(100, 2, 2, 2, 2, 2, 2)],
+    # "detector_distance_mm,two_theta_deg,phi_start,phi_increment,beam_center_x,
+    # beam_center_y,energy",
+    # [(100, 5, 4, 3, 2, 1, 6)],
+    "detector_distance_mm,beam_center_x,beam_center_y,energy",
+    [(100, 3, 2, 1)],
 )
 async def test_write_eiger_params(
     detector_distance_mm: float,
-    two_theta_deg: float,
-    phi_start: float,
-    phi_increment: float,
+    # two_theta_deg: float,
+    # phi_start: float,
+    # phi_increment: float,
     beam_center_x: float,
     beam_center_y: float,
     energy: float,
@@ -25,9 +28,9 @@ async def test_write_eiger_params(
     RE(
         write_eiger_params(
             detector_distance_mm,
-            two_theta_deg,
-            phi_start,
-            phi_increment,
+            # two_theta_deg,
+            # phi_start,
+            # phi_increment,
             beam_center_x,
             beam_center_y,
             energy,
@@ -35,6 +38,6 @@ async def test_write_eiger_params(
         )
     )
     assert (await eh2_eiger.drv.detector.detector_distance.get_value()) == 100
-    assert (await eh2_eiger.drv.detector.beam_center_x.get_value()) == 2
+    assert (await eh2_eiger.drv.detector.beam_center_x.get_value()) == 3
     assert (await eh2_eiger.drv.detector.beam_center_y.get_value()) == 2
-    assert (await eh2_eiger.drv.detector.photon_energy.get_value()) == 2
+    assert (await eh2_eiger.drv.detector.photon_energy.get_value()) == 1
