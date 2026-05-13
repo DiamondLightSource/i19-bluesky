@@ -41,3 +41,5 @@ async def test_write_eiger_params(
     assert (await eh2_eiger.drv.detector.beam_center_x.get_value()) == 3
     assert (await eh2_eiger.drv.detector.beam_center_y.get_value()) == 2
     assert (await eh2_eiger.drv.detector.photon_energy.get_value()) == 1
+    assert (await eh2_eiger.drv.detector.omega_start.get_value()) == 0
+    assert (await eh2_eiger.drv.detector.omega_increment.get_value()) == 0
