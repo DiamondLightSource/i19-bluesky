@@ -144,7 +144,7 @@ async def eh2_eiger(RE: RunEngine) -> EigerDetector:
     set_mock_value(eiger.drv.detector.beam_center_x, 100)
     set_mock_value(eiger.drv.detector.omega_start, 0)
     set_mock_value(eiger.drv.detector.omega_increment, 0)
-    # set_mock_value(eiger.drv.detector.wavelength, 1)
+    # set_mock_value(eiger.drv.detector.wavelength, 1) # type:ignore
     # set_mock_value(eiger.drv.detector.two_theta, 0)  # type:ignore
     # set_mock_value(eiger.drv.detector.phi_start, 0)  # type:ignore
     # set_mock_value(eiger.drv.detector.phi_increment, 0)type:ignore

@@ -43,3 +43,11 @@ async def test_write_eiger_params(
     assert (await eh2_eiger.drv.detector.photon_energy.get_value()) == 1
     assert (await eh2_eiger.drv.detector.omega_start.get_value()) == 0
     assert (await eh2_eiger.drv.detector.omega_increment.get_value()) == 0
+    # assert (await eiger.drv.detector.wavelength.get_value()==12398.4/1 # type:ignore
+    # assert (await eiger.drv.detector.two_theta.get_value()== 0  # type:ignore
+    # assert (await eiger.drv.detector.phi_start.get_value()==0  # type:ignore
+    # assert (await eiger.drv.detector.phi_increment.get_value()==0type:ignore
+    # assert (await eiger.drv.detector.chi_start.get_value()==0  # type:ignore
+    # assert (await eiger.drv.detector.chi_increment.get_value()==0  # type:ignore
+    # assert (await eiger.drv.detector.kappa_start.get_value()==0  # type:ignore
+    # assert (await eiger.drv.detector.kappa_increment.get_value()==0  # type:ignore
