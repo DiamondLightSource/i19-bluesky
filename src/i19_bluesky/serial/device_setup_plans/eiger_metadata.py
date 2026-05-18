@@ -12,17 +12,17 @@ def write_eiger_params(
     energy: float,
     eiger: EigerDetector,
 ):
-    yield from bps.abs_set(eiger.drv.detector.photon_energy, energy)
-    yield from bps.abs_set(eiger.drv.detector.detector_distance, detector_distance_mm)
-    yield from bps.abs_set(eiger.drv.detector.beam_center_x, beam_center_x)
-    yield from bps.abs_set(eiger.drv.detector.beam_center_y, beam_center_y)
-    yield from bps.abs_set(eiger.drv.detector.omega_start, 0)
-    yield from bps.abs_set(eiger.drv.detector.omega_increment, 0)
-    # yield from bps.abs_set(eiger.drv.detector.wavelength, 12398.4/energy)# type:ignore
-    # yield from bps.abs_set(eiger.drv.detector.two_theta, two_theta_deg)  # type:ignore
-    # yield from bps.abs_set(eiger.drv.detector.phi_start, phi_start)  # type:ignore
-    # yield from bps.abs_set(eiger.drv.detector.phi_increment, phi_increment)type:ignore
-    # yield from bps.abs_set(eiger.drv.detector.chi_start, 0)  # type:ignore
-    # yield from bps.abs_set(eiger.drv.detector.chi_increment, 0)  # type:ignore
-    # yield from bps.abs_set(eiger.drv.detector.kappa_start, 0)  # type:ignore
-    # yield from bps.abs_set(eiger.drv.detector.kappa_increment, 0)  # type:ignore
+    yield from bps.abs_set(eiger.detector.photon_energy, energy)
+    yield from bps.abs_set(eiger.detector.detector_distance, detector_distance_mm)
+    yield from bps.abs_set(eiger.detector.beam_center_x, beam_center_x)
+    yield from bps.abs_set(eiger.detector.beam_center_y, beam_center_y)
+    yield from bps.abs_set(eiger.detector.omega_start, 0)
+    yield from bps.abs_set(eiger.detector.omega_increment, 0)
+    # yield from bps.abs_set(eiger.detector.wavelength, 12398.4/energy)# type:ignore
+    # yield from bps.abs_set(eiger.detector.two_theta, two_theta_deg)  # type:ignore
+    # yield from bps.abs_set(eiger.detector.phi_start, phi_start)  # type:ignore
+    # yield from bps.abs_set(eiger.detector.phi_increment, phi_increment)type:ignore
+    # yield from bps.abs_set(eiger.detector.chi_start, 0)  # type:ignore
+    # yield from bps.abs_set(eiger.detector.chi_increment, 0)  # type:ignore
+    # yield from bps.abs_set(eiger.detector.kappa_start, 0)  # type:ignore
+    # yield from bps.abs_set(eiger.detector.kappa_increment, 0)  # type:ignore
