@@ -52,7 +52,7 @@ def trigger_panda(
     LOGGER.info("Arm panda and move phi")
     yield from arm_panda(devices.panda)
     LOGGER.info("Arm eiger")
-    yield from bps.trigger(devices.eiger.drv.detector.arm)
+    yield from bps.trigger(devices.eiger.detector.arm)
     # Currently a test, will be modified as we solidify parameters going forwards
     # assumes a dictionary of integer keys and coordinates in a list
     for well_num, coords in parameters.well_position.items():
@@ -85,7 +85,7 @@ def end_run(
     serial_stages: XYZPhiStage,
 ):
     LOGGER.info("Disarm eiger")
-    yield from bps.trigger(eiger.drv.detector.disarm)
+    yield from bps.trigger(eiger.detector.disarm)
     LOGGER.info("Disarm panda")
     yield from disarm_panda(panda)
     yield from reset_panda(panda)
@@ -99,5 +99,5 @@ def run_on_collection_abort(
 ) -> MsgGenerator:
     LOGGER.warning("ABORT")
     yield from bps.abs_set(diffractometer.phi.motor_stop, 1, wait=True)
-    yield from bps.trigger(eiger.drv.detector.disarm)
+    yield from bps.trigger(eiger.detector.disarm)
     yield from disarm_panda(panda)

@@ -80,7 +80,7 @@ async def test_trigger_panda(
             parameters.panda_rotation_params, devices.panda
         ),
         call.mock_arm_panda(devices.panda),
-        call.mock_arm_or_disarm(devices.eiger.drv.detector.arm),
+        call.mock_arm_or_disarm(devices.eiger.detector.arm),
         call.mock_move_stage_x_and_z(1, 3, devices.serial_stages),
         call.mock_set_value_for_params(devices.diffractometer.phi, phival, wait=True),
     ]
@@ -110,7 +110,7 @@ async def test_end_run(
             devices.serial_stages,
         )
     )
-    mock_disarm_eiger.assert_called_once_with(devices.eiger.drv.detector.disarm)
+    mock_disarm_eiger.assert_called_once_with(devices.eiger.detector.disarm)
     mock_move_sample_stage_back.assert_called_once_with(devices.serial_stages, 0)
     mock_disarm_panda.assert_called_once_with(devices.panda)
     mock_reset_panda.assert_called_once_with(devices.panda)
@@ -126,5 +126,5 @@ async def test_run_on_collection_abort(
 ):
     RE(run_on_collection_abort(devices.panda, devices.eiger, devices.diffractometer))
     get_mock_put(devices.diffractometer.phi.motor_stop).assert_called_once_with(1)
-    mock_disarm_eiger.assert_called_once_with(devices.eiger.drv.detector.disarm)
+    mock_disarm_eiger.assert_called_once_with(devices.eiger.detector.disarm)
     mock_disarm_panda.assert_called_once_with(devices.panda)

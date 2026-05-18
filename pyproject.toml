@@ -24,9 +24,9 @@ dependencies = [
     # Blueapi pinned until GDA can be updated on the beamline to use latest version
     "blueapi >= 1.4.1",
     "ophyd ==1.11.0",
-    "ophyd-async[ca,pva] >= 0.16.0",
+    "ophyd-async[ca,pva] >= 0.17a4",
     "bluesky >= 1.13",
-    "dls-dodal @ git+https://github.com/DiamondLightSource/dodal.git@main",
+    "dls-dodal @ git+https://github.com/DiamondLightSource/dodal.git@2811803081cf5e32fdaf26045638a33c8303a8e6",
 ]
 dynamic = ["version"]
 license.file = "LICENSE"
