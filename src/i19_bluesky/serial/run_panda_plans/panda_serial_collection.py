@@ -53,14 +53,12 @@ def trigger_panda(
     yield from arm_panda(devices.panda)
     LOGGER.info("Arm eiger")
     yield from bps.trigger(devices.eiger.drv.detector.arm)
-    # Currently a test, will be modified as we solidify parameters going forwards
-    # assumes a dictionary of integer keys and coordinates in a list
-    for well_num, coords in parameters.well_position.items():
+    for i, (well_num, coords) in enumerate(parameters.wells_to_collect.items()):
         yield from move_stage_x_and_z(coords[0], coords[2], devices.serial_stages)
         LOGGER.info(f"Moved to well {well_num}")
-        if well_num % 2 == 0:
+        if i % 2 == 0:  # even in list
             LOGGER.info(
-                f"Rotate {parameters.rot_axis_start} to\
+                f"Rotate {parameters.panda_rotation_params.scan_start_deg} to\
                 {parameters.panda_rotation_params.scan_end_deg}"
             )
             yield from bps.abs_set(
@@ -68,13 +66,15 @@ def trigger_panda(
                 parameters.panda_rotation_params.scan_end_deg,
                 wait=True,
             )
-        else:
+        else:  # odd idx in list
             LOGGER.info(
                 f"Rotate {parameters.panda_rotation_params.scan_end_deg} to\
-                    {parameters.rot_axis_start}"
+                    {parameters.panda_rotation_params.scan_start_deg}"
             )
             yield from bps.abs_set(
-                devices.diffractometer.phi, parameters.rot_axis_start, wait=True
+                devices.diffractometer.phi,
+                parameters.panda_rotation_params.scan_start_deg,
+                wait=True,
             )
 
 
