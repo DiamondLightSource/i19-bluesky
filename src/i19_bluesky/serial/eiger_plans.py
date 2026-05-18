@@ -74,10 +74,10 @@ def loop_plan_for_testing(
     panda_rotation_params: PandaRotationParams,
     eiger: EigerDetector,
     diffractometer: FourCircleDiffractometer,
-    well_num: int,
+    i: int,
 ) -> MsgGenerator:
     yield from bps.kickoff(eiger, wait=True)
-    if well_num % 2 == 0:
+    if i % 2 == 0:
         LOGGER.info(
             f"Rotate {panda_rotation_params.scan_start_deg} to\
                 {panda_rotation_params.scan_end_deg}"
@@ -112,7 +112,7 @@ def run_eiger(
         panda_rotation_params: PandaRotationParams,
         eiger: EigerDetector,
         diffractometer: FourCircleDiffractometer,
-        well_num: int,
+        i: int,
     ) -> MsgGenerator:
         yield from bps.kickoff(eiger, wait=True)
         if well_num % 2 == 0:
@@ -135,10 +135,10 @@ def run_eiger(
             )
         yield from bps.complete(eiger, wait=True)
 
-    for well_num, coords in well_position.items():
+    for i, (well_num, coords) in enumerate(well_position.items()):
         yield from move_stage_x_and_z(coords[0], coords[2], serial_stages)
         LOGGER.info(f"Moved to well {well_num}")
-        yield from loop_plan(panda_rotation_params, eiger, diffractometer, well_num)
+        yield from loop_plan(panda_rotation_params, eiger, diffractometer, i)
 
 
 def run_small_plan(
