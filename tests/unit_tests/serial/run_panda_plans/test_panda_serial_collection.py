@@ -74,7 +74,7 @@ def test_trigger_panda_call_order(
             parameters.panda_rotation_params, devices.panda
         ),
         call.mock_arm_panda(devices.panda),
-        call.mock_arm_or_disarm(devices.eiger.drv.detector.arm),
+        call.mock_arm_or_disarm(devices.eiger.detector.arm),
         call.mock_move_stage_x_and_z(0, 0, devices.serial_stages),
         call.mock_move_stage_x_and_z(1, 0, devices.serial_stages),
         call.mock_set_value_for_params(devices.diffractometer.phi, 6.0, wait=True),
