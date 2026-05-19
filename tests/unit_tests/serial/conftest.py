@@ -142,14 +142,14 @@ async def eh2_eiger(RE: RunEngine) -> EigerDetector:
     set_mock_value(eiger.detector.beam_center_x, 100)
     set_mock_value(eiger.detector.omega_start, 0)
     set_mock_value(eiger.detector.omega_increment, 0)
-    # set_mock_value(eiger.detector.wavelength, 1) # type:ignore
-    # set_mock_value(eiger.detector.two_theta, 0)  # type:ignore
-    # set_mock_value(eiger.detector.phi_start, 0)  # type:ignore
-    # set_mock_value(eiger.detector.phi_increment, 0)type:ignore
-    # set_mock_value(eiger.detector.chi_start, 0)  # type:ignore
-    # set_mock_value(eiger.detector.chi_increment, 0)  # type:ignore
-    # set_mock_value(eiger.detector.kappa_start, 0)  # type:ignore
-    # set_mock_value(eiger.detector.kappa_increment, 0)  # type:ignore
+    set_mock_value(eiger.detector.wavelength, 1)  # type:ignore
+    set_mock_value(eiger.detector.two_theta, 0)  # type:ignore
+    set_mock_value(eiger.detector.phi_start, 0)  # type:ignore
+    set_mock_value(eiger.detector.phi_increment, 0)  # type:ignore
+    set_mock_value(eiger.detector.chi_start, 0)  # type:ignore
+    set_mock_value(eiger.detector.chi_increment, 0)  # type:ignore
+    set_mock_value(eiger.detector.kappa_start, 0)  # type:ignore
+    set_mock_value(eiger.detector.kappa_increment, 0)  # type:ignore
     return eiger
 
 
