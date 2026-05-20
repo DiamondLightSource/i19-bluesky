@@ -1,3 +1,6 @@
+from unittest.mock import MagicMock, patch
+
+import pytest
 from bluesky.run_engine import RunEngine
 from ophyd_async.fastcs.eiger import EigerDetector
 
@@ -6,9 +9,13 @@ from i19_bluesky.serial.device_setup_plans.eiger_metadata import (
 )
 
 
+@pytest.mark.parametrize("wait", [(False, True)])
+@patch("i19_bluesky.serial.device_setup_plans.eiger_metadata.bps.wait")
 async def test_write_eiger_params(
+    mock_bps_wait: MagicMock,
     eh2_eiger: EigerDetector,
     RE: RunEngine,
+    wait: bool,
     detector_distance_mm: float = 100,
     two_theta_deg: float = 0,
     phi_start: float = 0,
@@ -17,6 +24,7 @@ async def test_write_eiger_params(
     wavelength: float = 100,
     energy: float = 10,
 ):
+
     RE(
         write_eiger_params(
             detector_distance_mm,
@@ -27,7 +35,7 @@ async def test_write_eiger_params(
             energy,
             wavelength,
             eh2_eiger,
-            wait=False,
+            wait=wait,
         )
     )
     assert await eh2_eiger.detector.detector_distance.get_value() == 100
@@ -44,3 +52,5 @@ async def test_write_eiger_params(
     assert await eh2_eiger.detector.chi_increment.get_value() == 0  # type:ignore
     assert await eh2_eiger.detector.kappa_start.get_value() == 0  # type:ignore
     assert await eh2_eiger.detector.kappa_increment.get_value() == 0  # type:ignore
+    if wait:
+        mock_bps_wait.assert_called_once_with("eiger_metadata")
