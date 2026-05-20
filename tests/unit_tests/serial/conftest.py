@@ -136,20 +136,34 @@ async def eh2_backlight(RE: RunEngine) -> BacklightPosition:
 async def eh2_eiger(RE: RunEngine) -> EigerDetector:
     eiger = EigerDetector(prefix="ixx-test-eiger", path_provider=get_path_provider())
     await eiger.connect(mock=True)
-    set_mock_value(eiger.detector.photon_energy, 100)
-    set_mock_value(eiger.detector.detector_distance, 100)
-    set_mock_value(eiger.detector.beam_center_y, 100)
-    set_mock_value(eiger.detector.beam_center_x, 100)
-    set_mock_value(eiger.detector.omega_start, 0)
-    set_mock_value(eiger.detector.omega_increment, 0)
-    set_mock_value(eiger.detector.wavelength, 1)  # type:ignore
-    set_mock_value(eiger.detector.two_theta, 0)  # type:ignore
-    set_mock_value(eiger.detector.phi_start, 0)  # type:ignore
-    set_mock_value(eiger.detector.phi_increment, 0)  # type:ignore
-    set_mock_value(eiger.detector.chi_start, 0)  # type:ignore
-    set_mock_value(eiger.detector.chi_increment, 0)  # type:ignore
-    set_mock_value(eiger.detector.kappa_start, 0)  # type:ignore
-    set_mock_value(eiger.detector.kappa_increment, 0)  # type:ignore
+
+    async def create_mock_signals(devices_and_signals: dict[Device, dict[str, Any]]):
+        for device, signals in devices_and_signals.items():
+            for name, dtype in signals.items():
+                sig = epics_signal_rw(dtype, name, name)
+                await sig.connect(mock=True)
+                setattr(device, name, sig)
+
+    await create_mock_signals(
+        {
+            eiger.detector: {
+                "photon_energy": float,
+                "detector_distance": float,
+                "beam_center_y": float,
+                "beam_center_x": float,
+                "omega_start": float,
+                "omega_increment": float,
+                "wavelength": float,
+                "two_theta": float,
+                "phi_start": float,
+                "phi_increment": float,
+                "chi_start": float,
+                "chi_increment": float,
+                "kappa_start": float,
+                "kappa_increment": float,
+            }
+        }
+    )
     return eiger
 
 
