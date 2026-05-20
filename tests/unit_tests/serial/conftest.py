@@ -147,12 +147,6 @@ async def eh2_eiger(RE: RunEngine) -> EigerDetector:
     await create_mock_signals(
         {
             eiger.detector: {
-                "photon_energy": float,
-                "detector_distance": float,
-                "beam_center_y": float,
-                "beam_center_x": float,
-                "omega_start": float,
-                "omega_increment": float,
                 "wavelength": float,
                 "two_theta": float,
                 "phi_start": float,
