@@ -1066,8 +1066,8 @@ wheels = [
 
 [[package]]
 name = "dls-dodal"
-version = "2.3.1.dev11+g0f2534ce9"
-source = { git = "https://github.com/DiamondLightSource/dodal.git?rev=main#0f2534ce926a173dba046352ea258a97b90176c2" }
+version = "2.4.1.dev1+g767b87c14"
+source = { git = "https://github.com/DiamondLightSource/dodal.git?rev=main#767b87c144111338b9f5d0d8ed539a1f8d273029" }
 dependencies = [
     { name = "aiofiles" },
     { name = "aiohttp" },
@@ -3381,7 +3381,7 @@ wheels = [
 
 [[package]]
 name = "ophyd-async"
-version = "0.16"
+version = "0.17a5"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "bluesky" },
@@ -3395,9 +3395,9 @@ dependencies = [
     { name = "stamina" },
     { name = "velocity-profile" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/08/2d/cd178f31c4efb7f2a1b2787900d62b70b478111c5db51a625307f5fb9b15/ophyd_async-0.16.tar.gz", hash = "sha256:c8a3671c704da77c7a7b7c5343b972230f743b1029a100f6c5780123fb0df33d", size = 545367, upload-time = "2026-02-17T16:39:37.897Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/1d/3c/127aeba71467a5dab69d21cbdcc7a7dfe294e826f6883af0b741ace01dbe/ophyd_async-0.17a5.tar.gz", hash = "sha256:f0eb30de946148479a1e33822e535542f47da0d9854da7d5ffa579990f650508", size = 557024, upload-time = "2026-05-20T08:21:08.682Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/c3/ab/0c92e9824c9e54df5a06b5759957fc23c30489c2aabef5653dd9057b3f61/ophyd_async-0.16-py3-none-any.whl", hash = "sha256:017d837767b63cdc20af1851275495b6bb0db195a887e0bd989dc7a17e0f0c79", size = 208499, upload-time = "2026-02-17T16:39:36.542Z" },
+    { url = "https://files.pythonhosted.org/packages/d7/a7/a87c4f373082674d2429af6912d2b0c113269063ee089eeb400effcc6bb6/ophyd_async-0.17a5-py3-none-any.whl", hash = "sha256:8175483b6ce5823cc3aff358afdd370bc08e1b2caf9f9e0cc4af9dc5b1802d8b", size = 208907, upload-time = "2026-05-20T08:21:06.899Z" },
 ]
 
 [package.optional-dependencies]
