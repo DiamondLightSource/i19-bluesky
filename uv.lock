@@ -1066,8 +1066,8 @@ wheels = [
 
 [[package]]
 name = "dls-dodal"
-version = "2.4.1.dev1+g767b87c14"
-source = { git = "https://github.com/DiamondLightSource/dodal.git?rev=main#767b87c144111338b9f5d0d8ed539a1f8d273029" }
+version = "2.4.1.dev6+ge0cc93d4d"
+source = { git = "https://github.com/DiamondLightSource/dodal.git?rev=e0cc93d4df47dd746edac79b59ea458f126b0adc#e0cc93d4df47dd746edac79b59ea458f126b0adc" }
 dependencies = [
     { name = "aiofiles" },
     { name = "aiohttp" },
@@ -2026,7 +2026,7 @@ dev = [
 requires-dist = [
     { name = "blueapi", specifier = ">=1.4.1" },
     { name = "bluesky", specifier = ">=1.13" },
-    { name = "dls-dodal", git = "https://github.com/DiamondLightSource/dodal.git?rev=main" },
+    { name = "dls-dodal", git = "https://github.com/DiamondLightSource/dodal.git?rev=e0cc93d4df47dd746edac79b59ea458f126b0adc" },
     { name = "fastapi", extras = ["all"] },
     { name = "nexgen" },
     { name = "numpy" },
