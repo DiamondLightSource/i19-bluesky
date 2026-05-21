@@ -16,24 +16,17 @@ async def test_write_eiger_params(
     eh2_eiger: EigerDetector,
     RE: RunEngine,
     wait: bool,
-    detector_distance_mm: float = 100,
-    two_theta_deg: float = 0,
-    phi_start: float = 0,
-    phi_increment: float = 1,
-    beam_center: tuple = (3, 2),
-    wavelength: float = 100,
-    energy: float = 10,
 ):
 
     RE(
         write_eiger_params(
-            detector_distance_mm,
-            two_theta_deg,
-            phi_start,
-            phi_increment,
-            beam_center,
-            energy,
-            wavelength,
+            100,
+            0,
+            0,
+            1,
+            (3, 2),
+            10,
+            100,
             eh2_eiger,
             wait=wait,
         )
