@@ -135,6 +135,29 @@ async def eh2_backlight(RE: RunEngine) -> BacklightPosition:
 @pytest.fixture
 async def eh2_eiger(RE: RunEngine) -> EigerDetector:
     eiger = EigerDetector(prefix="ixx-test-eiger", path_provider=get_path_provider())
+    await eiger.connect(mock=True)
+
+    async def create_mock_signals(devices_and_signals: dict[Device, dict[str, Any]]):
+        for device, signals in devices_and_signals.items():
+            for name, dtype in signals.items():
+                sig = epics_signal_rw(dtype, name, name)
+                await sig.connect(mock=True)
+                setattr(device, name, sig)
+
+    await create_mock_signals(
+        {
+            eiger.detector: {
+                "wavelength": float,
+                "two_theta": float,
+                "phi_start": float,
+                "phi_increment": float,
+                "chi_start": float,
+                "chi_increment": float,
+                "kappa_start": float,
+                "kappa_increment": float,
+            }
+        }
+    )
     return eiger
 
 
