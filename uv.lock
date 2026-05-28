@@ -1066,8 +1066,8 @@ wheels = [
 
 [[package]]
 name = "dls-dodal"
-version = "2.4.1.dev2+gedfa7d6c2"
-source = { git = "https://github.com/DiamondLightSource/dodal.git?rev=main#edfa7d6c2cc75860d613f0ed3439b20aab652443" }
+version = "2.4.1.dev8+gbde3b691f"
+source = { git = "https://github.com/DiamondLightSource/dodal.git?rev=main#bde3b691faff4afb4f3fd7540b6bd6fcbead2b45" }
 dependencies = [
     { name = "aiofiles" },
     { name = "aiohttp" },
@@ -2031,7 +2031,7 @@ requires-dist = [
     { name = "nexgen" },
     { name = "numpy" },
     { name = "ophyd", specifier = "==1.11.0" },
-    { name = "ophyd-async", extras = ["ca", "pva"], specifier = ">=0.16.0" },
+    { name = "ophyd-async", extras = ["ca", "pva"], specifier = ">=0.17a4" },
     { name = "pydantic" },
     { name = "pydantic-extra-types", specifier = ">=2.10.1" },
     { name = "requests" },
