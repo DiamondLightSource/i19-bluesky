@@ -86,6 +86,7 @@ def mirror_stripes(RE) -> MirrorStripes:
 
 @pytest.fixture
 def energy_devices(dcm, undulator, mirror_stripes, hfm, vfm) -> SetEnergyComposite:
-    return SetEnergyComposite(
+    composite = SetEnergyComposite(
         dcm=dcm, undulator=undulator, mirror_stripes=mirror_stripes, hfm=hfm, vfm=vfm
     )
+    return composite
