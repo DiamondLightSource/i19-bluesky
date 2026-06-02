@@ -26,6 +26,7 @@ dependencies = [
     "ophyd ==1.11.0",
     "ophyd-async[ca,pva] >= 0.17a4",
     "bluesky >= 1.13",
+    "daq-config-server >= 1.3.2",
     "dls-dodal @ git+https://github.com/DiamondLightSource/dodal.git@43ce6c7797c1ccc7d720e23c4e1a211bf3b719b8",
 ]
 dynamic = ["version"]
