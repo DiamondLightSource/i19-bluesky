@@ -11,6 +11,7 @@ from ophyd_async.core import set_mock_value
 
 from i19_bluesky.optics.change_energy_plans import (
     _apply_piezo_voltages,
+    _set_energy,
     change_energy_plan,
 )
 from i19_bluesky.optics.device_composites import SetEnergyComposite
@@ -22,8 +23,10 @@ PIEZO_VOLTAGES = {
 }
 
 
-async def test_set_energy():
-    pass
+async def test_set_energy(energy_devices: SetEnergyComposite, RE: RunEngine):
+    RE(_set_energy(25, energy_devices.dcm, energy_devices.undulator))
+
+    assert await energy_devices.dcm.energy_in_keV.user_readback.get_value() == 25
 
 
 @pytest.mark.parametrize(

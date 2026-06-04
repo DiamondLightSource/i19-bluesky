@@ -1,3 +1,5 @@
+from unittest.mock import MagicMock
+
 import pytest
 from dodal.beamlines import i19_optics
 from dodal.devices.beamlines.i19.access_controlled.hutch_access import (
@@ -13,7 +15,7 @@ from dodal.devices.hutch_shutter import (
 )
 from dodal.devices.undulator import UndulatorInKeV
 from dodal.utils import AnyDeviceFactory
-from ophyd_async.core import callback_on_mock_put, set_mock_value
+from ophyd_async.core import callback_on_mock_put, completed_status, set_mock_value
 
 from i19_bluesky.optics.device_composites import SetEnergyComposite
 from tests.conftest import device_factories_for_beamline
@@ -72,6 +74,7 @@ def dcm(RE) -> DoubleCrystalMonochromatorWithDSpacing:
 @pytest.fixture
 def undulator(RE) -> UndulatorInKeV:
     undulator = i19_optics.undulator.build(connect_immediately=True, mock=True)
+    undulator.set = MagicMock(side_effect=lambda _: completed_status())
     return undulator
 
 
