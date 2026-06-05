@@ -7,7 +7,7 @@ from pydantic import dataclasses
 
 @dataclasses.dataclass(config={"arbitrary_types_allowed": True})
 class SetEnergyComposite:
-    "Devices to trigger when changing the energy"
+    "Devices to be set when changing the energy"
 
     dcm: DoubleCrystalMonochromatorWithDSpacing
     undulator: UndulatorInKeV
