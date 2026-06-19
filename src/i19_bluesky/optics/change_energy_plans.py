@@ -6,7 +6,7 @@ from dodal.common import inject
 from dodal.common.beamlines.beamline_utils import (
     get_config_client,
 )
-from dodal.devices.beamlines.i19.mirror_stripes import StripeChoice
+from dodal.devices.beamlines.i19.mirror_stripes import MirrorStripes, StripeChoice
 from dodal.devices.common_dcm import DoubleCrystalMonochromatorWithDSpacing
 from dodal.devices.focusing_mirror import FocusingMirrorWithPiezo
 from dodal.devices.undulator import UndulatorInKeV
@@ -27,24 +27,30 @@ def change_energy_plan(
     devices: SetEnergyComposite = inject(),
 ) -> MsgGenerator:
     LOGGER.info(f"Change the energy to {energy_in_kev} KeV")
-    yield from _set_energy(energy_in_kev, devices.dcm, devices.undulator)
-    LOGGER.info(f"Drive mirrors to {stripe_choice.value} stripe and set voltages")
-    yield from bps.abs_set(
-        devices.mirror_stripes.stripe_choice, stripe_choice, wait=True
+    yield from _set_energy_and_stripes(
+        energy_in_kev,
+        stripe_choice,
+        devices.dcm,
+        devices.undulator,
+        devices.mirror_stripes,
     )
     yield from _apply_piezo_voltages(stripe_choice, devices.hfm, devices.vfm)
 
 
-def _set_energy(
+def _set_energy_and_stripes(
     energy_in_kev: float,
+    stripe_choice: StripeChoice,
     dcm: DoubleCrystalMonochromatorWithDSpacing,
     undulator: UndulatorInKeV,
-    group: str = "drive-dcm-and-id-gap",
+    mirror_stripes: MirrorStripes,
+    group: str = "drive-dcm-id-gap-and-stripes",
     wait: bool = True,
 ):
     LOGGER.info("Drive the dcm energy and ID gap")
     yield from bps.abs_set(undulator, energy_in_kev, group=group)
     yield from bps.abs_set(dcm.energy_in_keV, energy_in_kev, group=group)
+    LOGGER.info(f"Drive mirrors to {stripe_choice.value} stripe and set voltages")
+    yield from bps.abs_set(mirror_stripes.stripe_choice, stripe_choice, group=group)
     if wait:
         yield from bps.wait(group=group)
 

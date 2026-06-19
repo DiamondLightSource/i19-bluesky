@@ -11,7 +11,7 @@ from ophyd_async.core import set_mock_value
 
 from i19_bluesky.optics.change_energy_plans import (
     _apply_piezo_voltages,
-    _set_energy,
+    _set_energy_and_stripes,
     change_energy_plan,
 )
 from i19_bluesky.optics.device_composites import SetEnergyComposite
@@ -24,9 +24,21 @@ PIEZO_VOLTAGES = {
 
 
 async def test_set_energy(energy_devices: SetEnergyComposite, RE: RunEngine):
-    RE(_set_energy(25, energy_devices.dcm, energy_devices.undulator))
+    RE(
+        _set_energy_and_stripes(
+            25,
+            StripeChoice.EH2_PT,
+            energy_devices.dcm,
+            energy_devices.undulator,
+            energy_devices.mirror_stripes,
+        )
+    )
 
     assert await energy_devices.dcm.energy_in_keV.user_readback.get_value() == 25
+    assert (
+        await energy_devices.mirror_stripes.stripe_choice.get_value()
+        == StripeChoice.EH2_PT
+    )
 
 
 @pytest.mark.parametrize(
@@ -81,12 +93,10 @@ async def test_energy_and_stripe_not_changed_if_requested_from_wrong_hutch(
     )
 
 
-@patch("i19_bluesky.optics.change_energy_plans._set_energy")
-@patch("i19_bluesky.optics.change_energy_plans.bps.abs_set")
+@patch("i19_bluesky.optics.change_energy_plans._set_energy_and_stripes")
 @patch("i19_bluesky.optics.change_energy_plans._apply_piezo_voltages")
 async def test_change_energy_plan(
     mock_apply_voltages: MagicMock,
-    mock_set: MagicMock,
     mock_set_energy: MagicMock,
     access_control_device: HutchAccessControl,
     energy_devices: SetEnergyComposite,
@@ -104,10 +114,11 @@ async def test_change_energy_plan(
     )
 
     mock_set_energy.assert_called_once_with(
-        25.4, energy_devices.dcm, energy_devices.undulator
-    )
-    mock_set.assert_called_once_with(
-        energy_devices.mirror_stripes.stripe_choice, StripeChoice.EH1_PT, wait=True
+        25.4,
+        StripeChoice.EH1_PT,
+        energy_devices.dcm,
+        energy_devices.undulator,
+        energy_devices.mirror_stripes,
     )
     mock_apply_voltages.assert_called_once_with(
         StripeChoice.EH1_PT,
