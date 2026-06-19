@@ -1,7 +1,12 @@
+from unittest.mock import MagicMock
+
 import pytest
 from bluesky.run_engine import RunEngine
 from dodal.devices.beamlines.i19.access_controlled.attenuator_motor_squad import (
     AttenuatorMotorSquad,
+)
+from dodal.devices.beamlines.i19.access_controlled.energy_device import (
+    AccessControlledEnergyComposite,
 )
 from dodal.devices.beamlines.i19.access_controlled.piezo_control import (
     AccessControlledPiezoActuator,
@@ -54,3 +59,15 @@ async def eh1_vfm_piezo(RE: RunEngine) -> AccessControlledPiezoActuator:
     vfm_piezo.url = "http://test-blueapi.url"
     set_mock_value(vfm_piezo.readback, 0.849)
     return vfm_piezo
+
+
+@pytest.fixture
+async def eh1_energy_device(RE: RunEngine) -> AccessControlledEnergyComposite:
+    energy_device = AccessControlledEnergyComposite(
+        "", HutchState.EH1, "/path/to/config/", MagicMock(), "", "mock_energy_composite"
+    )
+    await energy_device.connect(mock=True)
+    energy_device.url = "http://test-blueapi.url"
+    set_mock_value(energy_device.energy_in_kev, 17.9)
+    set_mock_value(energy_device.wavelength_in_a, 0.6)
+    return energy_device
