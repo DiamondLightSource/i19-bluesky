@@ -18,7 +18,7 @@ Units mm mm mm
 
 
 @patch(
-    "i19_bluesky.serial.device_setup_plans.read_lookup_tables.config_client",
+    "i19_bluesky.serial.device_setup_plans.read_lookup_tables.get_config_client",
 )
 # check if one value (chosen arbitrarily) does provide the correct corresponding value
 def test_read_eiger_lookup_table(mock_client):
@@ -35,7 +35,7 @@ def test_read_eiger_lookup_table(mock_client):
     )
 
 
-@patch("i19_bluesky.serial.device_setup_plans.read_lookup_tables.config_client")
+@patch("i19_bluesky.serial.device_setup_plans.read_lookup_tables.get_config_client")
 def test_find_beam_xy(mock_client):
     returned_file = DetectorXYLookupTable.from_contents(CONTENT)
     mock_client.return_value.get_file_contents.return_value = returned_file
