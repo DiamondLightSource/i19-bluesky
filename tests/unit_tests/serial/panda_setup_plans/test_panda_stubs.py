@@ -3,7 +3,7 @@ from bluesky.run_engine import RunEngine
 from ophyd_async.core import set_mock_value
 from ophyd_async.fastcs.panda import HDFPanda, PandaBitMux, SeqTrigger
 
-from i19_bluesky.serial.panda_stubs import (
+from i19_bluesky.serial.panda_setup_plans.panda_stubs import (
     arm_panda,
     disarm_panda,
     generate_panda_seq_table,

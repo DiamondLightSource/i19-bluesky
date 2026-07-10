@@ -3,15 +3,19 @@
 from i19_bluesky.eh1.find_beam_centre import find_beam_centre_plan
 from i19_bluesky.eh1.pin_tip_detection import pin_tip_detection_plan
 from i19_bluesky.plans.optics_hutch_control_plans import (
+    apply_attenuator_positions,
     apply_voltage_to_piezo_actuators,
+    change_energy,
     close_experiment_shutter,
     open_experiment_shutter,
 )
 
 __all__ = [
-    "open_experiment_shutter",
-    "close_experiment_shutter",
+    "apply_attenuator_positions",
     "apply_voltage_to_piezo_actuators",
+    "close_experiment_shutter",
+    "open_experiment_shutter",
     "pin_tip_detection_plan",
     "find_beam_centre_plan",
+    "change_energy",
 ]

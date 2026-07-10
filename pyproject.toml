@@ -24,9 +24,10 @@ dependencies = [
     # Blueapi pinned until GDA can be updated on the beamline to use latest version
     "blueapi >= 1.4.1",
     "ophyd ==1.11.0",
-    "ophyd-async[ca,pva] >= 0.16.0",
+    "ophyd-async[ca,pva] >= 0.17a4",
     "bluesky >= 1.13",
-    "dls-dodal @ git+https://github.com/DiamondLightSource/dodal.git@233766f5efb4d34d3c6a9e1df34443fb01006868",
+    "daq-config-server >= 1.3.2",
+    "dls-dodal @ git+https://github.com/DiamondLightSource/dodal.git@main",
 ]
 dynamic = ["version"]
 license.file = "LICENSE"
@@ -91,6 +92,9 @@ filterwarnings = [
     "error",
     # Ignore deprecation warning from setuptools_dso (remove when https://github.com/epics-base/setuptools_dso/issues/36 is released)
     "ignore::DeprecationWarning:wheel",
+    # Ignore deprecation warnings about TriggerableCommand until https://github.com/bluesky/ophyd-async/issues/1292
+    # addressed
+    "ignore:epics_signal_x is deprecated, use epics_triggerable_command instead:DeprecationWarning",
 ]
 # Doctest python code in docs, python code in src docstrings, test functions in tests
 testpaths = "docs src tests"

@@ -17,6 +17,10 @@ class RotationAxis(StrEnum):
     OMEGA = "omega"
 
 
+class DetectorType(StrEnum):
+    EIGER = "EIGER"
+
+
 class VisitParameters(BaseModel):
     hutch: HutchName
     visit: Path

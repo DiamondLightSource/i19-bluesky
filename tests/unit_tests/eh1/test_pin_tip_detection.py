@@ -55,7 +55,10 @@ async def test_pin_tip_detection(
     pin_tip_position: PinTipCentreHolder,
     RE: RunEngine,
 ):
-    with patch("i19_bluesky.eh1.pin_tip_detection.OAVParameters") as mock_params:
+    with (
+        patch("i19_bluesky.eh1.pin_tip_detection.OAVParameters") as mock_params,
+        patch("i19_bluesky.eh1.pin_tip_detection.get_config_client"),
+    ):
         RE(
             pin_tip_detection_plan(
                 "someContext", pin_tip_detection, pin_tip_position, ""

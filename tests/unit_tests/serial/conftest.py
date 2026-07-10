@@ -1,5 +1,4 @@
 import os
-from pathlib import Path
 from typing import Any
 
 import pytest
@@ -7,10 +6,29 @@ from bluesky.run_engine import RunEngine
 from dodal.beamlines import i19_2
 from dodal.common.beamlines.beamline_utils import get_path_provider, set_path_provider
 from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitPathProvider
-from dodal.devices.beamlines.i19.diffractometer import FourCircleDiffractometer
+from dodal.devices.beamlines.i19.backlight import BacklightPosition
+from dodal.devices.beamlines.i19.diffractometer import (
+    FourCircleDiffractometer,
+)
+from dodal.devices.beamlines.i19.pin_col_stages import (
+    PinColRequest,
+    PinholeCollimatorControl,
+)
+from dodal.devices.motors import XYZPhiStage
 from ophyd_async.core import Device, DeviceVector, init_devices, set_mock_value
 from ophyd_async.epics.core import epics_signal_rw
+from ophyd_async.fastcs.eiger import EigerDetector
 from ophyd_async.fastcs.panda import HDFPanda
+
+from i19_bluesky.parameters.components import HutchName, Path
+from i19_bluesky.parameters.devices_composites import (
+    SerialCollectionEh2PandaComposite,
+    SerialCollectionEh2ZebraComposite,
+)
+from i19_bluesky.parameters.serial_parameters import (
+    DetectorType,
+    SerialExperimentEh2,
+)
 
 set_path_provider(
     StaticVisitPathProvider(
@@ -79,7 +97,119 @@ async def mock_panda() -> HDFPanda:
 
 
 @pytest.fixture
+async def serial_stages(RE: RunEngine) -> XYZPhiStage:
+    serial_stages = i19_2.serial_stages.build(connect_immediately=True, mock=True)
+    set_mock_value(serial_stages.phi.velocity, 1)
+    set_mock_value(serial_stages.z.user_readback, 0)
+    set_mock_value(serial_stages.x.user_readback, 0)
+    set_mock_value(serial_stages.y.user_readback, 0)
+    set_mock_value(serial_stages.phi.user_readback, -90)
+    return serial_stages
+
+
+@pytest.fixture
 async def eh2_diffractometer(RE: RunEngine) -> FourCircleDiffractometer:
     diffractometer = i19_2.diffractometer.build(connect_immediately=True, mock=True)
     set_mock_value(diffractometer.phi.velocity, 1)
+    set_mock_value(diffractometer.det_stage.det_z.user_readback, 100)
+    set_mock_value(diffractometer.det_stage.two_theta.user_readback, 0)
+    set_mock_value(diffractometer.phi.user_readback, 0)
     return diffractometer
+
+
+@pytest.fixture
+async def pincol(RE: RunEngine) -> PinholeCollimatorControl:
+    pincol = i19_2.pinhole_and_collimator.build(connect_immediately=True, mock=True)
+    set_mock_value(pincol.mapt.pin_x_out, 30.0)
+    set_mock_value(pincol.mapt.col_x_out, 20.0)
+    return pincol
+
+
+@pytest.fixture
+async def eh2_backlight(RE: RunEngine) -> BacklightPosition:
+    backlight = BacklightPosition("", name="mock_backlight")
+    await backlight.connect(mock=True)
+    return backlight
+
+
+@pytest.fixture
+async def eh2_eiger(RE: RunEngine) -> EigerDetector:
+    eiger = EigerDetector(prefix="ixx-test-eiger", path_provider=get_path_provider())
+    await eiger.connect(mock=True)
+
+    async def create_mock_signals(devices_and_signals: dict[Device, dict[str, Any]]):
+        for device, signals in devices_and_signals.items():
+            for name, dtype in signals.items():
+                sig = epics_signal_rw(dtype, name, name)
+                await sig.connect(mock=True)
+                setattr(device, name, sig)
+
+    await create_mock_signals(
+        {
+            eiger.detector: {
+                "wavelength": float,
+                "two_theta": float,
+                "phi_start": float,
+                "phi_increment": float,
+                "chi_start": float,
+                "chi_increment": float,
+                "kappa_start": float,
+                "kappa_increment": float,
+            }
+        }
+    )
+    return eiger
+
+
+@pytest.fixture
+async def devices(
+    mock_panda, eh2_eiger, eh2_backlight, eh2_diffractometer, serial_stages, pincol
+) -> SerialCollectionEh2PandaComposite:
+    devices = SerialCollectionEh2PandaComposite(
+        diffractometer=eh2_diffractometer,
+        backlight=eh2_backlight,
+        pincol=pincol,
+        panda=mock_panda,
+        eiger=eh2_eiger,
+        serial_stages=serial_stages,
+    )
+
+    return devices
+
+
+@pytest.fixture
+async def devices_zebra(
+    eh2_zebra, eh2_eiger, eh2_backlight, eh2_diffractometer, serial_stages, pincol
+) -> SerialCollectionEh2ZebraComposite:
+    devices_zebra = SerialCollectionEh2ZebraComposite(
+        diffractometer=eh2_diffractometer,
+        backlight=eh2_backlight,
+        pincol=pincol,
+        zebra=eh2_zebra,
+        eiger=eh2_eiger,
+        serial_stages=serial_stages,
+    )
+
+    return devices_zebra
+
+
+@pytest.fixture
+def parameters():
+    return SerialExperimentEh2(
+        hutch=HutchName.EH2,
+        visit=Path("/tmp/i19-2/cm12345-1"),
+        dataset="foo",
+        filename_prefix="bar_01",
+        images_per_well=10,
+        exposure_time_s=0.1,
+        image_width_deg=0.1,
+        detector_distance_mm=320,
+        two_theta_deg=0,
+        transmission_fraction=0.3,
+        aperture_request=PinColRequest.PCOL100,
+        detector_type=DetectorType.EIGER,
+        wells_to_collect={"1": (1, 2, 3)},
+        wells_series_len=1,
+        rot_axis_start=0,
+        rot_axis_increment=0.1,
+    )
