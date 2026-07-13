@@ -24,8 +24,8 @@ async def oav() -> OAVBeamCentreFile:
     oav_config = MagicMock()
     async with init_devices(mock=True, connect=True):
         oav = OAVBeamCentreFile("", config=oav_config, name="oav")
-    set_mock_value(oav.grid_snapshot.x_size, 1024)
-    set_mock_value(oav.grid_snapshot.y_size, 768)
+    set_mock_value(oav.snapshot.x_size, 1024)
+    set_mock_value(oav.snapshot.y_size, 768)
     return oav
 
 
@@ -42,8 +42,8 @@ async def test_find_beam_centre_plan(
     oav: OAVBeamCentreFile,
     RE: RunEngine,
 ):
-    set_mock_value(oav.grid_snapshot.x_size, image_size[0])
-    set_mock_value(oav.grid_snapshot.y_size, image_size[1])
+    set_mock_value(oav.snapshot.x_size, image_size[0])
+    set_mock_value(oav.snapshot.y_size, image_size[1])
 
     RE(find_beam_centre_plan(centre_device, oav))
 
