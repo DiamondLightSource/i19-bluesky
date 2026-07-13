@@ -9,6 +9,8 @@ from ophyd_async.core import init_devices, set_mock_value
 
 from i19_bluesky.eh1.find_beam_centre import find_beam_centre_plan
 
+from ..conftest import fake_generator
+
 
 @pytest.fixture
 async def centre_device() -> CentreEllipseMethod:
@@ -29,13 +31,17 @@ async def oav() -> OAVBeamCentreFile:
     return oav
 
 
+def test_trigger_beam_centre_fit():
+    pass
+
+
 @pytest.mark.parametrize(
     "image_size, expected_roi",
     [([768, 1024], 1024), ([1024, 1024], 1024), ([1292, 964], 1292)],
 )
-@patch("i19_bluesky.eh1.find_beam_centre.bps.trigger")
+@patch("i19_bluesky.eh1.find_beam_centre.trigger_beam_centre_fit")
 async def test_find_beam_centre_plan(
-    mock_trigger: MagicMock,
+    mock_trigger_plan: MagicMock,
     image_size: list[int],
     expected_roi: int,
     centre_device: CentreEllipseMethod,
@@ -45,7 +51,9 @@ async def test_find_beam_centre_plan(
     set_mock_value(oav.snapshot.x_size, image_size[0])
     set_mock_value(oav.snapshot.y_size, image_size[1])
 
+    mock_trigger_plan.side_effect = [fake_generator((757, 365))]
+
     RE(find_beam_centre_plan(centre_device, oav))
 
     assert await centre_device.roi_box_size.get_value() == expected_roi
-    mock_trigger.assert_called_once()
+    mock_trigger_plan.assert_called_once()
