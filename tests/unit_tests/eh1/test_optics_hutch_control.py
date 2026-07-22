@@ -2,7 +2,7 @@ from unittest.mock import MagicMock, patch
 
 from bluesky.run_engine import RunEngine
 from dodal.devices.beamlines.i19.access_controlled.attenuator_motor_squad import (
-    AttenuatorMotorPositionDemands,
+    AttenuatorMotorPositions,
     AttenuatorMotorSquad,
 )
 from dodal.devices.beamlines.i19.access_controlled.energy_device import (
@@ -31,7 +31,7 @@ def test_apply_attenuator_positions(
 ):
     xy_demands = {"X": 25.37, "Y": 18.091}
     filter_wheel_demands = {"W": 4}
-    position_demands = AttenuatorMotorPositionDemands(
+    position_demands = AttenuatorMotorPositions(
         continuous_demands=xy_demands, indexed_demands=filter_wheel_demands
     )
     RE(apply_attenuator_positions(position_demands, attenuator_motor_squad))
