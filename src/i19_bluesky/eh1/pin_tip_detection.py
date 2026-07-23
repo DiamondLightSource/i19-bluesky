@@ -10,8 +10,7 @@ from dodal.devices.oav.oav_parameters import OAVParameters
 from dodal.devices.oav.pin_image_recognition import PinTipDetection, Tip
 from dodal.plans.device_setup_plans import setup_pin_tip_detection_params
 
-# NOTE In scratch location until daq-config-server added
-OAV_CONFIG_JSON = "/dls_sw/i19-1/software/bluesky/OAVCentring.json"
+OAV_CONFIG_JSON = "/dls_sw/i19-1/software/daq_configuration/json/OAVCentring.json"
 
 
 def save_pin_tip_position(
