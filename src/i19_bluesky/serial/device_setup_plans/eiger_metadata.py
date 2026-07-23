@@ -66,7 +66,7 @@ def write_eiger_params(
     energy: float,
     wavelength: float,
     eiger: EigerDetector,
-    wait: bool,
+    wait: bool = True,
     group: str = "eiger_metadata",
 ):
     beam_centre = calculate_beam_centre_from_lut(

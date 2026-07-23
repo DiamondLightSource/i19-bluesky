@@ -7,6 +7,7 @@ from pydantic import computed_field
 
 from i19_bluesky.parameters.components import (
     DetectorType,
+    HutchName,
     PandaRotationParams,
     RotationAxis,
     VisitParameters,
@@ -57,6 +58,7 @@ class SerialExperiment(VisitParameters):
 class SerialExperimentEh2(SerialExperiment):
     aperture_request: PinColRequest
     detector_type: DetectorType
+    hutch: HutchName = HutchName.EH2
 
     @property
     def zebra_rotation_params(self) -> ZebraRotationParams:
