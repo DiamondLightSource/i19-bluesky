@@ -2,14 +2,25 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from bluesky.run_engine import RunEngine
+from daq_config_server.models.lookup_tables import DetectorXYLookupTable
 from ophyd_async.fastcs.eiger import EigerDetector
 
 from i19_bluesky.parameters.serial_parameters import SerialExperimentEh2
 from i19_bluesky.serial.device_setup_plans.eiger_metadata import (
     _convert_beam_centre_to_pixels,
+    _read_converter_lut,
     calculate_beam_centre_from_lut,
     write_eiger_params,
 )
+
+LUT_FILE = """
+#Table giving centre position of beam X and Y as a function of detector distance
+#
+# Columns: detector distance, x-centre, y-centre
+Units mm mm mm
+85  69.66 81.09
+585 69.66 81.09
+"""
 
 lut_columns = [[85.0, 585.0], [69.66, 69.66], [81.09, 81.09]]
 
@@ -21,6 +32,15 @@ def test_convert_bc_to_pix(parameters):
 
     assert beam_x == pytest.approx(266.67, 1e-2)
     assert beam_y == pytest.approx(133.33, 1e-2)
+
+
+@patch("i19_bluesky.serial.device_setup_plans.eiger_metadata.get_config_client")
+def test_read_converter_lut(mock_config_client: MagicMock):
+    file_contents = DetectorXYLookupTable.from_contents(LUT_FILE)
+    mock_config_client.return_value.get_file_contents.return_value = file_contents
+    cols = _read_converter_lut()
+
+    assert cols == lut_columns
 
 
 @patch("i19_bluesky.serial.device_setup_plans.eiger_metadata._read_converter_lut")

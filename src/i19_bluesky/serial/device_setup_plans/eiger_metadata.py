@@ -27,10 +27,10 @@ def _convert_beam_centre_to_pixels(
 
 def _read_converter_lut():
     config_client = get_config_client()
-    lut_columns = config_client.get_file_contents(
+    lut_contents = config_client.get_file_contents(
         BEAM_XY_TABLE_PATH, DetectorXYLookupTable
-    ).columns
-    return lut_columns
+    )
+    return lut_contents.columns
 
 
 def calculate_beam_centre_from_lut(
