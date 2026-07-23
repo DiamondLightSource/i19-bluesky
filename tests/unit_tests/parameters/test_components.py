@@ -28,7 +28,7 @@ def test_visit_parameters():
         "filename_prefix": "some_file",
     }
 
-    params = VisitParameters(**model)
+    params = VisitParameters(**model)  # type: ignore
 
     assert isinstance(params.visit, Path)
     assert params.collection_directory == Path("/tmp/foo/bar")

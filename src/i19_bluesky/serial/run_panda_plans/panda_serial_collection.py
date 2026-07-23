@@ -15,11 +15,11 @@ from i19_bluesky.serial.device_setup_plans.diffractometer_plans import (
     move_stage_x_and_z,
     setup_sample_stage,
 )
-from i19_bluesky.serial.panda_setup_plans.panda_setup_plans import (
+from i19_bluesky.serial.panda_plans.panda_setup_plans import (
     reset_panda,
     setup_panda_for_rotation,
 )
-from i19_bluesky.serial.panda_setup_plans.panda_stubs import arm_panda, disarm_panda
+from i19_bluesky.serial.panda_plans.panda_stubs import arm_panda, disarm_panda
 
 
 def trigger_panda(
