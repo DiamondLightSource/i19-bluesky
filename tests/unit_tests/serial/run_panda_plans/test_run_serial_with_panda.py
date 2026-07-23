@@ -29,6 +29,7 @@ async def test_run_serial_with_panda(
         devices.panda,
         devices.eiger,
         devices.serial_stages,
+        devices.shutter,
     )
 
 
@@ -65,6 +66,9 @@ async def test_run_on_collection_abort(
     mock_disarm_panda.assert_called_once_with(devices.panda)
 
 
+@patch(
+    "i19_bluesky.serial.run_panda_plans.run_serial_with_panda.close_experiment_shutter"
+)
 @patch("i19_bluesky.serial.run_panda_plans.run_serial_with_panda.reset_panda")
 @patch(
     "i19_bluesky.serial.run_panda_plans.run_serial_with_panda.move_sample_stage_back"
@@ -76,6 +80,7 @@ async def test_end_run(
     mock_disarm_eiger: MagicMock,
     mock_move_sample_stage_back: MagicMock,
     mock_reset_panda: MagicMock,
+    mock_close_shutter: MagicMock,
     parameters: SerialExperimentEh2,
     devices: SerialCollectionEh2PandaComposite,
     RE: RunEngine,
@@ -86,9 +91,11 @@ async def test_end_run(
             devices.panda,
             devices.eiger,
             devices.serial_stages,
+            devices.shutter,
         )
     )
     mock_disarm_eiger.assert_called_once_with(devices.eiger.detector.disarm)
     mock_move_sample_stage_back.assert_called_once_with(devices.serial_stages, 0)
     mock_disarm_panda.assert_called_once_with(devices.panda)
     mock_reset_panda.assert_called_once_with(devices.panda)
+    mock_close_shutter.assert_called_once_with(devices.shutter)

@@ -2,6 +2,9 @@ import bluesky.plan_stubs as bps
 import bluesky.preprocessors as bpp
 from bluesky.utils import MsgGenerator
 from dodal.common import inject
+from dodal.devices.beamlines.i19.access_controlled.shutter import (
+    AccessControlledShutter,
+)
 from dodal.devices.beamlines.i19.diffractometer import (
     FourCircleDiffractometer,
 )
@@ -12,6 +15,7 @@ from ophyd_async.fastcs.panda import HDFPanda
 from i19_bluesky.log import LOGGER
 from i19_bluesky.parameters.devices_composites import SerialCollectionEh2PandaComposite
 from i19_bluesky.parameters.serial_parameters import SerialExperimentEh2
+from i19_bluesky.plans.optics_hutch_control_plans import close_experiment_shutter
 from i19_bluesky.serial.device_setup_plans.diffractometer_plans import (
     move_sample_stage_back,
 )
@@ -40,6 +44,7 @@ def run_on_collection_end(
     panda: HDFPanda,
     eiger: EigerDetector,
     serial_stages: XYZPhiStage,
+    shutter: AccessControlledShutter,
 ):
     LOGGER.info("Disarm eiger")
     yield from bps.trigger(eiger.detector.disarm)
@@ -47,6 +52,8 @@ def run_on_collection_end(
     yield from disarm_panda(panda)
     yield from reset_panda(panda)
     yield from move_sample_stage_back(serial_stages, rot_axis_start)
+    LOGGER.info("Close experiment shutter")
+    yield from close_experiment_shutter(shutter)
 
 
 def run_on_collection_abort(
@@ -78,6 +85,7 @@ def run_serial_with_panda(
                 devices.panda,
                 devices.eiger,
                 devices.serial_stages,
+                devices.shutter,
             )
         ),
         auto_raise=False,
