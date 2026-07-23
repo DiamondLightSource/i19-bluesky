@@ -5,7 +5,7 @@ import bluesky.plan_stubs as bps
 from bluesky.utils import MsgGenerator
 from dodal.common import inject
 from dodal.devices.beamlines.i19.access_controlled.attenuator_motor_squad import (
-    AttenuatorMotorPositionDemands,
+    AttenuatorMotorPositions,
     AttenuatorMotorSquad,
 )
 from dodal.devices.beamlines.i19.access_controlled.energy_device import (
@@ -23,7 +23,7 @@ from i19_bluesky.log import LOGGER
 
 
 def apply_attenuator_positions(
-    position_demands: AttenuatorMotorPositionDemands,
+    position_demands: AttenuatorMotorPositions,
     motor_squad: AttenuatorMotorSquad = inject("attenuator_motor_squad"),
 ) -> MsgGenerator[None]:
     validated_demands = position_demands.validated_complete_demand()
