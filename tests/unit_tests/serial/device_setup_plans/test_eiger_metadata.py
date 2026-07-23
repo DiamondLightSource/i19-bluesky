@@ -7,8 +7,11 @@ from ophyd_async.fastcs.eiger import EigerDetector
 from i19_bluesky.parameters.serial_parameters import SerialExperimentEh2
 from i19_bluesky.serial.device_setup_plans.eiger_metadata import (
     _convert_beam_centre_to_pixels,
+    calculate_beam_centre_from_lut,
     write_eiger_params,
 )
+
+lut_columns = [[85.0, 585.0], [69.66, 69.66], [81.09, 81.09]]
 
 
 def test_convert_bc_to_pix(parameters):
@@ -18,6 +21,21 @@ def test_convert_bc_to_pix(parameters):
 
     assert beam_x == pytest.approx(266.67, 1e-2)
     assert beam_y == pytest.approx(133.33, 1e-2)
+
+
+@patch("i19_bluesky.serial.device_setup_plans.eiger_metadata._read_converter_lut")
+def test_calculate_beam_centre_from_lut(
+    mock_read_lut: MagicMock, parameters: SerialExperimentEh2
+):
+    mock_read_lut.return_value = lut_columns
+
+    (beam_centre_x, beam_centre_y) = calculate_beam_centre_from_lut(
+        parameters.detector_distance_mm,
+        parameters.detector_constants.DET_SIZE_CONSTANTS,
+    )
+
+    assert beam_centre_x == pytest.approx(928.80, 1e-2)
+    assert beam_centre_y == pytest.approx(1081.2, 1e-2)
 
 
 @pytest.mark.parametrize("wait", [(False, True)])

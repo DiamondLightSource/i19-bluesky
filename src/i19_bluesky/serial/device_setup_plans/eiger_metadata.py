@@ -25,6 +25,14 @@ def _convert_beam_centre_to_pixels(
     return (beam_x_px, beam_y_px)
 
 
+def _read_converter_lut():
+    config_client = get_config_client()
+    lut_columns = config_client.get_file_contents(
+        BEAM_XY_TABLE_PATH, DetectorXYLookupTable
+    ).columns
+    return lut_columns
+
+
 def calculate_beam_centre_from_lut(
     detector_distance_mm: float, det_size_constants: DetectorSizeConstants
 ) -> tuple[float, float]:
@@ -38,10 +46,7 @@ def calculate_beam_centre_from_lut(
     Returns:
         tuple[float, float]: x and y positions of beam centre, in pixels.
     """
-    config_client = get_config_client()
-    lut_columns = config_client.get_file_contents(
-        BEAM_XY_TABLE_PATH, DetectorXYLookupTable
-    ).columns
+    lut_columns = _read_converter_lut()
 
     interpolate_x = linear_interpolation_lut(lut_columns[0], lut_columns[1])
     beam_x_mm = interpolate_x(detector_distance_mm)
