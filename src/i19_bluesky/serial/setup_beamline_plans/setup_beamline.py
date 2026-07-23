@@ -1,8 +1,5 @@
 import bluesky.plan_stubs as bps
 from bluesky.utils import MsgGenerator
-from dodal.devices.beamlines.i19.access_controlled.energy_device import (
-    AccessControlledEnergyComposite,
-)
 from dodal.devices.beamlines.i19.backlight import BacklightPosition
 from dodal.devices.beamlines.i19.diffractometer import (
     FourCircleDiffractometer,
@@ -22,14 +19,7 @@ from i19_bluesky.serial.device_setup_plans.diffractometer_plans import (
     move_detector_stage,
     setup_sample_stage,
 )
-
-
-def read_energy_and_wavelength(
-    energy_device: AccessControlledEnergyComposite,
-) -> MsgGenerator[tuple[float, float]]:
-    energy = yield from bps.rd(energy_device.energy_in_kev)
-    wavelength = yield from bps.rd(energy_device.wavelength_in_a)
-    return (energy, wavelength)
+from i19_bluesky.serial.device_setup_plans.eiger_metadata import write_eiger_params
 
 
 def setup_eh2_serial_collection(
@@ -40,7 +30,11 @@ def setup_eh2_serial_collection(
     yield from open_experiment_shutter(devices.shutter)
     # Set up eiger - TO BE ADDED - IN SEPARATE BRANCH
     # Read energy and wavelength from dcm to then set up eiger
-    _ = yield from read_energy_and_wavelength(devices.energy_device)
+    energ_in_kev = yield from bps.rd(devices.energy_device.energy_in_kev)
+    wavelength_in_a = yield from bps.rd(devices.energy_device.wavelength_in_a)
+    yield from write_eiger_params(
+        parameters, energ_in_kev, wavelength_in_a, devices.eiger
+    )
     # Set up beamline for collection
     yield from setup_beamline_for_collection(
         parameters.aperture_request,

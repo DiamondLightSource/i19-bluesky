@@ -11,7 +11,6 @@ from ophyd_async.core import set_mock_value
 from i19_bluesky.parameters.devices_composites import SerialCollectionEh2PandaComposite
 from i19_bluesky.parameters.serial_parameters import SerialExperimentEh2
 from i19_bluesky.serial.setup_beamline_plans.setup_beamline import (
-    read_energy_and_wavelength,
     setup_beamline_for_collection,
     setup_eh2_serial_collection,
 )
@@ -73,20 +72,7 @@ async def test_setup_beamline_for_collection(
     )
 
 
-async def test_read_energy_and_wavelength(
-    devices: SerialCollectionEh2PandaComposite, RE: RunEngine
-):
-    set_mock_value(devices.energy_device.energy_in_kev, 17.9)
-    set_mock_value(devices.energy_device.wavelength_in_a, 0.6)
-    en, wl = RE(read_energy_and_wavelength(devices.energy_device)).plan_result  # type: ignore
-
-    assert await devices.energy_device.energy_in_kev.get_value() == en
-    assert await devices.energy_device.wavelength_in_a.get_value() == wl
-
-
-@patch(
-    "i19_bluesky.serial.setup_beamline_plans.setup_beamline.read_energy_and_wavelength"
-)
+@patch("i19_bluesky.serial.setup_beamline_plans.setup_beamline.write_eiger_params")
 @patch("i19_bluesky.serial.setup_beamline_plans.setup_beamline.setup_sample_stage")
 @patch(
     "i19_bluesky.serial.setup_beamline_plans.setup_beamline.setup_beamline_for_collection"
@@ -96,7 +82,7 @@ def test_setup_eh2_serial_collection(
     mock_open_shutter: MagicMock,
     mock_setup: MagicMock,
     mock_stage: MagicMock,
-    mock_read: MagicMock,
+    mock_write_eiger_params: MagicMock,
     parameters: SerialExperimentEh2,
     devices: SerialCollectionEh2PandaComposite,
     RE: RunEngine,
@@ -106,7 +92,9 @@ def test_setup_eh2_serial_collection(
     RE(setup_eh2_serial_collection(parameters, devices))
 
     mock_open_shutter.assert_called_once_with(devices.shutter)
-    # mock_read.assert_called_once_with(devices.energy_device)
+    mock_write_eiger_params.assert_called_once_with(
+        parameters, 17.9, 0.6, devices.eiger
+    )
     mock_setup.assert_called_once_with(
         "100um", 320, 0, devices.backlight, devices.pincol, devices.diffractometer
     )
