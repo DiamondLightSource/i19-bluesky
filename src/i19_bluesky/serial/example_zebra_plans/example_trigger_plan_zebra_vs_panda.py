@@ -15,12 +15,10 @@ from i19_bluesky.parameters.devices_composites import SerialCollectionEh2ZebraCo
 from i19_bluesky.parameters.serial_parameters import SerialExperimentEh2
 from i19_bluesky.serial.device_setup_plans.diffractometer_plans import (
     move_sample_stage_back,
+    setup_sample_stage,
 )
 from i19_bluesky.serial.example_zebra_plans.zebra_collection_setup_plan import (
     setup_zebra_for_collection,
-)
-from i19_bluesky.serial.run_panda_plans.panda_serial_collection import (
-    setup_sample_stage,
 )
 
 RAMP = 0.5
