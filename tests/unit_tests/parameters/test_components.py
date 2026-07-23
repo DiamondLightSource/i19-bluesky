@@ -3,7 +3,6 @@ from pathlib import Path
 import pytest
 
 from i19_bluesky.parameters.components import (
-    HutchName,
     PandaRotationParams,
     RotationParams,
     VisitParameters,
@@ -24,7 +23,6 @@ def test_validate_visit_parameters_model(hutch):
 
 def test_visit_parameters():
     model = {
-        "hutch": HutchName.EH2,
         "visit": "/tmp/foo",
         "dataset": "bar",
         "filename_prefix": "some_file",
