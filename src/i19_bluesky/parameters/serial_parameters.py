@@ -12,6 +12,7 @@ from i19_bluesky.parameters.components import (
     VisitParameters,
     ZebraRotationParams,
 )
+from i19_bluesky.parameters.constants import DetectorConstants, EigerConstants
 
 
 class SerialExperiment(VisitParameters):
@@ -77,3 +78,9 @@ class SerialExperimentEh2(SerialExperiment):
             scan_steps=self.images_per_well,
             exposure_time_s=self.exposure_time_s,
         )
+
+    @property
+    def detector_constants(self) -> EigerConstants:
+        match self.detector_type:
+            case DetectorType.EIGER:
+                return DetectorConstants.EIGER
