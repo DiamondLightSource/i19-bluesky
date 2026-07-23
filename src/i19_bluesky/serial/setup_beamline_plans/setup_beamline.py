@@ -1,4 +1,8 @@
+import bluesky.plan_stubs as bps
 from bluesky.utils import MsgGenerator
+from dodal.devices.beamlines.i19.access_controlled.energy_device import (
+    AccessControlledEnergyComposite,
+)
 from dodal.devices.beamlines.i19.backlight import BacklightPosition
 from dodal.devices.beamlines.i19.diffractometer import (
     FourCircleDiffractometer,
@@ -11,12 +15,48 @@ from dodal.devices.beamlines.i19.pin_col_stages import (
 from i19_bluesky.eh2.backlight_plan import move_backlight_out
 from i19_bluesky.eh2.pincol_control_plans import move_pin_col_to_requested_in_position
 from i19_bluesky.log import LOGGER
+from i19_bluesky.parameters.devices_composites import SerialCollectionEh2PandaComposite
+from i19_bluesky.parameters.serial_parameters import SerialExperimentEh2
+from i19_bluesky.plans.optics_hutch_control_plans import open_experiment_shutter
 from i19_bluesky.serial.device_setup_plans.diffractometer_plans import (
     move_detector_stage,
+    setup_sample_stage,
 )
 
 
-def setup_beamline_before_collection(
+def read_energy_and_wavelength(
+    energy_device: AccessControlledEnergyComposite,
+) -> MsgGenerator[tuple[float, float]]:
+    energy = yield from bps.rd(energy_device.energy_in_kev)
+    wavelength = yield from bps.rd(energy_device.wavelength_in_a)
+    return (energy, wavelength)
+
+
+def setup_eh2_serial_collection(
+    parameters: SerialExperimentEh2,
+    devices: SerialCollectionEh2PandaComposite,
+) -> MsgGenerator:
+    # Open shutter
+    yield from open_experiment_shutter(devices.shutter)
+    # Set up eiger - TO BE ADDED - IN SEPARATE BRANCH
+    # Read energy and wavelength from dcm to then set up eiger
+    _ = yield from read_energy_and_wavelength(devices.energy_device)
+    # Set up beamline for collection
+    yield from setup_beamline_for_collection(
+        parameters.aperture_request,
+        parameters.detector_distance_mm,
+        parameters.two_theta_deg,
+        devices.backlight,
+        devices.pincol,
+        devices.diffractometer,
+    )
+    # Set up sample stage
+    yield from setup_sample_stage(
+        parameters.panda_rotation_params, devices.serial_stages
+    )
+
+
+def setup_beamline_for_collection(
     aperture_request: PinColRequest,
     detector_distance_mm: float,
     two_theta_deg: float,

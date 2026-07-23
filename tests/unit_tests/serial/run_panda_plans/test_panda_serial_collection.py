@@ -11,7 +11,7 @@ from i19_bluesky.serial.device_setup_plans.diffractometer_plans import (
 from i19_bluesky.serial.run_panda_plans.panda_serial_collection import (
     end_run,
     run_on_collection_abort,
-    trigger_panda,
+    trigger_panda_collection,
 )
 
 
@@ -38,9 +38,7 @@ async def test_setup_sample_stage(
 @patch(
     "i19_bluesky.serial.run_panda_plans.panda_serial_collection.setup_panda_for_rotation"
 )
-@patch("i19_bluesky.serial.run_panda_plans.panda_serial_collection.setup_sample_stage")
 def test_trigger_panda_call_order(
-    mock_setup_sample_stage: MagicMock,
     mock_setup_panda_for_rotation: MagicMock,
     mock_arm_panda: MagicMock,
     mock_disarm_panda: MagicMock,
@@ -57,7 +55,6 @@ def test_trigger_panda_call_order(
     parent_mock = MagicMock()
     parent_mock.attach_mock(mock_set_value_for_params, "mock_set_value_for_params")
     parent_mock.attach_mock(mock_move_stage_x_and_z, "mock_move_stage_x_and_z")
-    parent_mock.attach_mock(mock_setup_sample_stage, "mock_setup_sample_stage")
     parent_mock.attach_mock(
         mock_setup_panda_for_rotation, "mock_setup_panda_for_rotation"
     )
@@ -65,11 +62,8 @@ def test_trigger_panda_call_order(
     parent_mock.attach_mock(mock_disarm_panda, "mock_disarm_panda")
     parent_mock.attach_mock(mock_reset_panda, "mock_reset_panda")
     parent_mock.attach_mock(mock_arm_or_disarm, "mock_arm_or_disarm")
-    RE(trigger_panda(parameters, devices))
+    RE(trigger_panda_collection(parameters, devices))
     expected_calls = [
-        call.mock_setup_sample_stage(
-            parameters.panda_rotation_params, devices.serial_stages
-        ),
         call.mock_setup_panda_for_rotation(
             parameters.panda_rotation_params, devices.panda
         ),

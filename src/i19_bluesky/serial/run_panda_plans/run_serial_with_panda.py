@@ -7,36 +7,21 @@ from i19_bluesky.parameters.serial_parameters import SerialExperimentEh2
 from i19_bluesky.serial.run_panda_plans.panda_serial_collection import (
     end_run,
     run_on_collection_abort,
-    trigger_panda,
+    trigger_panda_collection,
 )
-from i19_bluesky.serial.setup_beamline_plans.setup_beamline_pre_collection import (
-    setup_beamline_before_collection,
+from i19_bluesky.serial.setup_beamline_plans.setup_beamline import (
+    setup_eh2_serial_collection,
 )
 
 
-def setup_then_trigger_panda(
+def main_collection_plan(
     parameters: SerialExperimentEh2,
     devices: SerialCollectionEh2PandaComposite,
 ) -> MsgGenerator:
-    """Run primary setup processes then trigger PandA to collect data from experiment.
-    Has contingencies to abort if any stage produces errors, before moving the
-    diffractometer to its starting position. Designed to be called with BlueAPI.
-
-    Args:
-        parameters (SerialExperimentEh2): SerialExperimentEh2 object
-        devices (SerialCollectionEh2PandaComposite): SerialCollectionEh2PandaComposite
-        object
-    """
-
-    yield from setup_beamline_before_collection(
-        parameters.aperture_request,
-        parameters.detector_distance_mm,
-        parameters.two_theta_deg,
-        devices.backlight,
-        devices.pincol,
-        devices.diffractometer,
-    )
-    yield from trigger_panda(parameters, devices)
+    """Run a small rotative serial crystallography collection using the PandA to trigger
+    the detector."""
+    yield from setup_eh2_serial_collection(parameters, devices)
+    yield from trigger_panda_collection(parameters, devices)
 
 
 @bpp.run_decorator()
@@ -45,7 +30,7 @@ def run_serial_with_panda(
     devices: SerialCollectionEh2PandaComposite = inject(),
 ) -> MsgGenerator:
     yield from bpp.contingency_wrapper(
-        setup_then_trigger_panda(parameters, devices),
+        main_collection_plan(parameters, devices),
         except_plan=lambda: (
             yield from run_on_collection_abort(
                 devices.panda, devices.eiger, devices.diffractometer

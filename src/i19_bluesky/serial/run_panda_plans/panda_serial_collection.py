@@ -13,7 +13,6 @@ from i19_bluesky.parameters.serial_parameters import SerialExperimentEh2
 from i19_bluesky.serial.device_setup_plans.diffractometer_plans import (
     move_sample_stage_back,
     move_stage_x_and_z,
-    setup_sample_stage,
 )
 from i19_bluesky.serial.panda_plans.panda_setup_plans import (
     reset_panda,
@@ -22,7 +21,7 @@ from i19_bluesky.serial.panda_plans.panda_setup_plans import (
 from i19_bluesky.serial.panda_plans.panda_stubs import arm_panda, disarm_panda
 
 
-def trigger_panda(
+def trigger_panda_collection(
     parameters: SerialExperimentEh2,
     devices: SerialCollectionEh2PandaComposite,
 ) -> MsgGenerator:
@@ -41,10 +40,6 @@ def trigger_panda(
             panda (HDFPanda): The fastcs PandA ophyd device.
             eiger (EigerDetector): The eiger detector device
     """
-    yield from setup_sample_stage(
-        parameters.panda_rotation_params,
-        devices.serial_stages,
-    )
     yield from setup_panda_for_rotation(
         parameters.panda_rotation_params,
         devices.panda,
