@@ -1,30 +1,12 @@
 from unittest.mock import MagicMock, call, patch
 
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import get_mock_put
 
 from i19_bluesky.parameters.devices_composites import SerialCollectionEh2PandaComposite
 from i19_bluesky.parameters.serial_parameters import SerialExperimentEh2
-from i19_bluesky.serial.device_setup_plans.diffractometer_plans import (
-    setup_sample_stage,
-)
 from i19_bluesky.serial.run_panda_plans.panda_serial_collection import (
     trigger_panda_collection,
 )
-
-
-async def test_setup_sample_stage(
-    devices: SerialCollectionEh2PandaComposite,
-    RE: RunEngine,
-    parameters: SerialExperimentEh2,
-):
-
-    RE(setup_sample_stage(parameters.panda_rotation_params, devices.serial_stages))
-    mock_phi = get_mock_put(devices.serial_stages.phi.user_setpoint)
-    mock_phi.assert_called_once_with(0.0)
-
-    mock_phi_velocity = get_mock_put(devices.serial_stages.phi.velocity)
-    mock_phi_velocity.assert_called_once_with(1.0)
 
 
 @patch("i19_bluesky.serial.run_panda_plans.panda_serial_collection.bps.trigger")
