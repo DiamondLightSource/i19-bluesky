@@ -2,8 +2,11 @@ from unittest.mock import MagicMock, patch
 
 from bluesky.run_engine import RunEngine
 from dodal.devices.beamlines.i19.access_controlled.attenuator_motor_squad import (
-    AttenuatorMotorPositionDemands,
+    AttenuatorMotorPositions,
     AttenuatorMotorSquad,
+)
+from dodal.devices.beamlines.i19.access_controlled.energy_device import (
+    AccessControlledEnergyComposite,
 )
 from dodal.devices.beamlines.i19.access_controlled.piezo_control import (
     AccessControlledPiezoActuator,
@@ -14,12 +17,11 @@ from dodal.devices.beamlines.i19.access_controlled.shutter import (
 from dodal.devices.hutch_shutter import ShutterDemand
 
 from i19_bluesky.eh2 import (
-    close_experiment_shutter,
-    open_experiment_shutter,
-)
-from i19_bluesky.plans.optics_hutch_control_plans import (
     apply_attenuator_positions,
     apply_voltage_to_piezo_actuators,
+    change_energy,
+    close_experiment_shutter,
+    open_experiment_shutter,
 )
 
 
@@ -29,7 +31,7 @@ async def test_apply_attenuator_positions(
 ):
     xy_demands = {"X": 15.71, "Y": 38.16}
     filter_wheel_demands = {"W": 2}
-    position_demands = AttenuatorMotorPositionDemands(
+    position_demands = AttenuatorMotorPositions(
         continuous_demands=xy_demands, indexed_demands=filter_wheel_demands
     )
     RE(apply_attenuator_positions(position_demands, attenuator_motor_squad))
@@ -71,3 +73,13 @@ def test_apply_voltage_to_vfm_piezo_actuator(
 ):
     RE(apply_voltage_to_piezo_actuators(1.42, eh2_vfm_piezo))
     mock_set.assert_called_once_with(eh2_vfm_piezo, 1.42, wait=True)
+
+
+@patch("i19_bluesky.plans.optics_hutch_control_plans.bps.abs_set")
+def test_change_energy(
+    mock_set: MagicMock,
+    eh2_energy_device: AccessControlledEnergyComposite,
+    RE: RunEngine,
+):
+    RE(change_energy(25.3, eh2_energy_device))
+    mock_set.assert_called_once_with(eh2_energy_device, 25.3, wait=True)

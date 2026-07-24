@@ -2,8 +2,11 @@ from unittest.mock import MagicMock, patch
 
 from bluesky.run_engine import RunEngine
 from dodal.devices.beamlines.i19.access_controlled.attenuator_motor_squad import (
-    AttenuatorMotorPositionDemands,
+    AttenuatorMotorPositions,
     AttenuatorMotorSquad,
+)
+from dodal.devices.beamlines.i19.access_controlled.energy_device import (
+    AccessControlledEnergyComposite,
 )
 from dodal.devices.beamlines.i19.access_controlled.piezo_control import (
     AccessControlledPiezoActuator,
@@ -14,22 +17,21 @@ from dodal.devices.beamlines.i19.access_controlled.shutter import (
 from dodal.devices.hutch_shutter import ShutterDemand
 
 from i19_bluesky.eh1 import (
-    close_experiment_shutter,
-    open_experiment_shutter,
-)
-from i19_bluesky.plans.optics_hutch_control_plans import (
     apply_attenuator_positions,
     apply_voltage_to_piezo_actuators,
+    change_energy,
+    close_experiment_shutter,
+    open_experiment_shutter,
 )
 
 
 @patch("i19_bluesky.plans.optics_hutch_control_plans.bps.abs_set")
-async def test_apply_attenuator_positions(
+def test_apply_attenuator_positions(
     mock_set: MagicMock, attenuator_motor_squad: AttenuatorMotorSquad, RE: RunEngine
 ):
     xy_demands = {"X": 25.37, "Y": 18.091}
     filter_wheel_demands = {"W": 4}
-    position_demands = AttenuatorMotorPositionDemands(
+    position_demands = AttenuatorMotorPositions(
         continuous_demands=xy_demands, indexed_demands=filter_wheel_demands
     )
     RE(apply_attenuator_positions(position_demands, attenuator_motor_squad))
@@ -40,7 +42,7 @@ async def test_apply_attenuator_positions(
 
 
 @patch("i19_bluesky.plans.optics_hutch_control_plans.bps.abs_set")
-async def test_open_shutter_plan(
+def test_open_shutter_plan(
     mock_set: MagicMock, eh1_shutter: AccessControlledShutter, RE: RunEngine
 ):
     RE(open_experiment_shutter(eh1_shutter))
@@ -49,7 +51,7 @@ async def test_open_shutter_plan(
 
 
 @patch("i19_bluesky.plans.optics_hutch_control_plans.bps.abs_set")
-async def test_close_shutter_plan(
+def test_close_shutter_plan(
     mock_set: MagicMock, eh1_shutter: AccessControlledShutter, RE: RunEngine
 ):
     RE(close_experiment_shutter(eh1_shutter))
@@ -71,3 +73,13 @@ def test_apply_voltage_to_vfm_piezo_actuator(
 ):
     RE(apply_voltage_to_piezo_actuators(1.42, eh1_vfm_piezo))
     mock_set.assert_called_once_with(eh1_vfm_piezo, 1.42, wait=True)
+
+
+@patch("i19_bluesky.plans.optics_hutch_control_plans.bps.abs_set")
+def test_change_energy(
+    mock_set: MagicMock,
+    eh1_energy_device: AccessControlledEnergyComposite,
+    RE: RunEngine,
+):
+    RE(change_energy(12.86, eh1_energy_device))
+    mock_set.assert_called_once_with(eh1_energy_device, 12.86, wait=True)

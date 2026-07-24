@@ -7,11 +7,13 @@ from pydantic import computed_field
 
 from i19_bluesky.parameters.components import (
     DetectorType,
+    HutchName,
     PandaRotationParams,
     RotationAxis,
     VisitParameters,
     ZebraRotationParams,
 )
+from i19_bluesky.parameters.constants import DetectorConstants, EigerConstants
 
 
 class SerialExperiment(VisitParameters):
@@ -56,6 +58,7 @@ class SerialExperiment(VisitParameters):
 class SerialExperimentEh2(SerialExperiment):
     aperture_request: PinColRequest
     detector_type: DetectorType
+    hutch: HutchName = HutchName.EH2
 
     @property
     def zebra_rotation_params(self) -> ZebraRotationParams:
@@ -77,3 +80,9 @@ class SerialExperimentEh2(SerialExperiment):
             scan_steps=self.images_per_well,
             exposure_time_s=self.exposure_time_s,
         )
+
+    @property
+    def detector_constants(self) -> EigerConstants:
+        match self.detector_type:
+            case DetectorType.EIGER:
+                return DetectorConstants.EIGER
