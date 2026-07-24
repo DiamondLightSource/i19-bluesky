@@ -72,5 +72,6 @@ def reset_panda(panda: HDFPanda, group="reset_panda"):
         DeviceSettingsConstants.PANDA_THROUGH_ZEBRA,
         panda,
     )
-    yield from bps.abs_set(panda.outenc[1].val, "INENC1.VAL", group=group)  # type: ignore
+    # Moved to INENC3 as that's there the new serial stages are connected
+    yield from bps.abs_set(panda.outenc[1].val, "INENC3.VAL", group=group)  # type: ignore
     yield from bps.abs_set(panda.outenc[2].val, "INENC2.VAL", group=group)  # type: ignore

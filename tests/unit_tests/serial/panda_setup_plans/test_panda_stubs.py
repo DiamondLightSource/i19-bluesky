@@ -42,4 +42,4 @@ async def test_setup_outenc_vals(mock_panda: HDFPanda, RE: RunEngine):
     RE(setup_outenc_vals(mock_panda, group="setup_outenc_vals"))
 
     assert await mock_panda.outenc[1].val.get_value() == PandaBitMux.ZERO  # type: ignore
-    assert await mock_panda.outenc[2].val.get_value() == "INENC1.VAL"  # type: ignore
+    assert await mock_panda.outenc[2].val.get_value() == "INENC3.VAL"  # type: ignore
