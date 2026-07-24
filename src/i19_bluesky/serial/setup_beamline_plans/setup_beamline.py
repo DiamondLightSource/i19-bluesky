@@ -28,10 +28,13 @@ def setup_eh2_serial_collection(
     devices: SerialCollectionEh2PandaComposite,
 ) -> MsgGenerator:
     # Stage detector
+    LOGGER.info("Stage detector")
     yield from bps.stage(devices.eiger)
     # Open shutter
+    LOGGER.info("Open experiment shutter if EH2 is the active hutch")
     yield from open_experiment_shutter(devices.shutter)
     # Set up beamline for collection
+    LOGGER.info("Set up the beamline before collection")
     yield from setup_beamline_for_collection(
         parameters.aperture_request,
         parameters.detector_distance_mm,
@@ -41,10 +44,12 @@ def setup_eh2_serial_collection(
         devices.diffractometer,
     )
     # Set up sample stage
+    LOGGER.info("Move phi to start")
     yield from setup_sample_stage(
         parameters.panda_rotation_params, devices.serial_stages
     )
     # Read energy and wavelength from dcm to then set up eiger
+    LOGGER.info("Set up and prepare the eiger for collection")
     energ_in_kev = yield from bps.rd(devices.energy_device.energy_in_kev)
     wavelength_in_a = yield from bps.rd(devices.energy_device.wavelength_in_a)
     yield from set_eiger_params(
