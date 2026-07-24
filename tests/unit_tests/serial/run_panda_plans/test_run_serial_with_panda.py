@@ -52,17 +52,17 @@ async def test_main_collection_plan(
     mock_trigger_panda.assert_called_once_with(parameters, devices)
 
 
-@patch("i19_bluesky.serial.run_panda_plans.run_serial_with_panda.bps.trigger")
+@patch("i19_bluesky.serial.run_panda_plans.run_serial_with_panda.bps.unstage")
 @patch("i19_bluesky.serial.run_panda_plans.run_serial_with_panda.disarm_panda")
 async def test_run_on_collection_abort(
     mock_disarm_panda: MagicMock,
-    mock_disarm_eiger: MagicMock,
+    mock_unstage_eiger: MagicMock,
     RE: RunEngine,
     devices: SerialCollectionEh2PandaComposite,
 ):
     RE(run_on_collection_abort(devices.panda, devices.eiger, devices.diffractometer))
     get_mock_put(devices.diffractometer.phi.motor_stop).assert_called_once_with(1)
-    mock_disarm_eiger.assert_called_once_with(devices.eiger.detector.disarm)
+    mock_unstage_eiger.assert_called_once_with(devices.eiger, wait=True)
     mock_disarm_panda.assert_called_once_with(devices.panda)
 
 
@@ -73,11 +73,11 @@ async def test_run_on_collection_abort(
 @patch(
     "i19_bluesky.serial.run_panda_plans.run_serial_with_panda.move_sample_stage_back"
 )
-@patch("i19_bluesky.serial.run_panda_plans.run_serial_with_panda.bps.trigger")
+@patch("i19_bluesky.serial.run_panda_plans.run_serial_with_panda.bps.unstage")
 @patch("i19_bluesky.serial.run_panda_plans.run_serial_with_panda.disarm_panda")
 async def test_end_run(
     mock_disarm_panda: MagicMock,
-    mock_disarm_eiger: MagicMock,
+    mock_unstage_eiger: MagicMock,
     mock_move_sample_stage_back: MagicMock,
     mock_reset_panda: MagicMock,
     mock_close_shutter: MagicMock,
@@ -94,7 +94,7 @@ async def test_end_run(
             devices.shutter,
         )
     )
-    mock_disarm_eiger.assert_called_once_with(devices.eiger.detector.disarm)
+    mock_unstage_eiger.assert_called_once_with(devices.eiger, wait=True)
     mock_move_sample_stage_back.assert_called_once_with(devices.serial_stages, 0)
     mock_disarm_panda.assert_called_once_with(devices.panda)
     mock_reset_panda.assert_called_once_with(devices.panda)
