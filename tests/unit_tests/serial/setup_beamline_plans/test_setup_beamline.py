@@ -6,7 +6,7 @@ from dodal.common.enums import InOutUpper
 from dodal.devices.beamlines.i19.pin_col_stages import (
     PinColRequest,
 )
-from ophyd_async.core import set_mock_value
+from ophyd_async.core import DetectorTrigger, TriggerInfo, set_mock_value
 
 from i19_bluesky.parameters.devices_composites import SerialCollectionEh2PandaComposite
 from i19_bluesky.parameters.serial_parameters import SerialExperimentEh2
@@ -72,17 +72,19 @@ async def test_setup_beamline_for_collection(
     )
 
 
-@patch("i19_bluesky.serial.setup_beamline_plans.setup_beamline.write_eiger_params")
+@patch("i19_bluesky.serial.setup_beamline_plans.setup_beamline.set_eiger_params")
 @patch("i19_bluesky.serial.setup_beamline_plans.setup_beamline.setup_sample_stage")
 @patch(
     "i19_bluesky.serial.setup_beamline_plans.setup_beamline.setup_beamline_for_collection"
 )
 @patch("i19_bluesky.serial.setup_beamline_plans.setup_beamline.open_experiment_shutter")
-def test_setup_eh2_serial_collection(
+@patch("i19_bluesky.serial.setup_beamline_plans.setup_beamline.bps.prepare")
+async def test_setup_eh2_serial_collection(
+    mock_prepare: MagicMock,
     mock_open_shutter: MagicMock,
     mock_setup: MagicMock,
     mock_stage: MagicMock,
-    mock_write_eiger_params: MagicMock,
+    mock_set_eiger_params: MagicMock,
     parameters: SerialExperimentEh2,
     devices: SerialCollectionEh2PandaComposite,
     RE: RunEngine,
@@ -92,12 +94,23 @@ def test_setup_eh2_serial_collection(
     RE(setup_eh2_serial_collection(parameters, devices))
 
     mock_open_shutter.assert_called_once_with(devices.shutter)
-    mock_write_eiger_params.assert_called_once_with(
-        parameters, 17.9, 0.6, devices.eiger
-    )
+    mock_set_eiger_params.assert_called_once_with(parameters, 17.9, 0.6, devices.eiger)
     mock_setup.assert_called_once_with(
         "100um", 320, 0, devices.backlight, devices.pincol, devices.diffractometer
     )
     mock_stage.assert_called_once_with(
         parameters.panda_rotation_params, devices.serial_stages
+    )
+    assert (
+        await devices.eiger.detector.ntrigger.get_value() == parameters.total_num_images
+    )
+    mock_prepare.assert_called_once_with(
+        devices.eiger,
+        TriggerInfo(
+            collections_per_event=1,
+            number_of_events=1,
+            trigger=DetectorTrigger.EXTERNAL_EDGE,
+            livetime=parameters.exposure_time_s,
+        ),
+        wait=True,
     )

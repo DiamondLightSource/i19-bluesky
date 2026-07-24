@@ -6,11 +6,11 @@ from daq_config_server.models.lookup_tables import DetectorXYLookupTable
 from ophyd_async.fastcs.eiger import EigerDetector
 
 from i19_bluesky.parameters.serial_parameters import SerialExperimentEh2
-from i19_bluesky.serial.device_setup_plans.eiger_metadata import (
+from i19_bluesky.serial.device_setup_plans.eiger_setup_plans import (
     _convert_beam_centre_to_pixels,
     _read_converter_lut,
     calculate_beam_centre_from_lut,
-    write_eiger_params,
+    set_eiger_params,
 )
 
 LUT_FILE = """
@@ -34,7 +34,7 @@ def test_convert_bc_to_pix(parameters):
     assert beam_y == pytest.approx(133.33, 1e-2)
 
 
-@patch("i19_bluesky.serial.device_setup_plans.eiger_metadata.get_config_client")
+@patch("i19_bluesky.serial.device_setup_plans.eiger_setup_plans.get_config_client")
 def test_read_converter_lut(mock_config_client: MagicMock):
     file_contents = DetectorXYLookupTable.from_contents(LUT_FILE)
     mock_config_client.return_value.get_file_contents.return_value = file_contents
@@ -43,7 +43,7 @@ def test_read_converter_lut(mock_config_client: MagicMock):
     assert cols == lut_columns
 
 
-@patch("i19_bluesky.serial.device_setup_plans.eiger_metadata._read_converter_lut")
+@patch("i19_bluesky.serial.device_setup_plans.eiger_setup_plans._read_converter_lut")
 def test_calculate_beam_centre_from_lut(
     mock_read_lut: MagicMock, parameters: SerialExperimentEh2
 ):
@@ -59,11 +59,11 @@ def test_calculate_beam_centre_from_lut(
 
 
 @pytest.mark.parametrize("wait", [(False, True)])
-@patch("i19_bluesky.serial.device_setup_plans.eiger_metadata.bps.wait")
+@patch("i19_bluesky.serial.device_setup_plans.eiger_setup_plans.bps.wait")
 @patch(
-    "i19_bluesky.serial.device_setup_plans.eiger_metadata.calculate_beam_centre_from_lut"
+    "i19_bluesky.serial.device_setup_plans.eiger_setup_plans.calculate_beam_centre_from_lut"
 )
-async def test_write_eiger_params(
+async def test_set_eiger_params(
     mock_bc_from_lut: MagicMock,
     mock_bps_wait: MagicMock,
     eh2_eiger: EigerDetector,
@@ -74,7 +74,7 @@ async def test_write_eiger_params(
     mock_bc_from_lut.return_value = (100, 200)
 
     RE(
-        write_eiger_params(
+        set_eiger_params(
             parameters,
             17,
             0.6,
@@ -82,6 +82,9 @@ async def test_write_eiger_params(
             wait=wait,
         )
     )
+    assert await eh2_eiger.od.acquisition_id.get_value() == ""
+    assert await eh2_eiger.od.file_path.get_value() == "/tmp/i19-2/cm12345-1/foo"
+    assert await eh2_eiger.od.file_prefix.get_value() == "bar_01"
     assert await eh2_eiger.detector.detector_distance.get_value() == 320
     assert await eh2_eiger.detector.beam_center_x.get_value() == 100
     assert await eh2_eiger.detector.beam_center_y.get_value() == 200
@@ -97,4 +100,4 @@ async def test_write_eiger_params(
     assert await eh2_eiger.detector.kappa_start.get_value() == 0  # type:ignore
     assert await eh2_eiger.detector.kappa_increment.get_value() == 0  # type:ignore
     if wait:
-        mock_bps_wait.assert_called_once_with("eiger_metadata")
+        mock_bps_wait.assert_called_once_with("eiger_setup")

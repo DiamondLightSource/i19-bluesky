@@ -61,14 +61,24 @@ def calculate_beam_centre_from_lut(
     return beam_centre_px
 
 
-def write_eiger_params(
+def set_eiger_params(
     parameters: SerialExperimentEh2,
     energy: float,
     wavelength: float,
     eiger: EigerDetector,
     wait: bool = True,
-    group: str = "eiger_metadata",
+    group: str = "eiger_setup",
 ):
+    # Odin
+    # After an acquisition, OdinData’s metawriter sets its acquisitionID to None,
+    # which is invalid so it needs to be set at least to an empty string
+    yield from bps.abs_set(eiger.od.acquisition_id, "", wait=True)
+    yield from bps.abs_set(
+        eiger.od.file_path, parameters.collection_directory, wait=True
+    )
+    yield from bps.abs_set(eiger.od.file_prefix, parameters.filename_prefix, wait=True)
+
+    # Eiger config
     beam_centre = calculate_beam_centre_from_lut(
         parameters.detector_distance_mm,
         parameters.detector_constants.DET_SIZE_CONSTANTS,
