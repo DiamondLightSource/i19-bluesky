@@ -38,8 +38,8 @@ def trigger_panda_collection(
     )
     LOGGER.info("Arm panda and move phi")
     yield from arm_panda(devices.panda)
-    LOGGER.info("Arm eiger")
-    yield from bps.trigger(devices.eiger.detector.arm)
+    LOGGER.info("Kickoff eiger")
+    yield from bps.kickoff(devices.eiger, wait=True)
     for i, (well_num, coords) in enumerate(parameters.wells_to_collect.items()):
         yield from move_stage_x_and_z(coords[0], coords[2], devices.serial_stages)
         LOGGER.info(f"Moved to well {well_num}")
@@ -63,3 +63,5 @@ def trigger_panda_collection(
                 parameters.panda_rotation_params.scan_start_deg,
                 wait=True,
             )
+    LOGGER.debug("Complete")
+    yield from bps.complete(devices.eiger, wait=True)
