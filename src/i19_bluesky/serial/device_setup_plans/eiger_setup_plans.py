@@ -7,6 +7,8 @@ from dodal.devices.detector.det_dim_constants import DetectorSize, DetectorSizeC
 from dodal.devices.util.lookup_tables import linear_interpolation_lut
 from ophyd_async.fastcs.eiger import EigerDetector
 
+from i19_bluesky.log import LOGGER
+
 from i19_bluesky.parameters.serial_parameters import SerialExperimentEh2
 
 BEAM_XY_TABLE_PATH = (
@@ -21,6 +23,7 @@ def _convert_beam_centre_to_pixels(
 ) -> tuple[float, float]:
     beam_x_px = beam_centre_mm[0] * image_size_px.width / image_size_mm.width
     beam_y_px = beam_centre_mm[1] * image_size_px.height / image_size_mm.height
+    LOGGER.info(f"Beam centre in pixels: {beam_x_px}, {beam_y_px}")
 
     return (beam_x_px, beam_y_px)
 
@@ -28,7 +31,9 @@ def _convert_beam_centre_to_pixels(
 def _read_converter_lut():
     config_client = get_config_client()
     lut_contents = config_client.get_file_contents(
-        BEAM_XY_TABLE_PATH, DetectorXYLookupTable
+        BEAM_XY_TABLE_PATH,
+        DetectorXYLookupTable,
+        force_parser=DetectorXYLookupTable.from_contents,
     )
     return lut_contents.columns
 
@@ -46,12 +51,15 @@ def calculate_beam_centre_from_lut(
     Returns:
         tuple[float, float]: x and y positions of beam centre, in pixels.
     """
+    LOGGER.info("Read beam centre conversion LUT")
     lut_columns = _read_converter_lut()
 
     interpolate_x = linear_interpolation_lut(lut_columns[0], lut_columns[1])
     beam_x_mm = interpolate_x(detector_distance_mm)
     interpolate_y = linear_interpolation_lut(lut_columns[0], lut_columns[2])
     beam_y_mm = interpolate_y(detector_distance_mm)
+
+    LOGGER.info("Found beam centre")
 
     beam_centre_px = _convert_beam_centre_to_pixels(
         (beam_x_mm, beam_y_mm),
@@ -70,20 +78,21 @@ def set_eiger_params(
     group: str = "eiger_setup",
 ):
     # Odin
+    LOGGER.info("Set Odin params")
     # After an acquisition, OdinData’s metawriter sets its acquisitionID to None,
     # which is invalid so it needs to be set at least to an empty string
-    yield from bps.abs_set(eiger.od.acquisition_id, "", wait=True)
-    yield from bps.abs_set(
-        eiger.od.file_path, parameters.collection_directory, wait=True
-    )
-    yield from bps.abs_set(eiger.od.file_prefix, parameters.filename_prefix, wait=True)
+    # yield from bps.abs_set(eiger.od.acquisition_id, "", wait=True)
+    # yield from bps.abs_set(
+    #     eiger.od.file_path, parameters.collection_directory.as_posix(), wait=True
+    # )
+    # yield from bps.abs_set(eiger.od.file_prefix, parameters.filename_prefix, wait=True)
 
     # Eiger config
     beam_centre = calculate_beam_centre_from_lut(
         parameters.detector_distance_mm,
         parameters.detector_constants.DET_SIZE_CONSTANTS,
     )
-    yield from bps.abs_set(eiger.detector.photon_energy, energy, group=group)
+    yield from bps.abs_set(eiger.detector.photon_energy, energy * 1000, group=group)
     yield from bps.abs_set(
         eiger.detector.detector_distance, parameters.detector_distance_mm, group=group
     )
@@ -97,7 +106,7 @@ def set_eiger_params(
         group=group,
     )
     yield from bps.abs_set(
-        eiger.detector.two_theta,  # type:ignore
+        eiger.detector.two_theta_start,  # type:ignore
         parameters.two_theta_deg,
         group=group,
     )
@@ -132,4 +141,5 @@ def set_eiger_params(
         group=group,
     )
     if wait:
-        bps.wait(group)
+        yield from bps.wait(group)
+    LOGGER.info("Params done")

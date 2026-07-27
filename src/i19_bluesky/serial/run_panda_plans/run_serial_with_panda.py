@@ -48,6 +48,8 @@ def run_on_collection_end(
 ):
     LOGGER.info("Unstage eiger")
     yield from bps.unstage(eiger, wait=True)
+    LOGGER.info("Close experiment shutter")
+    yield from close_experiment_shutter(shutter)
     LOGGER.info("Disarm panda")
     yield from disarm_panda(panda)
     yield from reset_panda(panda)

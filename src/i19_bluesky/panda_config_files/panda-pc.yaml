@@ -526,12 +526,12 @@ lvdsout.1.val_delay: 0
 lvdsout.2.label: LVDS output
 lvdsout.2.val: ZERO
 lvdsout.2.val_delay: 0
-outenc.1.a: INENC3.A
+outenc.1.a: INENC1.A
 outenc.1.a_delay: 0
-outenc.1.b: INENC3.B
+outenc.1.b: INENC1.B
 outenc.1.b_delay: 0
 outenc.1.bits: 0.0
-outenc.1.data: INENC3.DATA
+outenc.1.data: INENC1.DATA
 outenc.1.data_delay: 0
 outenc.1.enable: ONE
 outenc.1.enable_delay: 0
@@ -542,7 +542,7 @@ outenc.1.protocol: Quadrature
 outenc.1.qperiod: 0.0
 outenc.1.qperiod_units: s
 outenc.1.val: ZERO
-outenc.1.z: INENC3.Z
+outenc.1.z: INENC1.Z
 outenc.1.z_delay: 0
 outenc.2.a: INENC2.A
 outenc.2.a_delay: 0
@@ -559,17 +559,17 @@ outenc.2.label: geobrick
 outenc.2.protocol: Quadrature
 outenc.2.qperiod: 0.0
 outenc.2.qperiod_units: s
-outenc.2.val: INENC3.VAL
+outenc.2.val: INENC2.VAL
 outenc.2.z: INENC2.Z
 outenc.2.z_delay: 0
-outenc.3.a: ZERO
+outenc.3.a: INENC3.A
 outenc.3.a_delay: 0
-outenc.3.b: ZERO
+outenc.3.b: INENC3.B
 outenc.3.b_delay: 0
 outenc.3.bits: 0.0
-outenc.3.data: ZERO
+outenc.3.data: INENC3.DATA
 outenc.3.data_delay: 0
-outenc.3.enable: ZERO
+outenc.3.enable: ONE
 outenc.3.enable_delay: 0
 outenc.3.encoding: Unsigned Binary
 outenc.3.generator_error: 'No'
@@ -577,8 +577,8 @@ outenc.3.label: Output encoder
 outenc.3.protocol: Quadrature
 outenc.3.qperiod: 0.0
 outenc.3.qperiod_units: s
-outenc.3.val: ZERO
-outenc.3.z: ZERO
+outenc.3.val: INENC3.VAL
+outenc.3.z: INENC3.Z
 outenc.3.z_delay: 0
 outenc.4.a: ZERO
 outenc.4.a_delay: 0

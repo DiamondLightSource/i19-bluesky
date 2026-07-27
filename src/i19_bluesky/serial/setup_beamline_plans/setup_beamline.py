@@ -52,11 +52,13 @@ def setup_eh2_serial_collection(
     LOGGER.info("Set up and prepare the eiger for collection")
     energ_in_kev = yield from bps.rd(devices.energy_device.energy_in_kev)
     wavelength_in_a = yield from bps.rd(devices.energy_device.wavelength_in_a)
+    LOGGER.info("Set eiger params")
     yield from set_eiger_params(
         parameters, energ_in_kev, wavelength_in_a, devices.eiger
     )
     # Set ntriggers
     # See https://github.com/bluesky/ophyd-async/issues/1288
+    LOGGER.info(f"Set ntriggers to {parameters.total_num_images}")
     yield from bps.abs_set(
         devices.eiger.detector.ntrigger, parameters.total_num_images, wait=True
     )
@@ -66,8 +68,10 @@ def setup_eh2_serial_collection(
         trigger=DetectorTrigger.EXTERNAL_EDGE,
         livetime=parameters.exposure_time_s,
     )
+    # yield from bps.abs_set(devices.eiger.stream.format, "cbor", wait=True) # type: ignore
     # Prepare
     yield from bps.prepare(devices.eiger, trigger_info, wait=True)
+    LOGGER.info("Prepare done!")
 
 
 def setup_beamline_for_collection(

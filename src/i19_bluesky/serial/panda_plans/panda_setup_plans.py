@@ -41,7 +41,7 @@ def setup_panda_for_rotation(
     gate_start = parameters.scan_start_deg - parameters.ramp_distance_deg
     # Home the input encoder
     yield from bps.abs_set(
-        panda.inenc[1].setp,  # type: ignore
+        panda.inenc[3].setp,  # type: ignore
         gate_start * DEG_TO_ENC_COUNTS,
         group="panda-setup",
     )

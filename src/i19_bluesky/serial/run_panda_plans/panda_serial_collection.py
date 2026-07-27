@@ -32,6 +32,7 @@ def trigger_panda_collection(
             panda (HDFPanda): The fastcs PandA ophyd device.
             eiger (EigerDetector): The eiger detector device
     """
+    LOGGER.info("Set up panda")
     yield from setup_panda_for_rotation(
         parameters.panda_rotation_params,
         devices.panda,
