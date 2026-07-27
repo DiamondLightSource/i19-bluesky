@@ -526,12 +526,12 @@ lvdsout.1.val_delay: 0
 lvdsout.2.label: LVDS output
 lvdsout.2.val: ZERO
 lvdsout.2.val_delay: 0
-outenc.1.a: INENC1.A
+outenc.1.a: INENC3.A
 outenc.1.a_delay: 0
-outenc.1.b: INENC1.B
+outenc.1.b: INENC3.B
 outenc.1.b_delay: 0
 outenc.1.bits: 0.0
-outenc.1.data: INENC1.DATA
+outenc.1.data: INENC3.DATA
 outenc.1.data_delay: 0
 outenc.1.enable: ONE
 outenc.1.enable_delay: 0
@@ -542,7 +542,7 @@ outenc.1.protocol: Quadrature
 outenc.1.qperiod: 0.0
 outenc.1.qperiod_units: s
 outenc.1.val: ZERO
-outenc.1.z: INENC1.Z
+outenc.1.z: INENC3.Z
 outenc.1.z_delay: 0
 outenc.2.a: INENC2.A
 outenc.2.a_delay: 0
@@ -559,7 +559,7 @@ outenc.2.label: geobrick
 outenc.2.protocol: Quadrature
 outenc.2.qperiod: 0.0
 outenc.2.qperiod_units: s
-outenc.2.val: INENC1.VAL
+outenc.2.val: INENC3.VAL
 outenc.2.z: INENC2.Z
 outenc.2.z_delay: 0
 outenc.3.a: ZERO
@@ -733,7 +733,7 @@ seq.1.bitc_delay: 0
 seq.1.enable: ZERO
 seq.1.enable_delay: 0
 seq.1.label: Sequencer
-seq.1.posa: INENC1.VAL
+seq.1.posa: INENC3.VAL
 seq.1.posb: ZERO
 seq.1.posc: ZERO
 seq.1.prescale: 0.0

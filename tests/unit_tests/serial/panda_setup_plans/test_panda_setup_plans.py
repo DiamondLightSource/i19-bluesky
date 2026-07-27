@@ -75,7 +75,7 @@ async def test_reset_panda(mock_panda: HDFPanda, RE: RunEngine):
 
     assert (
         await mock_panda.outenc[1].val.get_value()  # type: ignore
-        == "INENC3.VAL"
+        == "INENC1.VAL"
     )
     assert (
         await mock_panda.outenc[2].val.get_value()  # type: ignore
