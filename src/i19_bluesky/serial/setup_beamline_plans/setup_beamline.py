@@ -40,7 +40,7 @@ def setup_eh2_serial_collection(
         parameters.detector_distance_mm,
         parameters.two_theta_deg,
         devices.backlight,
-        devices.pincol,
+        devices.pinhole_and_collimator,
         devices.diffractometer,
     )
     # Set up sample stage
@@ -75,7 +75,7 @@ def setup_beamline_for_collection(
     detector_distance_mm: float,
     two_theta_deg: float,
     backlight: BacklightPosition,
-    pincol: PinholeCollimatorControl,
+    pinhole_and_collimator: PinholeCollimatorControl,
     diffractometer: FourCircleDiffractometer,
 ) -> MsgGenerator:
     """Runs setup tasks prior to data collection. Currently, moves the backlight to its
@@ -101,7 +101,7 @@ def setup_beamline_for_collection(
     LOGGER.info("Moving backlight out")
     yield from move_backlight_out(backlight)
     LOGGER.info("Moving pinhole collimator into position")
-    yield from move_pin_col_to_requested_in_position(aperture_request, pincol)
+    yield from move_pin_col_to_requested_in_position(aperture_request, pinhole_and_collimator)
     LOGGER.info("Moving attenuator wedge")
     # waiting for https://github.com/DiamondLightSource/i19-bluesky/issues/8
     LOGGER.info("Moving detector stage into position")
