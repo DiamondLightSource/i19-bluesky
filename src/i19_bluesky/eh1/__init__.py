@@ -8,6 +8,9 @@ from i19_bluesky.plans.optics_hutch_control_plans import (
     close_experiment_shutter,
     open_experiment_shutter,
 )
+from i19_bluesky.eh1.voltage_to_beam_position import (
+    measure_piezo_voltages_vs_beam_position,
+)
 
 __all__ = [
     "apply_attenuator_positions",
@@ -16,4 +19,5 @@ __all__ = [
     "open_experiment_shutter",
     "pin_tip_detection_plan",
     "change_energy",
+    "measure_piezo_voltages_vs_beam_position",
 ]
