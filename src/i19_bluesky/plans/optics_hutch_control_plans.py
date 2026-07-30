@@ -39,7 +39,8 @@ def apply_voltage_to_piezo_actuators(
 
 
 def change_energy(
-    requested_energy: float, energy_device: AccessControlledEnergyComposite
+    requested_energy: float,
+    energy_device: AccessControlledEnergyComposite = inject("energy_device"),
 ) -> MsgGenerator[None]:
     LOGGER.info(f"Changing the energy to {requested_energy} KeV.")
     yield from bps.abs_set(energy_device, requested_energy, wait=True)
