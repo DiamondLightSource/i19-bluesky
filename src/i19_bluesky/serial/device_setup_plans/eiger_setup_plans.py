@@ -77,16 +77,6 @@ def set_eiger_params(
     wait: bool = True,
     group: str = "eiger_setup",
 ):
-    # Odin
-    LOGGER.info("Set Odin params")
-    # After an acquisition, OdinData’s metawriter sets its acquisitionID to None,
-    # which is invalid so it needs to be set at least to an empty string
-    # yield from bps.abs_set(eiger.od.acquisition_id, "", wait=True)
-    # yield from bps.abs_set(
-    #     eiger.od.file_path, parameters.collection_directory.as_posix(), wait=True
-    # )
-    # yield from bps.abs_set(eiger.od.file_prefix, parameters.filename_prefix, wait=True)
-
     # Eiger config
     beam_centre = calculate_beam_centre_from_lut(
         parameters.detector_distance_mm,
