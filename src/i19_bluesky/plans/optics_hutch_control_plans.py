@@ -34,6 +34,7 @@ def apply_attenuator_positions(
 def apply_voltage_to_piezo_actuators(
     requested_voltage: float, piezo_device: AccessControlledPiezoActuator
 ) -> MsgGenerator[None]:
+    """Apply new voltage to the requested piezo actuator on the focus mirror."""
     LOGGER.info(f"Applying {requested_voltage} to {piezo_device.name}")
     yield from bps.abs_set(piezo_device, requested_voltage, wait=True)
 
@@ -42,6 +43,14 @@ def change_energy(
     requested_energy: float,
     energy_device: AccessControlledEnergyComposite = inject("energy_device"),
 ) -> MsgGenerator[None]:
+    """Trigger a plan to change the energy to the requested value.
+    The triggered plan will change the energy on the dcm, move the undulator gap, set
+    the mirror stripes and then apply a new voltage to the piezos. The values for this
+    can be found in i19-shared/json.
+
+    Args:
+        requested_energy: The newenergy to set, in KeV.
+    """
     LOGGER.info(f"Changing the energy to {requested_energy} KeV.")
     yield from bps.abs_set(energy_device, requested_energy, wait=True)
 
