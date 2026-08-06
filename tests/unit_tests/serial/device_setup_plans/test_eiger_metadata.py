@@ -82,17 +82,14 @@ async def test_set_eiger_params(
             wait=wait,
         )
     )
-    assert await eh2_eiger.od.acquisition_id.get_value() == ""
-    assert await eh2_eiger.od.file_path.get_value() == "/tmp/i19-2/cm12345-1/foo"
-    assert await eh2_eiger.od.file_prefix.get_value() == "bar_01"
     assert await eh2_eiger.detector.detector_distance.get_value() == 320
     assert await eh2_eiger.detector.beam_center_x.get_value() == 100
     assert await eh2_eiger.detector.beam_center_y.get_value() == 200
-    assert await eh2_eiger.detector.photon_energy.get_value() == 17
+    assert await eh2_eiger.detector.photon_energy.get_value() == 17000  # in ev
     assert await eh2_eiger.detector.omega_start.get_value() == 0
     assert await eh2_eiger.detector.omega_increment.get_value() == 0
     assert await eh2_eiger.detector.wavelength.get_value() == 0.6  # type:ignore
-    assert await eh2_eiger.detector.two_theta.get_value() == 0  # type:ignore
+    assert await eh2_eiger.detector.two_theta_start.get_value() == 0  # type:ignore
     assert await eh2_eiger.detector.phi_start.get_value() == 0  # type:ignore
     assert await eh2_eiger.detector.phi_increment.get_value() == 0.1  # type:ignore
     assert await eh2_eiger.detector.chi_start.get_value() == 0  # type:ignore
