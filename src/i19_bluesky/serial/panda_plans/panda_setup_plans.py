@@ -35,7 +35,7 @@ def setup_panda_for_rotation(
 
     yield from load_panda_from_yaml(
         DeviceSettingsConstants.PANDA_DIR.as_posix(),
-        DeviceSettingsConstants.PANDA_PC_FILENAME,
+        DeviceSettingsConstants.PANDA_SERIAL_CONFIG,
         panda,
     )
     gate_start = parameters.scan_start_deg - parameters.ramp_distance_deg
@@ -67,9 +67,10 @@ def setup_panda_for_rotation(
 
 
 def reset_panda(panda: HDFPanda, group="reset_panda"):
+    # NOTE. Beamline staff would like this called only when UI closes
     yield from load_panda_from_yaml(
         DeviceSettingsConstants.PANDA_DIR.as_posix(),
-        DeviceSettingsConstants.PANDA_THROUGH_ZEBRA,
+        DeviceSettingsConstants.PANDA_STANDARD_CONFIG,
         panda,
     )
     # Should go back to zebra settings
