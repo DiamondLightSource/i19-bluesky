@@ -26,7 +26,7 @@ def apply_attenuator_positions(
     position_demands: AttenuatorMotorPositions,
     motor_squad: AttenuatorMotorSquad = inject("attenuator_motor_squad"),
 ) -> MsgGenerator[None]:
-    validated_demands = position_demands.validated_complete_demand()
+    validated_demands = position_demands.validated_and_complete()
     LOGGER.info(f"Applying position demands {validated_demands} to attenuator elements")
     yield from bps.abs_set(motor_squad, position_demands, wait=True)
 
