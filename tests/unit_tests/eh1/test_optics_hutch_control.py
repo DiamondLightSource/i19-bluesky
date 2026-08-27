@@ -32,7 +32,7 @@ def test_apply_attenuator_positions(
     xy_demands = {"X": 25.37, "Y": 18.091}
     filter_wheel_demands = {"W": 4}
     position_demands = AttenuatorMotorPositions(
-        continuous_demands=xy_demands, indexed_demands=filter_wheel_demands
+        continuous_positions=xy_demands, discrete_indices=filter_wheel_demands
     )
     RE(apply_attenuator_positions(position_demands, attenuator_motor_squad))
 

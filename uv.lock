@@ -985,7 +985,7 @@ wheels = [
 
 [[package]]
 name = "daq-config-server"
-version = "1.5.1"
+version = "1.3.7"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "cachetools" },
@@ -1000,9 +1000,9 @@ dependencies = [
     { name = "uvicorn" },
     { name = "xmltodict" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/6f/a2/2fc42d3231be454be244c1dd19a1e36204fe68957b275fc37775efffc9ba/daq_config_server-1.5.1.tar.gz", hash = "sha256:e7dbcd335a1ec06faa777bc0f03039c90aa067b3b71df599cb59ae7cf5fac368", size = 236115, upload-time = "2026-07-28T14:03:52.265Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/36/93/c913c56425bf937c3c6b8733ac88bdb6b03a49dd10f068215473b511f12f/daq_config_server-1.3.7.tar.gz", hash = "sha256:6dc0c0613c88198eb16cd86c84c731de97090499ebcf39ccfe9be67dad84caae", size = 233043, upload-time = "2026-06-25T10:00:58.084Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/b8/6a/7a8d2a4d7c35f1e384e58c559b44fa41d90878b67e1c9689831fe2a1d125/daq_config_server-1.5.1-py3-none-any.whl", hash = "sha256:3076083c3a9a007f635562654d834c8528997316e1764b4cbd46cb324e3904be", size = 35620, upload-time = "2026-07-28T14:03:51.285Z" },
+    { url = "https://files.pythonhosted.org/packages/bd/0b/0472e9ab51f04a5fd00d477edf8567bdf320a6f245bd6414b3f208f49684/daq_config_server-1.3.7-py3-none-any.whl", hash = "sha256:ecf11b770d059248d70b3418b75701842dce398d4945e26a8a16ac5049a845c5", size = 35113, upload-time = "2026-06-25T10:00:57.083Z" },
 ]
 
 [[package]]
@@ -1066,8 +1066,8 @@ wheels = [
 
 [[package]]
 name = "dls-dodal"
-version = "2.5.4.dev16+g5e99eab30"
-source = { git = "https://github.com/DiamondLightSource/dodal.git?rev=5e99eab304e0fd9dff048d31d9707bb0b0b0d475#5e99eab304e0fd9dff048d31d9707bb0b0b0d475" }
+version = "2.5.4.dev2+gc44db1e08"
+source = { git = "https://github.com/DiamondLightSource/dodal.git?rev=c44db1e08de3857e96f96504798a1bf83f32e987#c44db1e08de3857e96f96504798a1bf83f32e987" }
 dependencies = [
     { name = "aiofiles" },
     { name = "aiohttp" },
@@ -2028,7 +2028,7 @@ requires-dist = [
     { name = "blueapi", specifier = ">=1.4.1" },
     { name = "bluesky", specifier = ">=1.13" },
     { name = "daq-config-server", specifier = ">=1.3.2" },
-    { name = "dls-dodal", git = "https://github.com/DiamondLightSource/dodal.git?rev=5e99eab304e0fd9dff048d31d9707bb0b0b0d475" },
+    { name = "dls-dodal", git = "https://github.com/DiamondLightSource/dodal.git?rev=c44db1e08de3857e96f96504798a1bf83f32e987" },
     { name = "fastapi", extras = ["all"] },
     { name = "nexgen" },
     { name = "numpy" },
