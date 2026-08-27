@@ -985,7 +985,7 @@ wheels = [
 
 [[package]]
 name = "daq-config-server"
-version = "1.3.7"
+version = "1.5.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "cachetools" },
@@ -1000,9 +1000,9 @@ dependencies = [
     { name = "uvicorn" },
     { name = "xmltodict" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/36/93/c913c56425bf937c3c6b8733ac88bdb6b03a49dd10f068215473b511f12f/daq_config_server-1.3.7.tar.gz", hash = "sha256:6dc0c0613c88198eb16cd86c84c731de97090499ebcf39ccfe9be67dad84caae", size = 233043, upload-time = "2026-06-25T10:00:58.084Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/50/50/5870d12cd0a1e93695c5dea7f5ad6714e1a8af6d48f9753678f5aa2a37b3/daq_config_server-1.5.2.tar.gz", hash = "sha256:ca8aada60107c0969f83112d3b6e1d07ab23d5e72d26a968e04bb36ec02f0507", size = 237348, upload-time = "2026-08-14T15:07:36.172Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/bd/0b/0472e9ab51f04a5fd00d477edf8567bdf320a6f245bd6414b3f208f49684/daq_config_server-1.3.7-py3-none-any.whl", hash = "sha256:ecf11b770d059248d70b3418b75701842dce398d4945e26a8a16ac5049a845c5", size = 35113, upload-time = "2026-06-25T10:00:57.083Z" },
+    { url = "https://files.pythonhosted.org/packages/6c/5b/dc623b063822cae2494d6265ac1077406007495d42513ba2eae66e729b08/daq_config_server-1.5.2-py3-none-any.whl", hash = "sha256:7834f7479af40792a164355bd6acd15f32eeb6803b861eefb27dcb83355de786", size = 36376, upload-time = "2026-08-14T15:07:35.114Z" },
 ]
 
 [[package]]
@@ -1066,8 +1066,8 @@ wheels = [
 
 [[package]]
 name = "dls-dodal"
-version = "2.5.4.dev2+gc44db1e08"
-source = { git = "https://github.com/DiamondLightSource/dodal.git?rev=c44db1e08de3857e96f96504798a1bf83f32e987#c44db1e08de3857e96f96504798a1bf83f32e987" }
+version = "2.6.3.dev9+g316750071"
+source = { git = "https://github.com/DiamondLightSource/dodal.git?rev=3167500719b80470fa740f35cdd30f016b6b4666#3167500719b80470fa740f35cdd30f016b6b4666" }
 dependencies = [
     { name = "aiofiles" },
     { name = "aiohttp" },
@@ -2028,7 +2028,7 @@ requires-dist = [
     { name = "blueapi", specifier = ">=1.4.1" },
     { name = "bluesky", specifier = ">=1.13" },
     { name = "daq-config-server", specifier = ">=1.3.2" },
-    { name = "dls-dodal", git = "https://github.com/DiamondLightSource/dodal.git?rev=c44db1e08de3857e96f96504798a1bf83f32e987" },
+    { name = "dls-dodal", git = "https://github.com/DiamondLightSource/dodal.git?rev=3167500719b80470fa740f35cdd30f016b6b4666" },
     { name = "fastapi", extras = ["all"] },
     { name = "nexgen" },
     { name = "numpy" },
@@ -3383,7 +3383,7 @@ wheels = [
 
 [[package]]
 name = "ophyd-async"
-version = "0.20.1"
+version = "0.21.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "bluesky" },
@@ -3397,9 +3397,9 @@ dependencies = [
     { name = "stamina" },
     { name = "velocity-profile" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/48/e1/8faa491911abd3426273daf2249769ca54786ca2a70f928afa89dd75e226/ophyd_async-0.20.1.tar.gz", hash = "sha256:a98f502d8868e35ab593aef2819730f3263445a256b7729bf43aa791feae575e", size = 660613, upload-time = "2026-07-22T11:25:59.086Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/b6/f0/91b6071faf34e87769e2522ddfabdd9fd592cd8fd12cabf4926408cab70b/ophyd_async-0.21.1.tar.gz", hash = "sha256:d0f2b9c72a444797484071b5f61b7ab0ae307d0779ca750daf2237c6ba5965ea", size = 668752, upload-time = "2026-08-04T08:53:00.232Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/0a/a3/fead51df9547035d674b98c6c583064decd09a282ef2bb94122b254fac2d/ophyd_async-0.20.1-py3-none-any.whl", hash = "sha256:95f83ba007d33a86b4eb15b423deddc65dcd3f7b228b424523087c3b10eeb718", size = 255614, upload-time = "2026-07-22T11:25:57.768Z" },
+    { url = "https://files.pythonhosted.org/packages/0e/fd/aad3337b0d14352589af31719112d25f0f27958547c81ed0dc01301a1b3a/ophyd_async-0.21.1-py3-none-any.whl", hash = "sha256:a94ad8d02a3b03d9cb023d1e988dfc2dbb1ea9a22d6cbea25bbcd9575a8fe1ee", size = 258851, upload-time = "2026-08-04T08:52:58.863Z" },
 ]
 
 [package.optional-dependencies]
@@ -4890,16 +4890,16 @@ wheels = [
 
 [[package]]
 name = "scanspec"
-version = "0.10.0"
+version = "1.0.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "click" },
     { name = "numpy" },
     { name = "pydantic" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/7b/7c/9d9de144ca0e0be895caf824f30e2c8d809c032b248fb3a6c92a4df30660/scanspec-0.10.0.tar.gz", hash = "sha256:8d0d93c4b5a3c74d983a38c6f6001d3cc574429a7a26604a31a61b82c373f0a9", size = 266550, upload-time = "2026-02-02T12:59:56.678Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/03/c3/7b3621a0eec53b7e348457de68a33a93314c5626523ab1481395811aa09e/scanspec-1.0.0.tar.gz", hash = "sha256:31d297861978e56bb6cfcaa15527bad5ba3dc158b3fc52142ecb5611a22e1b5a", size = 285029, upload-time = "2026-04-28T12:12:54.378Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/f8/6d/8500f4bece0aa7cd2af374739f2944c9fa52f0fc5e1d9e65a366f37f494a/scanspec-0.10.0-py3-none-any.whl", hash = "sha256:0979cdcf9790573478f863c36844e1446e87996f945b1bd9c1dcbd7fb663ad92", size = 37728, upload-time = "2026-02-02T12:59:55.843Z" },
+    { url = "https://files.pythonhosted.org/packages/68/b9/f44b139096467996b4d85589d9880fd55f0c80a204d298a1b73d0adc2654/scanspec-1.0.0-py3-none-any.whl", hash = "sha256:4ad6dccd6ac19dbd8af888c80c5db53c70d6b8aee9d26c0ca174cebd3c396730", size = 37825, upload-time = "2026-04-28T12:12:53.084Z" },
 ]
 
 [[package]]
