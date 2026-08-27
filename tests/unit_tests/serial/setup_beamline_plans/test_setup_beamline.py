@@ -37,10 +37,18 @@ async def test_setup_beamline_for_collection(
     parameters.detector_distance_mm = detector_z
     parameters.two_theta_deg = detector_two_theta
     parameters.aperture_request = eh2_aperture
-    set_mock_value(devices.pinhole_and_collimator.mapt.pin_x.in_positions[size], in_positions[0])
-    set_mock_value(devices.pinhole_and_collimator.mapt.pin_y.in_positions[size], in_positions[1])
-    set_mock_value(devices.pinhole_and_collimator.mapt.col_x.in_positions[size], in_positions[2])
-    set_mock_value(devices.pinhole_and_collimator.mapt.col_y.in_positions[size], in_positions[3])
+    set_mock_value(
+        devices.pinhole_and_collimator.mapt.pin_x.in_positions[size], in_positions[0]
+    )
+    set_mock_value(
+        devices.pinhole_and_collimator.mapt.pin_y.in_positions[size], in_positions[1]
+    )
+    set_mock_value(
+        devices.pinhole_and_collimator.mapt.col_x.in_positions[size], in_positions[2]
+    )
+    set_mock_value(
+        devices.pinhole_and_collimator.mapt.col_y.in_positions[size], in_positions[3]
+    )
     RE(
         setup_beamline_for_collection(
             parameters.aperture_request,
@@ -62,13 +70,21 @@ async def test_setup_beamline_for_collection(
 
     assert await devices.backlight.position.get_value() == InOutUpper.OUT
 
-    assert await devices.pinhole_and_collimator._pinhole.x.user_readback.get_value() == in_positions[0]
-    assert await devices.pinhole_and_collimator._pinhole.y.user_readback.get_value() == in_positions[1]
     assert (
-        await devices.pinhole_and_collimator._collimator.x.user_readback.get_value() == in_positions[2]
+        await devices.pinhole_and_collimator._pinhole.x.user_readback.get_value()
+        == in_positions[0]
     )
     assert (
-        await devices.pinhole_and_collimator._collimator.y.user_readback.get_value() == in_positions[3]
+        await devices.pinhole_and_collimator._pinhole.y.user_readback.get_value()
+        == in_positions[1]
+    )
+    assert (
+        await devices.pinhole_and_collimator._collimator.x.user_readback.get_value()
+        == in_positions[2]
+    )
+    assert (
+        await devices.pinhole_and_collimator._collimator.y.user_readback.get_value()
+        == in_positions[3]
     )
 
 
@@ -96,7 +112,12 @@ async def test_setup_eh2_serial_collection(
     mock_open_shutter.assert_called_once_with(devices.shutter)
     mock_set_eiger_params.assert_called_once_with(parameters, 17.9, 0.6, devices.eiger)
     mock_setup.assert_called_once_with(
-        "100um", 320, 0, devices.backlight, devices.pinhole_and_collimator, devices.diffractometer
+        "100um",
+        320,
+        0,
+        devices.backlight,
+        devices.pinhole_and_collimator,
+        devices.diffractometer,
     )
     mock_stage.assert_called_once_with(
         parameters.panda_rotation_params, devices.serial_stages

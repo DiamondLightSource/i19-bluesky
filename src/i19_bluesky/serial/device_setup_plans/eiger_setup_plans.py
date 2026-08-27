@@ -8,7 +8,6 @@ from dodal.devices.util.lookup_tables import linear_interpolation_lut
 from ophyd_async.fastcs.eiger import EigerDetector
 
 from i19_bluesky.log import LOGGER
-
 from i19_bluesky.parameters.serial_parameters import SerialExperimentEh2
 
 BEAM_XY_TABLE_PATH = (

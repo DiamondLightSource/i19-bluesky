@@ -68,7 +68,7 @@ def setup_eh2_serial_collection(
         trigger=DetectorTrigger.EXTERNAL_EDGE,
         livetime=parameters.exposure_time_s,
     )
-    # yield from bps.abs_set(devices.eiger.stream.format, "cbor", wait=True) # type: ignore
+    # yield from bps.abs_set(devices.eiger.stream.format, "cbor", wait=True)
     # Prepare
     yield from bps.prepare(devices.eiger, trigger_info, wait=True)
     LOGGER.info("Prepare done!")
@@ -105,7 +105,9 @@ def setup_beamline_for_collection(
     LOGGER.info("Moving backlight out")
     yield from move_backlight_out(backlight)
     LOGGER.info("Moving pinhole collimator into position")
-    yield from move_pin_col_to_requested_in_position(aperture_request, pinhole_and_collimator)
+    yield from move_pin_col_to_requested_in_position(
+        aperture_request, pinhole_and_collimator
+    )
     LOGGER.info("Moving attenuator wedge")
     # waiting for https://github.com/DiamondLightSource/i19-bluesky/issues/8
     LOGGER.info("Moving detector stage into position")
