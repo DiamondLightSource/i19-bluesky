@@ -1,9 +1,7 @@
 from enum import StrEnum
 
 from bluesky.protocols import Movable
-from dodal.common.beamlines.beamline_utils import (
-    device_factory,
-)
+from dodal.device_manager import DeviceManager
 from dodal.devices.beamlines.i19.access_controlled.blueapi_device import (
     HutchState,
     OpticsBlueAPIDevice,
@@ -13,6 +11,8 @@ from dodal.devices.beamlines.i19.access_controlled.hutch_access import (
 )
 from ophyd_async.core import AsyncStatus, StandardReadable
 from ophyd_async.sim import SimMotor
+
+devices = DeviceManager()
 
 
 class MotorPosition(StrEnum):
@@ -36,12 +36,12 @@ class FakeOpticsMotors(StandardReadable, Movable[MotorPosition]):
             await self.motor2.set(0.0)
 
 
-@device_factory()
+@devices.factory()
 def optics_motors() -> FakeOpticsMotors:
     return FakeOpticsMotors(name="optics_motors")
 
 
-@device_factory()
+@devices.factory()
 def access_device() -> HutchAccessControl:
     device = HutchAccessControl(prefix="MOCK-ACCESS-CONTROL:", name="access_control")
     return device
