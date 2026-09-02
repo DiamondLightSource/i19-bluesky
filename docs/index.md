@@ -2,10 +2,6 @@
 html_theme.sidebar_secondary.remove: true
 ---
 
-```{include} ../README.md
-:end-before: <!-- README only content
-```
-
 
 How the documentation is structured
 -----------------------------------
