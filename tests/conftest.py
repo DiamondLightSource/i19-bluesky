@@ -2,12 +2,10 @@ import logging
 import os
 import sys
 from collections.abc import Sequence
-from types import ModuleType
 from typing import Any
 
 import pytest
 from dodal.log import LOGGER as dodal_logger
-from dodal.utils import AnyDeviceFactory, collect_factories
 
 from i19_bluesky.log import LOGGER, BeamlineHutch, do_default_logging_setup
 
@@ -30,11 +28,6 @@ if os.getenv("PYTEST_RAISE", "0") == "1":
     @pytest.hookimpl(tryfirst=True)
     def pytest_internalerror(excinfo: pytest.ExceptionInfo[Any]):
         raise excinfo.value
-
-
-def device_factories_for_beamline(beamline_module: ModuleType) -> set[AnyDeviceFactory]:
-    device_factories = collect_factories(beamline_module, include_skipped=True).values()
-    return {f for f in device_factories if hasattr(f, "cache_clear")}
 
 
 def _reset_loggers(loggers):
