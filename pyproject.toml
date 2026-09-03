@@ -10,6 +10,7 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
 ]
 description = "Bluesky tools for i19 beamline."
 dependencies = [
@@ -21,8 +22,6 @@ dependencies = [
     "fastapi[all]",
     # These dependencies may be issued as pre-release versions and should have a pin constraint
     # as by default pip-install will not upgrade to a pre-release.
-    # Blueapi pinned until GDA can be updated on the beamline to use latest version
-    "blueapi >= 1.4.1",
     "ophyd ==1.11.0",
     "ophyd-async[ca,pva] >= 0.20.1",
     "bluesky >= 1.13",
@@ -37,6 +36,7 @@ requires-python = ">=3.11"
 [dependency-groups]
 dev = [
     "build",
+    "blueapi >= 1.18.0",    # To avoid it taking up space in cluster
     "copier",
     "ipython",
     "import-linter",
@@ -135,7 +135,7 @@ commands = [
     [
         "pyright",
         "--pythonpath",
-        ".venv/bin/python",
+        "{env:VIRTUAL_ENV}/bin/python",
         "src",
         "tests",
         { replace = "posargs", default = [

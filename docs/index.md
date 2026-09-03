@@ -2,13 +2,9 @@
 html_theme.sidebar_secondary.remove: true
 ---
 
-```{include} ../README.md
-:end-before: <!-- README only content
-```
-
 
 How the documentation is structured
------------------------------------
+===================================
 
 Documentation is split into [four categories](https://diataxis.fr), also accessible from links in the top bar.
 

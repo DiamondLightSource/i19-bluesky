@@ -28,7 +28,7 @@
             ]
         },
         {
-            "name": "access_control",
+            "name": "access_device",
             "protocols": [
                 {
                     "name": "Readable",
