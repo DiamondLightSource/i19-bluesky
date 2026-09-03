@@ -32,11 +32,8 @@ async def test_setup_sample_stage(
 ):
     parameters.rot_axis_start = 6.0
     RE(setup_sample_stage(parameters.panda_rotation_params, serial_stages))
-    mock_phi = get_mock_put(serial_stages.phi.user_setpoint)
-    mock_phi.assert_called_once_with(6.0)
-
-    mock_phi_velocity = get_mock_put(serial_stages.phi.velocity)
-    mock_phi_velocity.assert_called_once_with(1)
+    assert await serial_stages.phi.user_readback.get_value() == 6.0
+    assert await serial_stages.phi.velocity.get_value() == 1.0
 
 
 @pytest.mark.parametrize(

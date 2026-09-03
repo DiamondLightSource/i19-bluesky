@@ -12,6 +12,8 @@ from i19_bluesky.parameters.components import RotationParams
 def setup_sample_stage(
     rotation_parameters: RotationParams,
     serial_stages: XYZPhiStage,
+    group: str = "setup_phi",
+    wait: bool = True,
 ) -> MsgGenerator:
     """Setup phi start posistion and velocity on the diffractometer.
 
@@ -22,10 +24,16 @@ def setup_sample_stage(
             exposure_time_s (float): Time between images, in seconds.
         serial_stages (XYZPhiStage): XYZPhiStage object representing the sample stage
     """
-    yield from bps.abs_set(serial_stages.phi, rotation_parameters.scan_start_deg)
     yield from bps.abs_set(
-        serial_stages.phi.velocity, rotation_parameters.rotation_axis_velocity
+        serial_stages.phi, rotation_parameters.scan_start_deg, group=group
     )
+    yield from bps.abs_set(
+        serial_stages.phi.velocity,
+        rotation_parameters.rotation_axis_velocity,
+        group=group,
+    )
+    if wait:
+        yield from bps.wait(group=group)
 
 
 def move_sample_stage_back(
