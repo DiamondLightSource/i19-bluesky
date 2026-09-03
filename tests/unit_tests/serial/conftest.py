@@ -1,11 +1,19 @@
 import os
 from typing import Any
+from unittest.mock import MagicMock
 
 import pytest
 from bluesky.run_engine import RunEngine
 from dodal.beamlines import i19_2
 from dodal.common.beamlines.beamline_utils import get_path_provider, set_path_provider
 from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitPathProvider
+from dodal.devices.beamlines.i19.access_controlled.energy_device import (
+    AccessControlledEnergyComposite,
+)
+from dodal.devices.beamlines.i19.access_controlled.shutter import (
+    AccessControlledShutter,
+    HutchState,
+)
 from dodal.devices.beamlines.i19.backlight import BacklightPosition
 from dodal.devices.beamlines.i19.diffractometer import (
     FourCircleDiffractometer,
@@ -20,7 +28,7 @@ from ophyd_async.epics.core import epics_signal_rw
 from ophyd_async.fastcs.eiger import EigerDetector
 from ophyd_async.fastcs.panda import HDFPanda
 
-from i19_bluesky.parameters.components import HutchName, Path
+from i19_bluesky.parameters.components import Path
 from i19_bluesky.parameters.devices_composites import (
     SerialCollectionEh2PandaComposite,
     SerialCollectionEh2ZebraComposite,
@@ -162,8 +170,36 @@ async def eh2_eiger(RE: RunEngine) -> EigerDetector:
 
 
 @pytest.fixture
+async def eh2_shutter(RE: RunEngine) -> AccessControlledShutter:
+    shutter = AccessControlledShutter("", HutchState.EH2, name="mock_shutter")
+    await shutter.connect(mock=True)
+
+    shutter.url = "http://test-blueapi.url"
+    return shutter
+
+
+@pytest.fixture
+async def eh2_energy_device(RE: RunEngine) -> AccessControlledEnergyComposite:
+    energy_device = AccessControlledEnergyComposite(
+        "", HutchState.EH2, "/path/to/config/", MagicMock(), "", "mock_energy_composite"
+    )
+    await energy_device.connect(mock=True)
+    energy_device.url = "http://test-blueapi.url"
+    set_mock_value(energy_device.energy_in_kev, 17.9)
+    set_mock_value(energy_device.wavelength_in_a, 0.6)
+    return energy_device
+
+
+@pytest.fixture
 async def devices(
-    mock_panda, eh2_eiger, eh2_backlight, eh2_diffractometer, serial_stages, pincol
+    mock_panda,
+    eh2_eiger,
+    eh2_backlight,
+    eh2_diffractometer,
+    serial_stages,
+    pincol,
+    eh2_shutter,
+    eh2_energy_device,
 ) -> SerialCollectionEh2PandaComposite:
     devices = SerialCollectionEh2PandaComposite(
         diffractometer=eh2_diffractometer,
@@ -172,6 +208,8 @@ async def devices(
         panda=mock_panda,
         eiger=eh2_eiger,
         serial_stages=serial_stages,
+        shutter=eh2_shutter,
+        energy_device=eh2_energy_device,
     )
 
     return devices
@@ -196,7 +234,6 @@ async def devices_zebra(
 @pytest.fixture
 def parameters():
     return SerialExperimentEh2(
-        hutch=HutchName.EH2,
         visit=Path("/tmp/i19-2/cm12345-1"),
         dataset="foo",
         filename_prefix="bar_01",

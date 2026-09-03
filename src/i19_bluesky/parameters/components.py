@@ -22,7 +22,6 @@ class DetectorType(StrEnum):
 
 
 class VisitParameters(BaseModel):
-    hutch: HutchName
     visit: Path
     dataset: str
     filename_prefix: str

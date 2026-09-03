@@ -1,12 +1,16 @@
 import asyncio
 import time
+from typing import TypeVar
 
+import bluesky.plan_stubs as bps
 import pytest
-from blueapi.core import BlueskyContext
+from blueapi.core import BlueskyContext, MsgGenerator
 from bluesky.run_engine import RunEngine
 from dodal.beamlines import i19_2
 from dodal.devices.zebra.zebra import Zebra
 from ophyd_async.core import get_mock_put, set_mock_value
+
+T = TypeVar("T")
 
 
 @pytest.fixture
@@ -25,6 +29,11 @@ async def RE():
 @pytest.fixture
 def context() -> BlueskyContext:
     return BlueskyContext()
+
+
+def fake_generator(return_val: T = None) -> MsgGenerator[T]:
+    yield from bps.null()
+    return return_val
 
 
 @pytest.fixture

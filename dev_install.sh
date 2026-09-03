@@ -7,14 +7,14 @@ if [ -d "./.venv" ]; then
 rm -rf .venv
 fi
 
-module load python/3.11 && module load uv
+module load python/3.12 && module load uv
 
 uv sync --editable --group dev    # This creates venv with i19-bluesky in dev editable mode
 source .venv/bin/activate
 
 pre-commit install
 
-module unload python/3.11 && module unload uv
+module unload python/3.12 && module unload uv
 
 # Local version of dodal
 if [ ! -d "../dodal" ]; then

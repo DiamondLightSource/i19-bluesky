@@ -1,3 +1,5 @@
+from unittest.mock import MagicMock, patch
+
 import pytest
 from bluesky.run_engine import RunEngine
 from dodal.common.enums import InOutUpper
@@ -8,8 +10,9 @@ from ophyd_async.core import set_mock_value
 
 from i19_bluesky.parameters.devices_composites import SerialCollectionEh2PandaComposite
 from i19_bluesky.parameters.serial_parameters import SerialExperimentEh2
-from i19_bluesky.serial.setup_beamline_plans.setup_beamline_pre_collection import (
-    setup_beamline_before_collection,
+from i19_bluesky.serial.setup_beamline_plans.setup_beamline import (
+    setup_beamline_for_collection,
+    setup_eh2_serial_collection,
 )
 
 
@@ -20,7 +23,7 @@ from i19_bluesky.serial.setup_beamline_plans.setup_beamline_pre_collection impor
         (80, 90, PinColRequest.PCOL100, [23.4, 22.1, 12, 18.7]),
     ],
 )
-async def test_setup_beamline_before_collection(
+async def test_setup_beamline_for_collection(
     detector_z: float,
     detector_two_theta: float,
     eh2_aperture: PinColRequest,
@@ -39,7 +42,7 @@ async def test_setup_beamline_before_collection(
     set_mock_value(devices.pincol.mapt.col_x.in_positions[size], in_positions[2])
     set_mock_value(devices.pincol.mapt.col_y.in_positions[size], in_positions[3])
     RE(
-        setup_beamline_before_collection(
+        setup_beamline_for_collection(
             parameters.aperture_request,
             parameters.detector_distance_mm,
             parameters.two_theta_deg,
@@ -66,4 +69,35 @@ async def test_setup_beamline_before_collection(
     )
     assert (
         await devices.pincol._collimator.y.user_readback.get_value() == in_positions[3]
+    )
+
+
+@patch("i19_bluesky.serial.setup_beamline_plans.setup_beamline.write_eiger_params")
+@patch("i19_bluesky.serial.setup_beamline_plans.setup_beamline.setup_sample_stage")
+@patch(
+    "i19_bluesky.serial.setup_beamline_plans.setup_beamline.setup_beamline_for_collection"
+)
+@patch("i19_bluesky.serial.setup_beamline_plans.setup_beamline.open_experiment_shutter")
+def test_setup_eh2_serial_collection(
+    mock_open_shutter: MagicMock,
+    mock_setup: MagicMock,
+    mock_stage: MagicMock,
+    mock_write_eiger_params: MagicMock,
+    parameters: SerialExperimentEh2,
+    devices: SerialCollectionEh2PandaComposite,
+    RE: RunEngine,
+):
+    set_mock_value(devices.energy_device.energy_in_kev, 17.9)
+    set_mock_value(devices.energy_device.wavelength_in_a, 0.6)
+    RE(setup_eh2_serial_collection(parameters, devices))
+
+    mock_open_shutter.assert_called_once_with(devices.shutter)
+    mock_write_eiger_params.assert_called_once_with(
+        parameters, 17.9, 0.6, devices.eiger
+    )
+    mock_setup.assert_called_once_with(
+        "100um", 320, 0, devices.backlight, devices.pincol, devices.diffractometer
+    )
+    mock_stage.assert_called_once_with(
+        parameters.panda_rotation_params, devices.serial_stages
     )

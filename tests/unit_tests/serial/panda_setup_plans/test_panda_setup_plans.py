@@ -6,7 +6,7 @@ from ophyd_async.fastcs.panda import HDFPanda, SeqTable, SeqTrigger
 
 from i19_bluesky.parameters.devices_composites import SerialCollectionEh2PandaComposite
 from i19_bluesky.parameters.serial_parameters import SerialExperimentEh2
-from i19_bluesky.serial.panda_setup_plans.panda_setup_plans import (
+from i19_bluesky.serial.panda_plans.panda_setup_plans import (
     reset_panda,
     setup_panda_for_rotation,
 )
@@ -16,11 +16,9 @@ async def test_wait_between_setting_table_and_arming(
     mock_panda: HDFPanda, RE: RunEngine, parameters: SerialExperimentEh2
 ):
     with (
+        patch("i19_bluesky.serial.panda_plans.panda_setup_plans.load_panda_from_yaml"),
         patch(
-            "i19_bluesky.serial.panda_setup_plans.panda_setup_plans.load_panda_from_yaml"
-        ),
-        patch(
-            "i19_bluesky.serial.panda_setup_plans.panda_setup_plans.bps.wait"
+            "i19_bluesky.serial.panda_plans.panda_setup_plans.bps.wait"
         ) as patch_wait,
     ):
         RE(setup_panda_for_rotation(parameters.panda_rotation_params, mock_panda))
@@ -33,7 +31,7 @@ async def test_setup_panda_for_rotation(
     RE: RunEngine,
 ):
     with patch(
-        "i19_bluesky.serial.panda_setup_plans.panda_setup_plans.load_panda_from_yaml"
+        "i19_bluesky.serial.panda_plans.panda_setup_plans.load_panda_from_yaml"
     ) as patch_load:
         parameters.rot_axis_start = 4
         parameters.images_per_well = 25
@@ -70,7 +68,7 @@ async def test_setup_panda_for_rotation(
 
 async def test_reset_panda(mock_panda: HDFPanda, RE: RunEngine):
     with patch(
-        "i19_bluesky.serial.panda_setup_plans.panda_setup_plans.load_panda_from_yaml"
+        "i19_bluesky.serial.panda_plans.panda_setup_plans.load_panda_from_yaml"
     ) as patch_load:
         RE(reset_panda(mock_panda, group="reset panda"))
         patch_load.assert_called_once()

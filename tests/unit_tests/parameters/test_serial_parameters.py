@@ -3,6 +3,7 @@ from pathlib import Path
 import pytest
 
 from i19_bluesky.parameters.components import PandaRotationParams, ZebraRotationParams
+from i19_bluesky.parameters.constants import EigerConstants
 from i19_bluesky.parameters.serial_parameters import (
     SerialExperiment,
     SerialExperimentEh2,
@@ -119,7 +120,7 @@ def test_split_wells_into_run_list_for_collection(
     assert len(wells_per_run) == expected_run_num
 
 
-def test_serial_parameter_model_for_eh2(dummy_serial_params_eh2):
+def test_serial_parameter_model_for_eh2_with_eiger(dummy_serial_params_eh2):
     eh2_params = SerialExperimentEh2(**dummy_serial_params_eh2)
 
     assert eh2_params.total_num_images == 20
@@ -128,6 +129,7 @@ def test_serial_parameter_model_for_eh2(dummy_serial_params_eh2):
 
     assert isinstance(eh2_params.zebra_rotation_params, ZebraRotationParams)
     assert isinstance(eh2_params.panda_rotation_params, PandaRotationParams)
+    assert isinstance(eh2_params.detector_constants, EigerConstants)
 
     assert eh2_params.zebra_rotation_params.scan_start_deg == eh2_params.rot_axis_start
     assert eh2_params.zebra_rotation_params.rotation_direction == "Positive"

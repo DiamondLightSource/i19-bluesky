@@ -1,4 +1,10 @@
 import pydantic
+from dodal.devices.beamlines.i19.access_controlled.energy_device import (
+    AccessControlledEnergyComposite,
+)
+from dodal.devices.beamlines.i19.access_controlled.shutter import (
+    AccessControlledShutter,
+)
 from dodal.devices.beamlines.i19.backlight import BacklightPosition
 from dodal.devices.beamlines.i19.diffractometer import (
     FourCircleDiffractometer,
@@ -20,6 +26,8 @@ class SerialCollectionEh2PandaComposite:
     panda: HDFPanda
     eiger: EigerDetector
     serial_stages: XYZPhiStage
+    shutter: AccessControlledShutter
+    energy_device: AccessControlledEnergyComposite
 
 
 @pydantic.dataclasses.dataclass(config={"arbitrary_types_allowed": True})
