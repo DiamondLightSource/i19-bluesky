@@ -23,9 +23,10 @@ dependencies = [
     # These dependencies may be issued as pre-release versions and should have a pin constraint
     # as by default pip-install will not upgrade to a pre-release.
     "ophyd ==1.11.0",
-    "ophyd-async[ca,pva] >= 0.17a4",
+    "ophyd-async[ca,pva] >= 0.20.1",
     "bluesky >= 1.13",
     "daq-config-server >= 1.3.2",
+    # "dls-dodal @ git+https://github.com/DiamondLightSource/dodal.git@i19-serial-test",
     # Pin temporarily removed to avoid it clashing with editable version
     # when deploying blueapi in cluster.
     "dls-dodal",
@@ -38,7 +39,7 @@ requires-python = ">=3.11"
 [dependency-groups]
 dev = [
     "build",
-    "blueapi >= 1.18.0",    # To avoid it taking up space in cluster
+    "blueapi >= 1.18.0",         # To avoid it taking up space in cluster
     "copier",
     "ipython",
     "import-linter",

@@ -17,9 +17,12 @@ DEG_TO_ENC_COUNTS = 1000
 
 @dataclass(frozen=True)
 class DeviceSettingsConstants:
-    PANDA_PC_FILENAME = "panda-pc"
-    PANDA_THROUGH_ZEBRA = "panda-through-zebra"
-    PANDA_DIR = Path("i19-bluesky/src/i19_bluesky/panda_config_files").absolute()
+    PANDA_SERIAL_CONFIG = "panda_standard_config"
+    PANDA_STANDARD_CONFIG = "panda_serial_config"
+    # NOTE needed full path on cluster
+    PANDA_DIR = Path(
+        "/dls_sw/i19-2/software/bluesky/i19-bluesky/src/i19_bluesky/panda_config_files"
+    ).absolute()
 
 
 def arm_panda(panda: HDFPanda) -> MsgGenerator[None]:
@@ -63,4 +66,5 @@ def generate_panda_seq_table(
 
 def setup_outenc_vals(panda: HDFPanda, group="setup_outenc_vals"):
     yield from bps.abs_set(panda.outenc[1].val, "ZERO", group=group)  # type: ignore
-    yield from bps.abs_set(panda.outenc[2].val, "INENC1.VAL", group=group)  # type: ignore
+    # Moved to INENC3 as that's there the new serial stages are connected
+    yield from bps.abs_set(panda.outenc[3].val, "INENC3.VAL", group=group)  # type: ignore

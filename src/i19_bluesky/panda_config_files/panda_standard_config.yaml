@@ -1,8 +1,8 @@
-bits.a: '0'
+bits.a: '1'
 bits.b: '0'
 bits.c: '0'
 bits.d: '0'
-bits.label: Soft inputs and constant bits
+bits.label: Soft inputs
 calc.1.inpa: ZERO
 calc.1.inpb: ZERO
 calc.1.inpc: ZERO
@@ -60,7 +60,7 @@ counter.1.out_mode: On-Change
 counter.1.out_offset: 0.0
 counter.1.out_scale: 1.0
 counter.1.out_units: ''
-counter.1.set: 1
+counter.1.set_: 1
 counter.1.start: 0
 counter.1.step: 0.0
 counter.1.trig: ZERO
@@ -79,7 +79,7 @@ counter.2.out_mode: On-Change
 counter.2.out_offset: 0.0
 counter.2.out_scale: 1.0
 counter.2.out_units: ''
-counter.2.set: 0
+counter.2.set_: 0
 counter.2.start: 0
 counter.2.step: 0.0
 counter.2.trig: ZERO
@@ -98,7 +98,7 @@ counter.3.out_mode: On-Change
 counter.3.out_offset: 0.0
 counter.3.out_scale: 1.0
 counter.3.out_units: ''
-counter.3.set: 0
+counter.3.set_: 0
 counter.3.start: 0
 counter.3.step: 0.0
 counter.3.trig: ZERO
@@ -117,7 +117,7 @@ counter.4.out_mode: On-Change
 counter.4.out_offset: 0.0
 counter.4.out_scale: 1.0
 counter.4.out_units: ''
-counter.4.set: 0
+counter.4.set_: 0
 counter.4.start: 0
 counter.4.step: 0.0
 counter.4.trig: ZERO
@@ -136,7 +136,7 @@ counter.5.out_mode: On-Change
 counter.5.out_offset: 0.0
 counter.5.out_scale: 1.0
 counter.5.out_units: ''
-counter.5.set: 0
+counter.5.set_: 0
 counter.5.start: 0
 counter.5.step: 0.0
 counter.5.trig: ZERO
@@ -155,7 +155,7 @@ counter.6.out_mode: On-Change
 counter.6.out_offset: 0.0
 counter.6.out_scale: 1.0
 counter.6.out_units: ''
-counter.6.set: 0
+counter.6.set_: 0
 counter.6.start: 0
 counter.6.step: 0.0
 counter.6.trig: ZERO
@@ -174,7 +174,7 @@ counter.7.out_mode: On-Change
 counter.7.out_offset: 0.0
 counter.7.out_scale: 1.0
 counter.7.out_units: ''
-counter.7.set: 0
+counter.7.set_: 0
 counter.7.start: 0
 counter.7.step: 0.0
 counter.7.trig: ZERO
@@ -193,7 +193,7 @@ counter.8.out_mode: On-Change
 counter.8.out_offset: 0.0
 counter.8.out_scale: 1.0
 counter.8.out_units: ''
-counter.8.set: 0
+counter.8.set_: 0
 counter.8.start: 0
 counter.8.step: 0.0
 counter.8.trig: ZERO
@@ -393,7 +393,7 @@ lut.1.inpd: ZERO
 lut.1.inpd_delay: 0
 lut.1.inpe: ZERO
 lut.1.inpe_delay: 0
-lut.1.label: Lookup table
+lut.1.label: Lookup table 1
 lut.1.typea: Input-Level
 lut.1.typeb: Input-Level
 lut.1.typec: Input-Level
@@ -541,7 +541,7 @@ outenc.1.label: zebrain1
 outenc.1.protocol: Quadrature
 outenc.1.qperiod: 0.0
 outenc.1.qperiod_units: s
-outenc.1.val: ZERO
+outenc.1.val: INENC1.VAL
 outenc.1.z: INENC1.Z
 outenc.1.z_delay: 0
 outenc.2.a: INENC2.A
@@ -559,7 +559,7 @@ outenc.2.label: geobrick
 outenc.2.protocol: Quadrature
 outenc.2.qperiod: 0.0
 outenc.2.qperiod_units: s
-outenc.2.val: INENC1.VAL
+outenc.2.val: INENC2.VAL
 outenc.2.z: INENC2.Z
 outenc.2.z_delay: 0
 outenc.3.a: ZERO
@@ -686,31 +686,31 @@ pulse.1.trig_edge: Rising
 pulse.1.width: 0.0
 pulse.1.width_units: s
 pulse.2.delay: 0.0
-pulse.2.delay_units: s
+pulse.2.delay_units: us
 pulse.2.enable: ZERO
 pulse.2.enable_delay: 0
-pulse.2.label: One-shot pulse delay and stretch
-pulse.2.pulses: 0
-pulse.2.step: 0.0
-pulse.2.step_units: s
+pulse.2.label: One-shot pulse delay and stretch 2
+pulse.2.pulses: 2
+pulse.2.step: 1.872
+pulse.2.step_units: us
 pulse.2.trig: ZERO
 pulse.2.trig_delay: 0
 pulse.2.trig_edge: Rising
-pulse.2.width: 0.0
-pulse.2.width_units: s
-pulse.3.delay: 0.0
-pulse.3.delay_units: s
-pulse.3.enable: ZERO
+pulse.2.width: 0.24
+pulse.2.width_units: us
+pulse.3.delay: 1.528
+pulse.3.delay_units: us
+pulse.3.enable: ONE
 pulse.3.enable_delay: 0
-pulse.3.label: One-shot pulse delay and stretch
+pulse.3.label: laser delay SYNC-IN
 pulse.3.pulses: 0
 pulse.3.step: 0.0
-pulse.3.step_units: s
-pulse.3.trig: ZERO
+pulse.3.step_units: us
+pulse.3.trig: TTLIN1.VAL
 pulse.3.trig_delay: 0
 pulse.3.trig_edge: Rising
-pulse.3.width: 0.0
-pulse.3.width_units: s
+pulse.3.width: 0.2
+pulse.3.width_units: us
 pulse.4.delay: 0.0
 pulse.4.delay_units: s
 pulse.4.enable: ZERO
@@ -842,7 +842,7 @@ srgate.1.label: Set reset gate
 srgate.1.rst: ZERO
 srgate.1.rst_delay: 0
 srgate.1.rst_edge: Falling
-srgate.1.set: ZERO
+srgate.1.set_: ZERO
 srgate.1.set_delay: 0
 srgate.1.set_edge: Falling
 srgate.1.when_disabled: Set output low
@@ -852,7 +852,7 @@ srgate.2.label: Set reset gate
 srgate.2.rst: ZERO
 srgate.2.rst_delay: 0
 srgate.2.rst_edge: Falling
-srgate.2.set: ZERO
+srgate.2.set_: ZERO
 srgate.2.set_delay: 0
 srgate.2.set_edge: Falling
 srgate.2.when_disabled: Set output low
@@ -862,7 +862,7 @@ srgate.3.label: Set reset gate
 srgate.3.rst: ZERO
 srgate.3.rst_delay: 0
 srgate.3.rst_edge: Rising
-srgate.3.set: ZERO
+srgate.3.set_: ZERO
 srgate.3.set_delay: 0
 srgate.3.set_edge: Rising
 srgate.3.when_disabled: Set output low
@@ -872,16 +872,16 @@ srgate.4.label: Set reset gate
 srgate.4.rst: ZERO
 srgate.4.rst_delay: 0
 srgate.4.rst_edge: Rising
-srgate.4.set: ZERO
+srgate.4.set_: ZERO
 srgate.4.set_delay: 0
 srgate.4.set_edge: Rising
 srgate.4.when_disabled: Set output low
 system.clock_source: int clock
 system.label: System control FPGA
 system.timestamp_source: None
-ttlin.1.label: TTL input 1
+ttlin.1.label: 53.3kHz
 ttlin.1.term: High-Z
-ttlin.2.label: TTL input
+ttlin.2.label: position compare
 ttlin.2.term: High-Z
 ttlin.3.label: TTL input
 ttlin.3.term: High-Z
@@ -891,19 +891,19 @@ ttlin.5.label: TTL input
 ttlin.5.term: High-Z
 ttlin.6.label: TTL input
 ttlin.6.term: High-Z
-ttlout.1.label: TTL output 1
+ttlout.1.label: zebra then eiger
 ttlout.1.val: PULSE1.OUT
 ttlout.1.val_delay: 0
-ttlout.10.label: TTL output
-ttlout.10.val: ZERO
+ttlout.10.label: polariser
+ttlout.10.val: BITS.OUTA
 ttlout.10.val_delay: 0
-ttlout.2.label: TTL output
-ttlout.2.val: ZERO
+ttlout.2.label: eiger
+ttlout.2.val: TTLIN2.VAL
 ttlout.2.val_delay: 0
-ttlout.3.label: TTL output
-ttlout.3.val: ZERO
+ttlout.3.label: PORTO SYNC-IN
+ttlout.3.val: PULSE3.OUT
 ttlout.3.val_delay: 0
-ttlout.4.label: TTL output
+ttlout.4.label: TTL output 4
 ttlout.4.val: ZERO
 ttlout.4.val_delay: 0
 ttlout.5.label: TTL output
