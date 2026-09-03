@@ -62,7 +62,7 @@ class AccessControlledOpticsMotors(OpticsBlueAPIDevice):
             "name": "move_motors",
             "params": {
                 "experiment_hutch": self._invoking_hutch,
-                "access_device": "access_control",
+                "access_device": "access_device",
                 "position": value.value,
             },
             "instrument_session": "self.instrument",
