@@ -7,11 +7,4 @@
 
 Plans and related scripts for running Bluesky on i19
 
-|    Source     |     <https://github.com/DiamondLightSource/i19-bluesky>      |
-| :-----------: | :----------------------------------------------------------: |
-| Documentation |      <https://diamondlightsource.github.io/i19-bluesky>      |
-|   Releases    | <https://github.com/DiamondLightSource/i19-bluesky/releases> |
-
-<!-- README only content. Anything below this line won't be included in index.md -->
-
 See https://diamondlightsource.github.io/i19-bluesky for more detailed documentation.

@@ -14,7 +14,6 @@ from dodal.devices.hutch_shutter import (
     ShutterState,
 )
 from dodal.devices.undulator import UndulatorInKeV
-from dodal.utils import AnyDeviceFactory
 from ophyd_async.core import (
     callback_on_mock_put,
     completed_status,
@@ -23,12 +22,6 @@ from ophyd_async.core import (
 )
 
 from i19_bluesky.optics.device_composites import SetEnergyComposite
-from tests.conftest import device_factories_for_beamline
-
-
-@pytest.fixture(scope="session")
-def active_device_factories() -> set[AnyDeviceFactory]:
-    return device_factories_for_beamline(i19_optics)
 
 
 @pytest.fixture
