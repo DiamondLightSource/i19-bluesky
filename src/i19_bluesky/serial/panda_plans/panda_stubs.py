@@ -66,5 +66,5 @@ def generate_panda_seq_table(
 
 def setup_outenc_vals(panda: HDFPanda, group="setup_outenc_vals"):
     yield from bps.abs_set(panda.outenc[1].val, "ZERO", group=group)  # type: ignore
-    # Moved to INENC3 as that's there the new serial stages are connected
-    yield from bps.abs_set(panda.outenc[3].val, "INENC3.VAL", group=group)  # type: ignore
+    # Moved to INENC4 as that's there the new serial stages are connected
+    yield from bps.abs_set(panda.outenc[4].val, "INENC4.VAL", group=group)  # type: ignore
