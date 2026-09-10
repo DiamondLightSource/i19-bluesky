@@ -28,7 +28,7 @@ dependencies = [
     "daq-config-server >= 1.3.2",
     # Pin temporarily removed to avoid it clashing with editable version
     # when deploying blueapi in cluster.
-    "dls-dodal",
+    "dls-dodal @ git+https://github.com/DiamondLightSource/dodal@add_lvds_to_zebra_mapping",
 ]
 dynamic = ["version"]
 license.file = "LICENSE"
@@ -38,7 +38,7 @@ requires-python = ">=3.11"
 [dependency-groups]
 dev = [
     "build",
-    "blueapi >= 1.18.0",    # To avoid it taking up space in cluster
+    "blueapi >= 1.18.0",         # To avoid it taking up space in cluster
     "copier",
     "ipython",
     "import-linter",

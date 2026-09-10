@@ -47,10 +47,11 @@ async def test_zebra_collection_setup(
 async def test_setup_out_triggers(eh2_zebra: Zebra, RE: RunEngine):
     RE(setup_out_triggers(eh2_zebra, wait=True))
     assert (
-        await eh2_zebra.output.out_pvs[1].get_value() == eh2_zebra.mapping.sources.OR1
+        await eh2_zebra.output.out_ttl_pvs[1].get_value()
+        == eh2_zebra.mapping.sources.OR1
     )
     assert (
-        await eh2_zebra.output.out_pvs[2].get_value()
+        await eh2_zebra.output.out_ttl_pvs[2].get_value()
         == eh2_zebra.mapping.sources.PC_PULSE
     )
 
