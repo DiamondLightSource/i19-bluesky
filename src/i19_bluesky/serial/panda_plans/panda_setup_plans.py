@@ -16,7 +16,8 @@ from i19_bluesky.serial.panda_plans.panda_stubs import (
     setup_outenc_vals,
 )
 
-DEG_TO_ENC_COUNTS = 1000
+# DEG_TO_ENC_COUNTS = 1000
+DEG_TO_ENC_COUNTS = -16763  # or sth like that, TBD
 GENERAL_TIMEOUT = 60
 
 
@@ -41,7 +42,7 @@ def setup_panda_for_rotation(
     gate_start = parameters.scan_start_deg - parameters.ramp_distance_deg
     # Home the input encoder
     yield from bps.abs_set(
-        panda.inenc[3].setp,  # type: ignore
+        panda.inenc[4].setp,  # type: ignore
         gate_start * DEG_TO_ENC_COUNTS,
         group="panda-setup",
     )

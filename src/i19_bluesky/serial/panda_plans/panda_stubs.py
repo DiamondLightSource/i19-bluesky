@@ -12,7 +12,8 @@ from pydantic.dataclasses import dataclass
 
 from i19_bluesky.log import LOGGER
 
-DEG_TO_ENC_COUNTS = 1000
+# DEG_TO_ENC_COUNTS = 1000
+DEG_TO_ENC_COUNTS = -16763  # or sth like that, TBD
 
 
 @dataclass(frozen=True)
