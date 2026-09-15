@@ -156,7 +156,7 @@ async def eh2_eiger(RE: RunEngine) -> EigerDetector:
         {
             eiger.detector: {
                 "wavelength": float,
-                "two_theta": float,
+                "two_theta_start": float,
                 "phi_start": float,
                 "phi_increment": float,
                 "chi_start": float,
@@ -204,7 +204,7 @@ async def devices(
     devices = SerialCollectionEh2PandaComposite(
         diffractometer=eh2_diffractometer,
         backlight=eh2_backlight,
-        pincol=pincol,
+        pinhole_and_collimator=pincol,
         panda=mock_panda,
         eiger=eh2_eiger,
         serial_stages=serial_stages,
@@ -222,7 +222,7 @@ async def devices_zebra(
     devices_zebra = SerialCollectionEh2ZebraComposite(
         diffractometer=eh2_diffractometer,
         backlight=eh2_backlight,
-        pincol=pincol,
+        pinhole_and_collimator=pincol,
         zebra=eh2_zebra,
         eiger=eh2_eiger,
         serial_stages=serial_stages,
