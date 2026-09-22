@@ -1,4 +1,5 @@
 import csv
+import datetime
 from pathlib import Path
 
 import bluesky.plan_stubs as bps
@@ -7,18 +8,15 @@ from dodal.common import inject
 from dodal.devices.beamlines.i19.access_controlled.piezo_control import (
     AccessControlledPiezoActuator,
 )
-from dodal.devices.oav.beam_centre.beam_centre import CentreEllipseMethod
-from dodal.devices.oav.oav_detector import OAVBeamCentreFile
-
 from dodal.devices.oav.beam_centre.centroid_from_epics import (
     CentroidFromEpics,
 )
-from i19_bluesky.eh1.find_beam_centre import find_beam_centre_plan
+from dodal.devices.oav.oav_detector import OAVBeamCentreFile
+
 from i19_bluesky.log import LOGGER
 from i19_bluesky.plans.optics_hutch_control_plans import (
     apply_voltage_to_piezo_actuators,
 )
-import datetime
 
 SAVE_FILE_PATH = Path("/dls_sw/i19-1/software/bluesky/voltage_to_beam_position_data")
 TIME_TO_SETTLE = 2
