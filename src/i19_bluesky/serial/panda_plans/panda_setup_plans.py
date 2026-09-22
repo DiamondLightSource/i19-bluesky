@@ -16,7 +16,8 @@ from i19_bluesky.serial.panda_plans.panda_stubs import (
     setup_outenc_vals,
 )
 
-DEG_TO_ENC_COUNTS = 1000
+# DEG_TO_ENC_COUNTS = 1000
+DEG_TO_ENC_COUNTS = -16763  # or sth like that, TBD
 GENERAL_TIMEOUT = 60
 
 
@@ -35,13 +36,13 @@ def setup_panda_for_rotation(
 
     yield from load_panda_from_yaml(
         DeviceSettingsConstants.PANDA_DIR.as_posix(),
-        DeviceSettingsConstants.PANDA_PC_FILENAME,
+        DeviceSettingsConstants.PANDA_SERIAL_CONFIG,
         panda,
     )
     gate_start = parameters.scan_start_deg - parameters.ramp_distance_deg
     # Home the input encoder
     yield from bps.abs_set(
-        panda.inenc[1].setp,  # type: ignore
+        panda.inenc[4].setp,  # type: ignore
         gate_start * DEG_TO_ENC_COUNTS,
         group="panda-setup",
     )
@@ -67,10 +68,12 @@ def setup_panda_for_rotation(
 
 
 def reset_panda(panda: HDFPanda, group="reset_panda"):
+    # NOTE. Beamline staff would like this called only when UI closes
     yield from load_panda_from_yaml(
         DeviceSettingsConstants.PANDA_DIR.as_posix(),
-        DeviceSettingsConstants.PANDA_THROUGH_ZEBRA,
+        DeviceSettingsConstants.PANDA_STANDARD_CONFIG,
         panda,
     )
+    # Should go back to zebra settings
     yield from bps.abs_set(panda.outenc[1].val, "INENC1.VAL", group=group)  # type: ignore
     yield from bps.abs_set(panda.outenc[2].val, "INENC2.VAL", group=group)  # type: ignore
