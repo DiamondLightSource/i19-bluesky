@@ -9,6 +9,7 @@ from i19_bluesky.plans.optics_hutch_control_plans import (
     close_experiment_shutter,
     open_experiment_shutter,
 )
+from i19_bluesky.plans.temperature_control_plans import run_temperature_ramp
 
 __all__ = [
     "apply_attenuator_positions",
@@ -18,4 +19,5 @@ __all__ = [
     "pin_tip_detection_plan",
     "find_beam_centre_plan",
     "change_energy",
+    "run_temperature_ramp",
 ]
