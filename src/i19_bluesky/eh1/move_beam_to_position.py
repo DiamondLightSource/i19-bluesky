@@ -36,7 +36,7 @@ def _read_current_position(
 
 
 # TODO Create model in daq-config-server
-def _read_lut():
+def _read_lut() -> list[list[float]]:
     config_client = get_config_client()
     lut_contents = config_client.get_file_contents(HFM_LUT.as_posix())
     lut = GenericLookupTable.from_contents(
@@ -47,6 +47,8 @@ def _read_lut():
 
 
 def _calculate_nudge_from_lut(distance: float) -> float:
+    """Read lookup table and extract the voltage needed to get to that position.
+    For now assume linear."""
     LOGGER.debug("Reading lut for nudge size...")
     lut_columns = _read_lut()
 
@@ -60,6 +62,10 @@ def nudge_hfm_and_move_beam_to_position(
     piezo_device: AccessControlledPiezoActuator = inject("hfm_piezo"),
     beam_centre: CentroidFromEpics = inject("beam_centre_from_epics"),
 ) -> MsgGenerator:
+    """Given a known target position, nudge the piezo actuator to move the beam there.
+    Current beam position is extracted from epics setting up the ad-plugin chain.
+    Using only hfm for now to avoid issues with vfm not being in a closed loop.
+    """
     yield from setup_ad_plugin_chain_for_beam_centre(beam_centre)
 
     current_xy = yield from _read_current_position(beam_centre)
