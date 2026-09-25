@@ -35,7 +35,7 @@ def _save_results_to_file(
         SAVE_FILE_PATH
         / f"{str_now}_{device_name}_to_beam_centre_nudge_{nudge_size}.csv"
     )
-    column_names = ["voltage", "beam position_x", "beam_position_y"]
+    column_names = ["voltage", "beam_position_x", "beam_position_y"]
     with open(filename, "w") as fh:
         writer = csv.writer(fh, delimiter="\t")
         writer.writerow(column_names)
