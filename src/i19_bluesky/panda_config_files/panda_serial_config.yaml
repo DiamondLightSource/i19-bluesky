@@ -869,11 +869,11 @@ ttlin.5.term: High-Z
 ttlin.5.val_capture: false
 ttlin.6.term: High-Z
 ttlin.6.val_capture: false
-ttlout.1.val: PULSE1.OUT
+ttlout.1.val: ZERO # PULSE1.OUT
 ttlout.1.val_delay: 0
 ttlout.10.val: BITS.OUTA
 ttlout.10.val_delay: 0
-ttlout.2.val: TTLIN2.VAL
+ttlout.2.val: PULSE1.OUT #SEQ1.OUTA
 ttlout.2.val_delay: 0
 ttlout.3.val: PULSE3.OUT
 ttlout.3.val_delay: 0

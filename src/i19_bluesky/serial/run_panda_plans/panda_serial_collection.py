@@ -36,7 +36,10 @@ def trigger_panda_collection(
     yield from setup_panda_for_rotation(
         parameters.panda_rotation_params,
         devices.panda,
+        devices.serial_stages,
     )
+    # LOGGER.info("SEQ! OUTA to TTOLOUT2 (eiger)")
+    # yield from bps.abs_set(devices.panda.)
     LOGGER.info("Arm panda and move phi")
     yield from arm_panda(devices.panda)
     LOGGER.info("Kickoff eiger")
@@ -50,7 +53,8 @@ def trigger_panda_collection(
                 {parameters.panda_rotation_params.scan_end_deg}"
             )
             yield from bps.abs_set(
-                devices.diffractometer.phi,
+                devices.serial_stages.phi,
+                # devices.diffractometer.phi,
                 parameters.panda_rotation_params.scan_end_deg,
                 wait=True,
             )
@@ -60,9 +64,14 @@ def trigger_panda_collection(
                     {parameters.panda_rotation_params.scan_start_deg}"
             )
             yield from bps.abs_set(
-                devices.diffractometer.phi,
+                devices.serial_stages.phi,
+                # devices.diffractometer.phi,
                 parameters.panda_rotation_params.scan_start_deg,
                 wait=True,
             )
-    LOGGER.debug("Complete")
+    LOGGER.info("Run complete eiger")
+    LOGGER.warning("SLEEP FOR 10 s")
+    yield from bps.sleep(
+        10
+    )  # parameters.exposure_time_s * parameters.total_num_images + 1)
     yield from bps.complete(devices.eiger, wait=True)

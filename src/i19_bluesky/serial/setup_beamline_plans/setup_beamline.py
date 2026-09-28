@@ -63,7 +63,7 @@ def setup_eh2_serial_collection(
         devices.eiger.detector.ntrigger, parameters.total_num_images, wait=True
     )
     trigger_info = TriggerInfo(
-        collections_per_event=1,
+        collections_per_event=1,  # parameters.total_num_images,
         number_of_events=1,
         trigger=DetectorTrigger.EXTERNAL_EDGE,
         livetime=parameters.exposure_time_s,
