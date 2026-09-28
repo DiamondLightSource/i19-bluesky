@@ -26,6 +26,8 @@ HFM_LUT = Path(
     "/dls_sw/i19-1/software/daq_configuration/lookup/hfm_nudge_to_position_new.txt"
 )  # This one is a bit more complete as has both directions
 
+TIME_TO_SETTLE = 2.0
+
 
 def _read_current_position(
     beam_centre: CentroidFromEpics,
@@ -71,15 +73,22 @@ def nudge_hfm_and_move_beam_to_position(
     current_xy = yield from _read_current_position(beam_centre)
     current_voltage = yield from bps.rd(piezo_device.setpoint)
 
+    # Should do in a loop until close enough
+    # while True:
     delta_x = target_xy[0] - current_xy[0]
     nudge_size = _calculate_nudge_from_lut(delta_x)
     LOGGER.info(
         f"Calculated hfm nudge for {delta_x}px move in x direction: {nudge_size}V"
     )
 
-    new_voltage = current_voltage + nudge_size
+    current_voltage += nudge_size
     LOGGER.info(f"Apply {current_voltage} to {piezo_device.name}")
-    yield from apply_voltage_to_piezo_actuators(new_voltage, piezo_device)
+    yield from apply_voltage_to_piezo_actuators(current_voltage, piezo_device)
+
+    # For now just sleep for half a second to wait for settling
+    LOGGER.info(f"Wait {TIME_TO_SETTLE}s to settle")
+    yield from bps.sleep(TIME_TO_SETTLE)
 
     current_xy = yield from _read_current_position(beam_centre)
     LOGGER.info(f"Beam position after nudge: {current_xy}")
+    # Then need to check if it's close enough in which case, break.
