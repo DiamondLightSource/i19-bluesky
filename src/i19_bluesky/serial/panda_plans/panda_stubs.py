@@ -54,8 +54,9 @@ def generate_panda_seq_table(
 
     delay_between_pulses = int(time_between_images * TIME_TO_US_SCALE)
 
+    # NOTE Need to swap the columns around as DEG_TO_ENC converter is negative
     rows += SeqTable.row(
-        trigger=SeqTrigger.POSA_GT,
+        trigger=SeqTrigger.POSA_LT,  # SeqTrigger.POSA_GT,
         position=start_forwards_position,
         repeats=phi_steps,
         time1=delay_between_pulses,
@@ -63,7 +64,7 @@ def generate_panda_seq_table(
     )
 
     rows += SeqTable.row(
-        trigger=SeqTrigger.POSA_LT,
+        trigger=SeqTrigger.POSA_GT,
         position=start_backwards_position,
         repeats=phi_steps,
         time1=delay_between_pulses,
