@@ -22,7 +22,7 @@ from ophyd_async.fastcs.panda import HDFPanda
 class SerialCollectionEh2PandaComposite:
     diffractometer: FourCircleDiffractometer
     backlight: BacklightPosition
-    pincol: PinholeCollimatorControl
+    pinhole_and_collimator: PinholeCollimatorControl
     panda: HDFPanda
     eiger: EigerDetector
     serial_stages: XYZPhiStage
@@ -34,7 +34,7 @@ class SerialCollectionEh2PandaComposite:
 class SerialCollectionEh2ZebraComposite:
     diffractometer: FourCircleDiffractometer
     backlight: BacklightPosition
-    pincol: PinholeCollimatorControl
+    pinhole_and_collimator: PinholeCollimatorControl
     zebra: Zebra
     eiger: EigerDetector
     serial_stages: XYZPhiStage

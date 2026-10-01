@@ -4,6 +4,7 @@ i19 PandA setup plan for serial collection.
 
 import bluesky.plan_stubs as bps
 from bluesky.utils import MsgGenerator
+from dodal.devices.motors import XYZPhiStage
 from dodal.plans.load_panda_yaml import load_panda_from_yaml
 from ophyd_async.fastcs.panda import HDFPanda
 
@@ -16,13 +17,15 @@ from i19_bluesky.serial.panda_plans.panda_stubs import (
     setup_outenc_vals,
 )
 
-DEG_TO_ENC_COUNTS = 1000
+# DEG_TO_ENC_COUNTS = 1000
+DEG_TO_ENC_COUNTS = -16667  # From Marks calculations... BUT sign is other way around.
 GENERAL_TIMEOUT = 60
 
 
 def setup_panda_for_rotation(
     parameters: PandaRotationParams,
     panda: HDFPanda,
+    serial_stages: XYZPhiStage,
 ) -> MsgGenerator:
     """Configures the PandA device for phi forward and backward rotation
 
@@ -35,17 +38,26 @@ def setup_panda_for_rotation(
 
     yield from load_panda_from_yaml(
         DeviceSettingsConstants.PANDA_DIR.as_posix(),
-        DeviceSettingsConstants.PANDA_PC_FILENAME,
+        DeviceSettingsConstants.PANDA_SERIAL_CONFIG,
         panda,
     )
-    gate_start = parameters.scan_start_deg - parameters.ramp_distance_deg
+    LOGGER.warning(f"Gate start: {parameters.gate_start}")
+    LOGGER.info("Move phi to gate start position and home panda there")
+    yield from bps.mv(serial_stages.phi, parameters.gate_start)
+    gate_start = parameters.gate_start * DEG_TO_ENC_COUNTS
+    LOGGER.warning(f"Set inenc setp to {gate_start}")
     # Home the input encoder
     yield from bps.abs_set(
-        panda.inenc[1].setp,  # type: ignore
-        gate_start * DEG_TO_ENC_COUNTS,
-        group="panda-setup",
+        panda.inenc[4].setp,  # type: ignore
+        gate_start,
+        wait=True,
+        # group="panda-setup",
     )
     yield from setup_outenc_vals(panda)
+
+    yield from bps.abs_set(
+        panda.pulse[1].width, parameters.exposure_time_s, group="setup-panda"
+    )
 
     seq_table = generate_panda_seq_table(
         parameters.scan_start_deg,
@@ -67,10 +79,12 @@ def setup_panda_for_rotation(
 
 
 def reset_panda(panda: HDFPanda, group="reset_panda"):
+    # NOTE. Beamline staff would like this called only when UI closes
     yield from load_panda_from_yaml(
         DeviceSettingsConstants.PANDA_DIR.as_posix(),
-        DeviceSettingsConstants.PANDA_THROUGH_ZEBRA,
+        DeviceSettingsConstants.PANDA_STANDARD_CONFIG,
         panda,
     )
+    # Should go back to zebra settings
     yield from bps.abs_set(panda.outenc[1].val, "INENC1.VAL", group=group)  # type: ignore
-    yield from bps.abs_set(panda.outenc[2].val, "INENC2.VAL", group=group)  # type: ignore
+    yield from bps.abs_set(panda.outenc[4].val, "INENC4.VAL", group=group)  # type: ignore
