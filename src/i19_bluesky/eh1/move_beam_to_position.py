@@ -106,7 +106,6 @@ def nudge_hfm_and_move_beam_to_position(
         LOGGER.info(f"Beam position after nudge: {current_xy}")
         delta_x = target_xy[0] - current_xy[0]
         i += 1
-    # Then need to check if it's close enough in which case, break.
 
 
 def nudge_vfm_and_move_beam_to_position(
@@ -158,9 +157,6 @@ def nudge_vfm_and_move_beam_to_position(
         i += 1
 
 
-# Then need to check if it's close enough in which case, break.
-
-
 def _check_position_reached(
     target_xy: tuple[float, float], current_xy: tuple[float, float]
 ) -> bool:
@@ -178,12 +174,37 @@ def nudge_piezos_and_move_to_beam_centre(
     vfm_piezo: AccessControlledPiezoActuator = inject("vfm_piezo"),
     beam_centre: CentroidFromEpics = inject("beam_centre_from_epics"),
 ) -> MsgGenerator:
+    """Given a known target position, nudge the piezo actuators to move the beam there.
+    Current beam position is extracted from epics setting up the ad-plugin chain.
+
+    The hfm will move the beam in x while the vfm moves it in y. However, both actuators
+    also slightly move the beam in the other direction upon being nudged. The change in
+    y for the hfm is small enough to be ignored but the vfm may change x by 1 px (likely
+    due to it not being in a closed loop). Therefore, the vfm is nudged first in order
+    to make up for this shift when nudging the hfm.
+
+    The target (x,y) position usually comes from the display.configuration and refers to
+    the crosshair position in GDA (not the one on the OAV viewer). In this case, the
+    conversion of the position is:
+        x_centroid = x_crosshair
+        y_centroid = y_crosshair * 4/3
+
+    For now the conversion is done in the plan but it should really come from GDA so
+    that we can use the same algorithm when not using it. Additionally, eh2 might have a
+    different ratio they need.
+
+    Args:
+        target_xy: Position of the crosshair to centre the beam on, in px.
+        hfm_piezo: Device controlling the piezo on the hfm.
+        vfm_piezo: Device controlling the piezo on the vfm.
+        beam_centre: Device to set up the AD plugin chain and read the centroid.
+    """
     yield from setup_ad_plugin_chain_for_beam_centre(beam_centre)
 
     target_xy = (
         target_xy[0],
         target_xy[1] * 4 / 3,
-    )  # beacue GDA is I put in crosshair from file
+    )  # beacuse GDA, the input value is that of the crosshair from file
 
     current_xy = yield from _read_current_position(beam_centre)
     LOGGER.info(f"Starting position: {current_xy}, position to reach: {target_xy}")
@@ -196,7 +217,9 @@ def nudge_piezos_and_move_to_beam_centre(
         delta_y = target_xy[1] - current_xy[1]
         vfm_nudge_size = _calculate_nudge_from_lut(delta_y)
         LOGGER.info(
-            f"Calculated vfm nudge for {delta_y}px move in y direction: {vfm_nudge_size}V"
+            f"""
+            Calculated vfm nudge for {delta_y}px move in y direction: {vfm_nudge_size}V
+            """
         )
 
         current_vfm_v += vfm_nudge_size
@@ -211,7 +234,9 @@ def nudge_piezos_and_move_to_beam_centre(
         delta_x = target_xy[0] - current_xy[0]
         hfm_nudge_size = _calculate_nudge_from_lut(delta_x)
         LOGGER.info(
-            f"Calculated hfm nudge for {delta_x}px move in x direction: {hfm_nudge_size}V"
+            f"""
+            Calculated hfm nudge for {delta_x}px move in x direction: {hfm_nudge_size}V
+            """
         )
 
         current_hfm_v += hfm_nudge_size
@@ -228,21 +253,3 @@ def nudge_piezos_and_move_to_beam_centre(
         if _check_position_reached(target_xy, current_xy):
             break
     LOGGER.warning("DONE!")
-
-
-#     LOGGER.warning("Start hfm nudge")
-#     yield from nudge_hfm_and_move_beam_to_position(
-#         target_xy[0], current_xy[0], hfm_piezo, beam_centre
-#     )
-#     # TODO NEED to do this properly as like this it doesn't wait for one plan to be
-#     # done before starting the next. For time reason, doing the test manually on
-#     # beamline for now
-#     LOGGER.warning("Start vfm nudge")
-#     yield from nudge_vfm_and_move_beam_to_position(
-#         target_xy[1], current_xy[1], vfm_piezo, beam_centre
-#     )
-
-#     final_position = yield _read_current_position(beam_centre)
-#     LOGGER.info(
-#         f"DONE! Position reached: ({final_position[0]}, {final_position[1] * 3 / 4})"
-#     )
