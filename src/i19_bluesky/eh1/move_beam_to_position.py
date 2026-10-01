@@ -30,7 +30,8 @@ VFM_LUT = Path(
 )  # This one is a bit more complete as has both directions
 
 TIME_TO_SETTLE = 2.0
-TOLERANCE = 5.0
+TOLERANCE_X = 0.5
+TOLERANCE_Y = 1.0
 MAX_TRIES = 10
 
 
@@ -40,7 +41,6 @@ def _read_current_position(
     x = yield from bps.rd(beam_centre.beam_centre_x)
     y = yield from bps.rd(beam_centre.beam_centre_y)
     return (x, y)
-    # return (x, y * 4 / 3)
 
 
 # TODO Create model in daq-config-server
@@ -87,7 +87,9 @@ def nudge_hfm_and_move_beam_to_position(
     # while True:
     delta_x = target_xy[0] - current_xy[0]
     i = 0
-    while abs(delta_x) > TOLERANCE and i < MAX_TRIES:
+    while abs(delta_x) > TOLERANCE_X:
+        if i >= MAX_TRIES:
+            break
         LOGGER.info(f"Loop {i + 1}")
         nudge_size = _calculate_nudge_from_lut(delta_x)
         LOGGER.info(
@@ -126,13 +128,12 @@ def nudge_vfm_and_move_beam_to_position(
     LOGGER.info(f"Starting position: {current_xy}, position to reach: {target_xy}")
     current_voltage = yield from bps.rd(piezo_device.setpoint)
 
-    # Should do in a loop until close enough
-    # while True:
-    delta_y = target_xy[1] - (
-        current_xy[1] * 4 / 3
-    )  # May be better to just do * 4 / 3 right at the start
+    target_y = current_xy[1] * 4 / 3
+    delta_y = target_y - (current_xy[1])
     i = 0
-    while abs(delta_y) > TOLERANCE and i < MAX_TRIES:
+    while abs(delta_y) > TOLERANCE_Y:
+        if i >= MAX_TRIES:
+            break
         LOGGER.info(f"Loop {i + 1}")
         dir = 1 if delta_y >= 0 else -1
         LOGGER.warning(f"DIRECTION: {dir}")
@@ -153,7 +154,7 @@ def nudge_vfm_and_move_beam_to_position(
 
         current_xy = yield from _read_current_position(beam_centre)
         LOGGER.info(f"Beam position after nudge: {current_xy}")
-        delta_y = target_xy[1] - (current_xy[1] * 4 / 3)
+        delta_y = target_y - (current_xy[1] * 4 / 3)
         i += 1
 
 
@@ -161,9 +162,9 @@ def _check_position_reached(
     target_xy: tuple[float, float], current_xy: tuple[float, float]
 ) -> bool:
     _x = target_xy[0] - current_xy[0]
-    _y = target_xy[1] - (current_xy[1] * 4 / 3)
+    _y = target_xy[1] - current_xy[1]
     # For the checvk it does not need conversion anymore
-    if abs(_x) <= 0.5 and abs(_y) <= 1.0:
+    if abs(_x) <= TOLERANCE_X and abs(_y) <= TOLERANCE_Y:
         return True
     return False
 
