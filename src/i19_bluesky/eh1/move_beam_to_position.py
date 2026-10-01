@@ -67,8 +67,6 @@ def _calculate_nudge_from_lut(distance: float) -> float:
 
 def nudge_hfm_and_move_beam_to_position(
     target_xy: tuple[float, float],
-    # target_x: float,
-    # start_x_pos: float,
     piezo_device: AccessControlledPiezoActuator = inject("hfm_piezo"),
     beam_centre: CentroidFromEpics = inject("beam_centre_from_epics"),
 ) -> MsgGenerator:
@@ -78,13 +76,10 @@ def nudge_hfm_and_move_beam_to_position(
     """
     yield from setup_ad_plugin_chain_for_beam_centre(beam_centre)
 
-    # for _ in range(3):
     current_xy = yield from _read_current_position(beam_centre)
     LOGGER.info(f"Starting position: {current_xy}, position to reach: {target_xy}")
     current_voltage = yield from bps.rd(piezo_device.setpoint)
 
-    # Should do in a loop until close enough
-    # while True:
     delta_x = target_xy[0] - current_xy[0]
     i = 0
     while abs(delta_x) > TOLERANCE_X:
@@ -111,8 +106,6 @@ def nudge_hfm_and_move_beam_to_position(
 
 
 def nudge_vfm_and_move_beam_to_position(
-    # target_y: float,
-    # start_y_pos: float,
     target_xy: tuple[float, float],
     piezo_device: AccessControlledPiezoActuator = inject("vfm_piezo"),
     beam_centre: CentroidFromEpics = inject("beam_centre_from_epics"),
@@ -123,7 +116,6 @@ def nudge_vfm_and_move_beam_to_position(
     """
     yield from setup_ad_plugin_chain_for_beam_centre(beam_centre)
 
-    # for _ in range(3):
     current_xy = yield from _read_current_position(beam_centre)
     LOGGER.info(f"Starting position: {current_xy}, position to reach: {target_xy}")
     current_voltage = yield from bps.rd(piezo_device.setpoint)
