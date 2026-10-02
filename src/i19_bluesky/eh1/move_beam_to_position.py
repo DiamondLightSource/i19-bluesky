@@ -23,7 +23,7 @@ from i19_bluesky.plans.optics_hutch_control_plans import (
 )
 
 HFM_LUT = Path(
-    "/dls_sw/i19-1/software/daq_configuration/lookup/hfm_nudge_to_position_new.txt"
+    "/dls_sw/i19-1/software/daq_configuration/lookup/hfm_nudge_to_position.txt"
 )  # This one is a bit more complete as has both directions
 VFM_LUT = Path(
     "/dls_sw/i19-1/software/daq_configuration/lookup/vfm_nudge_to_position.txt"
