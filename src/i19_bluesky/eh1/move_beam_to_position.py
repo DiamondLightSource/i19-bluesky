@@ -127,9 +127,7 @@ def nudge_vfm_and_move_beam_to_position(
         if i >= MAX_TRIES:
             break
         LOGGER.info(f"Loop {i + 1}")
-        dir = 1 if delta_y >= 0 else -1
-        LOGGER.warning(f"DIRECTION: {dir}")
-        nudge_size = _calculate_nudge_from_lut(delta_y)  # * dir
+        nudge_size = _calculate_nudge_from_lut(delta_y)
         LOGGER.info(
             f"Calculated vfm nudge for {delta_y}px move in y direction: {nudge_size}V"
         )
