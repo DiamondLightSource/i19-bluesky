@@ -28,7 +28,7 @@ dependencies = [
     "daq-config-server >= 1.3.2",
     # Pin temporarily removed to avoid it clashing with editable version
     # when deploying blueapi in cluster.
-    "dls-dodal @ git+https://github.com/DiamondLightSource/dodal@main",
+    "dls-dodal @ git+https://github.com/DiamondLightSource/dodal@i19-166-ad-plugin-chain",
 ]
 dynamic = ["version"]
 license.file = "LICENSE"
