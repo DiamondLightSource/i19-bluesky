@@ -71,7 +71,7 @@ def apply_voltage_and_read_position(
 
 def measure_piezo_voltages_vs_beam_position(
     piezo_device: AccessControlledPiezoActuator,
-    nudges: list[tuple[float, float]] = NUDGE_SERIES,
+    nudges: list[tuple[int, float]] = NUDGE_SERIES,
     beam_centre: CentroidFromEpics = inject("beam_centre_from_epics"),
 ) -> MsgGenerator:
     """Plan to measure the relationship between nudging a piezo actuato on the focus
