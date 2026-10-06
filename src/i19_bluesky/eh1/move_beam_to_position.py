@@ -47,9 +47,9 @@ def _read_current_position(
 
 
 # TODO Create model in daq-config-server
-def _read_lut() -> list[list[float]]:
+def _read_lut(lut_path: Path) -> list[list[float]]:
     config_client = get_config_client()
-    lut_contents = config_client.get_file_contents(HFM_LUT.as_posix())
+    lut_contents = config_client.get_file_contents(lut_path.as_posix())
     lut = GenericLookupTable.from_contents(
         lut_contents, ("nudge", float), ("delta_x", float), ("delta_y", float)
     )
@@ -57,13 +57,24 @@ def _read_lut() -> list[list[float]]:
     return lut.columns
 
 
-def _calculate_nudge_from_lut(distance: float) -> float:
+def _calculate_hfm_nudge_from_lut(distance: float) -> float:
     """Read lookup table and extract the voltage needed to get to that position.
     For now assume linear."""
     LOGGER.debug("Reading lut for nudge size...")
-    lut_columns = _read_lut()
+    lut_columns = _read_lut(HFM_LUT)
 
     interp_nudge = linear_interpolation_lut(lut_columns[1], lut_columns[0])
+    nudge_size = interp_nudge(distance)
+    return nudge_size
+
+
+def _calculate_vfm_nudge_from_lut(distance: float) -> float:
+    """Read lookup table and extract the voltage needed to get to that position.
+    For now assume linear."""
+    LOGGER.debug("Reading lut for nudge size...")
+    lut_columns = _read_lut(VFM_LUT)
+
+    interp_nudge = linear_interpolation_lut(lut_columns[2], lut_columns[0])
     nudge_size = interp_nudge(distance)
     return nudge_size
 
@@ -89,7 +100,7 @@ def nudge_hfm_and_move_beam_to_position(
         if i >= MAX_TRIES:
             break
         LOGGER.info(f"Loop {i + 1}")
-        nudge_size = _calculate_nudge_from_lut(delta_x)
+        nudge_size = _calculate_hfm_nudge_from_lut(delta_x)
         LOGGER.info(
             f"Calculated hfm nudge for {delta_x}px move in x direction: {nudge_size}V"
         )
@@ -130,7 +141,7 @@ def nudge_vfm_and_move_beam_to_position(
         if i >= MAX_TRIES:
             break
         LOGGER.info(f"Loop {i + 1}")
-        nudge_size = _calculate_nudge_from_lut(delta_y)
+        nudge_size = _calculate_vfm_nudge_from_lut(delta_y)
         LOGGER.info(
             f"Calculated vfm nudge for {delta_y}px move in y direction: {nudge_size}V"
         )
@@ -209,7 +220,7 @@ def nudge_piezos_and_move_to_beam_centre(
         LOGGER.warning("Start from vfm")
         current_vfm_v = yield from bps.rd(vfm_piezo.setpoint)
         delta_y = target_xy[1] - current_xy[1]
-        vfm_nudge_size = _calculate_nudge_from_lut(delta_y)
+        vfm_nudge_size = _calculate_vfm_nudge_from_lut(delta_y)
         LOGGER.info(
             f"""
             Calculated vfm nudge for {delta_y}px move in y direction: {vfm_nudge_size}V
@@ -226,7 +237,7 @@ def nudge_piezos_and_move_to_beam_centre(
         LOGGER.warning("Now hfm")
         current_hfm_v = yield from bps.rd(hfm_piezo.setpoint)
         delta_x = target_xy[0] - current_xy[0]
-        hfm_nudge_size = _calculate_nudge_from_lut(delta_x)
+        hfm_nudge_size = _calculate_hfm_nudge_from_lut(delta_x)
         LOGGER.info(
             f"""
             Calculated hfm nudge for {delta_x}px move in x direction: {hfm_nudge_size}V
