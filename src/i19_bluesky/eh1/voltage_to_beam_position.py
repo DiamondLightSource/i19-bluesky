@@ -10,9 +10,10 @@ from dodal.devices.beamlines.i19.access_controlled.piezo_control import (
 )
 from dodal.devices.oav.beam_centre.centroid_from_epics import (
     CentroidFromEpics,
+    CentroidSettings,
+    ColourMode,
 )
 
-from i19_bluesky.eh1.find_beam_centre import setup_ad_plugin_chain_for_beam_centre
 from i19_bluesky.log import LOGGER
 from i19_bluesky.plans.optics_hutch_control_plans import (
     apply_voltage_to_piezo_actuators,
@@ -49,8 +50,9 @@ def measure_piezo_voltages_vs_beam_position(
     piezo_device: AccessControlledPiezoActuator,
     beam_centre: CentroidFromEpics = inject("beam_centre_from_epics"),
 ) -> MsgGenerator:
-
-    yield from setup_ad_plugin_chain_for_beam_centre(beam_centre)
+    yield from bps.prepare(
+        beam_centre, CentroidSettings(threshold=20, colour_mode=ColourMode.MONO)
+    )
 
     current_voltage = yield from bps.rd(piezo_device.setpoint)
 

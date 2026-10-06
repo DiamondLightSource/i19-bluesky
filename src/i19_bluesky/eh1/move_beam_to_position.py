@@ -13,21 +13,24 @@ from dodal.devices.beamlines.i19.access_controlled.piezo_control import (
 )
 from dodal.devices.oav.beam_centre.centroid_from_epics import (
     CentroidFromEpics,
+    CentroidSettings,
+    ColourMode,
 )
 from dodal.devices.util.lookup_tables import linear_interpolation_lut
 
-from i19_bluesky.eh1.find_beam_centre import setup_ad_plugin_chain_for_beam_centre
 from i19_bluesky.log import LOGGER
 from i19_bluesky.plans.optics_hutch_control_plans import (
     apply_voltage_to_piezo_actuators,
 )
 
+PLUGIN_SETTINGS = CentroidSettings(threshold=20, colour_mode=ColourMode.MONO)
+
 HFM_LUT = Path(
     "/dls_sw/i19-1/software/daq_configuration/lookup/hfm_nudge_to_position.txt"
-)  # This one is a bit more complete as has both directions
+)
 VFM_LUT = Path(
     "/dls_sw/i19-1/software/daq_configuration/lookup/vfm_nudge_to_position.txt"
-)  # This one is a bit more complete as has both directions
+)
 
 TIME_TO_SETTLE = 2.0
 TOLERANCE_X = 0.5
@@ -74,7 +77,7 @@ def nudge_hfm_and_move_beam_to_position(
     Current beam position is extracted from epics setting up the ad-plugin chain.
     Using only hfm for now to avoid issues with vfm not being in a closed loop.
     """
-    yield from setup_ad_plugin_chain_for_beam_centre(beam_centre)
+    yield from bps.prepare(beam_centre, PLUGIN_SETTINGS)
 
     current_xy = yield from _read_current_position(beam_centre)
     LOGGER.info(f"Starting position: {current_xy}, position to reach: {target_xy}")
@@ -114,7 +117,7 @@ def nudge_vfm_and_move_beam_to_position(
     Current beam position is extracted from epics setting up the ad-plugin chain.
     Using only hfm for now to avoid issues with vfm not being in a closed loop.
     """
-    yield from setup_ad_plugin_chain_for_beam_centre(beam_centre)
+    yield from bps.prepare(beam_centre, PLUGIN_SETTINGS)
 
     current_xy = yield from _read_current_position(beam_centre)
     LOGGER.info(f"Starting position: {current_xy}, position to reach: {target_xy}")
@@ -190,7 +193,7 @@ def nudge_piezos_and_move_to_beam_centre(
         vfm_piezo: Device controlling the piezo on the vfm.
         beam_centre: Device to set up the AD plugin chain and read the centroid.
     """
-    yield from setup_ad_plugin_chain_for_beam_centre(beam_centre)
+    yield from bps.prepare(beam_centre, PLUGIN_SETTINGS)
 
     target_xy = (
         target_xy[0],

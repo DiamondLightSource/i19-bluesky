@@ -12,7 +12,6 @@ from ophyd_async.core import init_devices, set_mock_value
 
 from i19_bluesky.eh1.find_beam_centre import (
     find_beam_centre_plan,
-    setup_ad_plugin_chain_for_beam_centre,
 )
 
 from ..conftest import fake_generator
@@ -68,12 +67,3 @@ async def test_find_beam_centre_plan(
 
     assert await centre_device.roi_box_size.get_value() == expected_roi
     mock_trigger_plan.assert_called_once()
-
-
-async def test_setup_ad_plugin_chain(centroid_device: CentroidFromEpics, RE: RunEngine):
-    RE(setup_ad_plugin_chain_for_beam_centre(centroid_device))
-
-    assert await centroid_device.cc_array_port.get_value() == "OAV1.cam"
-    assert await centroid_device.stat_array_port.get_value() == "OAV1.cc"
-    assert await centroid_device.colour_mode.get_value() == "Mono"  # B/W
-    assert await centroid_device.centroid_threshold.get_value() == 20
