@@ -162,7 +162,7 @@ def nudge_piezos_and_move_to_beam_centre(
     # GDA when that part is written
     target_xy = (
         target_xy[0],
-        target_xy[1] * 4 / 3,
+        round(target_xy[1] * 4 / 3, 3),
     )  # beacuse GDA, the input value is that of the crosshair from file
 
     current_xy = yield from _read_current_position(beam_centre)

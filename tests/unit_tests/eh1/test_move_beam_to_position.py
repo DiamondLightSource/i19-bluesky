@@ -1,7 +1,10 @@
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, call, patch
 
 import pytest
 from bluesky import RunEngine
+from dodal.devices.beamlines.i19.access_controlled.piezo_control import (
+    AccessControlledPiezoActuator,
+)
 from dodal.devices.oav.beam_centre.centroid_from_epics import CentroidFromEpics
 from ophyd_async.core import set_mock_value
 
@@ -10,6 +13,8 @@ from i19_bluesky.eh1.move_beam_to_position import (
     _check_position_reached,
     _get_lut_path_and_column_from_name,
     _read_current_position,
+    nudge_piezos_and_move_to_beam_centre,
+    nudge_single_piezo,
     setup_centroid_device,
     stop_stats_at_end,
 )
@@ -114,3 +119,97 @@ async def test_stop_stats_at_end(centroid_device: CentroidFromEpics, RE: RunEngi
     assert await centroid_device.stats.compute_centroid.get_value() is False
     assert await centroid_device.stats.compute_profiles.get_value() is False
     assert await centroid_device.stats.compute_histogram.get_value() is False
+
+
+@patch("i19_bluesky.eh1.move_beam_to_position.apply_voltage_to_piezo_actuators")
+@patch("i19_bluesky.eh1.move_beam_to_position._calculate_nudge_from_lut")
+async def test_nudge_single_piezo_hfm(
+    mock_calc: MagicMock,
+    mock_apply_voltage_plan: MagicMock,
+    eh1_hfm_piezo: AccessControlledPiezoActuator,
+    RE: RunEngine,
+):
+    set_mock_value(eh1_hfm_piezo.setpoint, 1.24)
+    mock_calc.return_value = 0.02
+
+    RE(nudge_single_piezo(16, eh1_hfm_piezo))
+
+    mock_apply_voltage_plan.assert_called_once_with(1.26, eh1_hfm_piezo)
+
+
+@patch("i19_bluesky.eh1.move_beam_to_position.apply_voltage_to_piezo_actuators")
+@patch("i19_bluesky.eh1.move_beam_to_position._calculate_nudge_from_lut")
+async def test_nudge_single_piezo_vfm(
+    mock_calc: MagicMock,
+    mock_apply_voltage_plan: MagicMock,
+    eh1_vfm_piezo: AccessControlledPiezoActuator,
+    RE: RunEngine,
+):
+    set_mock_value(eh1_vfm_piezo.setpoint, 1.70)
+    mock_calc.return_value = -0.01
+
+    RE(nudge_single_piezo(-9, eh1_vfm_piezo))
+
+    mock_apply_voltage_plan.assert_called_once_with(1.69, eh1_vfm_piezo)
+
+
+@patch("i19_bluesky.eh1.move_beam_to_position.bps.sleep")
+@patch("i19_bluesky.eh1.move_beam_to_position._check_position_reached")
+@patch("i19_bluesky.eh1.move_beam_to_position.nudge_single_piezo")
+async def test_nudge_piezos_and_move_to_beam_centre(
+    mock_nudge: MagicMock,
+    mock_check: MagicMock,
+    mock_sleep: MagicMock,
+    centroid_device: CentroidFromEpics,
+    eh1_hfm_piezo: AccessControlledPiezoActuator,
+    eh1_vfm_piezo: AccessControlledPiezoActuator,
+    RE: RunEngine,
+):
+    set_mock_value(centroid_device.beam_centre_x, 720)
+    set_mock_value(centroid_device.beam_centre_y, 390.5)
+
+    mock_check.side_effect = [False, True]
+
+    RE(
+        nudge_piezos_and_move_to_beam_centre(
+            (710, 290), 5, eh1_hfm_piezo, eh1_vfm_piezo, centroid_device
+        )
+    )
+
+    # Should only be called twice as second check returns True and loop ends
+    mock_sleep.assert_has_calls([call(2.0), call(2.0)], any_order=True)
+    mock_nudge.assert_has_calls(
+        [
+            call(pytest.approx(-3.833, abs=1e-3), eh1_vfm_piezo),
+            call(-10, eh1_hfm_piezo),
+        ],
+        any_order=True,
+    )
+
+
+@patch("i19_bluesky.eh1.move_beam_to_position.bps.sleep")
+@patch("i19_bluesky.eh1.move_beam_to_position._check_position_reached")
+@patch("i19_bluesky.eh1.move_beam_to_position.nudge_single_piezo")
+async def test_nudge_piezos_and_move_to_beam_centre_stops_after_max_iterations(
+    mock_nudge: MagicMock,
+    mock_check: MagicMock,
+    mock_sleep: MagicMock,
+    centroid_device: CentroidFromEpics,
+    eh1_hfm_piezo: AccessControlledPiezoActuator,
+    eh1_vfm_piezo: AccessControlledPiezoActuator,
+    RE: RunEngine,
+):
+    set_mock_value(centroid_device.beam_centre_x, 720)
+    set_mock_value(centroid_device.beam_centre_y, 390.5)
+
+    mock_check.side_effect = [False, False]
+
+    RE(
+        nudge_piezos_and_move_to_beam_centre(
+            (710, 290), 1, eh1_hfm_piezo, eh1_vfm_piezo, centroid_device
+        )
+    )
+
+    # Should only be called twice as only 1 iteration
+    assert mock_sleep.call_count == 2
+    assert mock_nudge.call_count == 2
