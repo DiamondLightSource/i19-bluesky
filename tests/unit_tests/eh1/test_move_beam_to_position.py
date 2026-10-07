@@ -23,14 +23,14 @@ TEST_VFM_LUT_COLUMNS = [
 ]
 
 
-async def test_read_current_position(beam_centre: CentroidFromEpics, RE: RunEngine):
-    set_mock_value(beam_centre.beam_centre_x, 710)
-    set_mock_value(beam_centre.beam_centre_y, 253)
+async def test_read_current_position(centroid_device: CentroidFromEpics, RE: RunEngine):
+    set_mock_value(centroid_device.beam_centre_x, 710)
+    set_mock_value(centroid_device.beam_centre_y, 253)
 
-    (beam_x, beam_y) = RE(_read_current_position(beam_centre)).plan_result
+    (beam_x, beam_y) = RE(_read_current_position(centroid_device)).plan_result
 
-    assert await beam_centre.beam_centre_x.get_value() == beam_x
-    assert await beam_centre.beam_centre_y.get_value() == beam_y
+    assert await centroid_device.beam_centre_x.get_value() == beam_x
+    assert await centroid_device.beam_centre_y.get_value() == beam_y
 
 
 @pytest.mark.parametrize(
@@ -43,7 +43,7 @@ async def test_read_current_position(beam_centre: CentroidFromEpics, RE: RunEngi
 def test_get_lut_path_and_column_from_name(
     device_name: str, expected_idx: int, expected_filename: str
 ):
-    idx, filepath = _get_lut_path_and_column_from_name(device_name)
+    filepath, idx = _get_lut_path_and_column_from_name(device_name)
 
     assert idx == expected_idx
     assert filepath.name == expected_filename
@@ -63,13 +63,13 @@ def test_get_lut_path_and_column_from_name_fails_for_unexpected_device():
 )
 @patch("i19_bluesky.eh1.move_beam_to_position._read_lut")
 def test_calculate_nudge_from_lut(
+    mock_lut_columns: MagicMock,
     device_name: str,
     test_lut: list,
     distance: float,
     expected_nudge: float,
-    mock_lut_columns: MagicMock,
 ):
     mock_lut_columns.return_value = test_lut
     nudge_size = _calculate_nudge_from_lut(distance, device_name)
 
-    assert nudge_size == pytest.approxx(expected_nudge, 1e-3)
+    assert nudge_size == pytest.approx(expected_nudge, abs=1e-3)
