@@ -7,8 +7,11 @@ from ophyd_async.core import set_mock_value
 
 from i19_bluesky.eh1.move_beam_to_position import (
     _calculate_nudge_from_lut,
+    _check_position_reached,
     _get_lut_path_and_column_from_name,
     _read_current_position,
+    setup_centroid_device,
+    stop_stats_at_end,
 )
 
 TEST_HFM_LUT_COLUMNS = [
@@ -27,7 +30,7 @@ async def test_read_current_position(centroid_device: CentroidFromEpics, RE: Run
     set_mock_value(centroid_device.beam_centre_x, 710)
     set_mock_value(centroid_device.beam_centre_y, 253)
 
-    (beam_x, beam_y) = RE(_read_current_position(centroid_device)).plan_result
+    (beam_x, beam_y) = RE(_read_current_position(centroid_device)).plan_result  # type: ignore
 
     assert await centroid_device.beam_centre_x.get_value() == beam_x
     assert await centroid_device.beam_centre_y.get_value() == beam_y
@@ -73,3 +76,41 @@ def test_calculate_nudge_from_lut(
     nudge_size = _calculate_nudge_from_lut(distance, device_name)
 
     assert nudge_size == pytest.approx(expected_nudge, abs=1e-3)
+
+
+@pytest.mark.parametrize(
+    "position, target, expected_res",
+    [
+        ((690, 302), (710, 283), False),
+        ((710.3, 284.9), (710, 283), False),
+        ((712, 283.2), (710, 283), False),
+        ((710.2, 283.4), (710, 283), True),
+    ],
+)
+def test_check_position_reached(
+    position: tuple[float, float],
+    target: tuple[float, float],
+    expected_res: bool,
+):
+    res = _check_position_reached(target, position)
+    assert res == expected_res
+
+
+async def test_setup_centroid_device(centroid_device: CentroidFromEpics, RE: RunEngine):
+    RE(setup_centroid_device(centroid_device))
+
+    assert await centroid_device.stats.nd_array_port.get_value() == "OAV1.cc"
+    assert await centroid_device.stats.centroid_threshold.get_value() == 20
+    assert await centroid_device.colour_mode.get_value() == "Mono"
+    assert await centroid_device.stats.enable_callbacks.get_value() == "Enable"
+    assert await centroid_device.stats.compute_centroid.get_value() is True
+
+
+async def test_stop_stats_at_end(centroid_device: CentroidFromEpics, RE: RunEngine):
+    RE(stop_stats_at_end(centroid_device))
+
+    assert await centroid_device.stats.enable_callbacks.get_value() == "Disable"
+    assert await centroid_device.stats.compute_statistics.get_value() is False
+    assert await centroid_device.stats.compute_centroid.get_value() is False
+    assert await centroid_device.stats.compute_profiles.get_value() is False
+    assert await centroid_device.stats.compute_histogram.get_value() is False

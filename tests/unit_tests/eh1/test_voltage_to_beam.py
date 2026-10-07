@@ -24,7 +24,7 @@ async def test_apply_and_read(
 ):
     (beam_x, beam_y) = RE(
         apply_voltage_and_read_position(1.2, eh1_hfm_piezo, centroid_device)
-    ).plan_result
+    ).plan_result  # type: ignore
 
     mock_apply_voltage_plan.assert_called_once_with(1.2, eh1_hfm_piezo)
     mock_sleep.assert_called_once_with(2.0)
