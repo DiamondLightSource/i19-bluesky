@@ -35,8 +35,6 @@ VFM_LUT = Path(
 
 TIME_TO_SETTLE = 2.0
 TOLERANCE = 0.5
-TOLERANCE_X = 0.5
-TOLERANCE_Y = 1.0
 MAX_TRIES = 10
 
 
@@ -81,6 +79,17 @@ def _calculate_nudge_from_lut(distance: float, device_name: str) -> float:
     return nudge_size
 
 
+def _check_position_reached(
+    target_xy: tuple[float, float], current_xy: tuple[float, float]
+) -> bool:
+    _x = target_xy[0] - current_xy[0]
+    _y = target_xy[1] - current_xy[1]
+    if abs(_x) <= TOLERANCE and abs(_y) <= TOLERANCE:
+        LOGGER.info("Position reached within tolerance.")
+        return True
+    return False
+
+
 def setup_centroid_device(beam_centre: CentroidFromEpics):
     """Sets up the plugin chain and starts the stats plugin"""
     yield from bps.prepare(beam_centre, PLUGIN_SETTINGS)
@@ -90,6 +99,7 @@ def setup_centroid_device(beam_centre: CentroidFromEpics):
 def stop_stats_at_end(
     beam_centre: CentroidFromEpics, group: str = "disable-stats", wait: bool = True
 ):
+    """Stops the stats plugin at the end of the loop"""
     yield from bps.abs_set(
         beam_centre.stats.enable_callbacks, EnableDisable.DISABLE, group=group
     )
@@ -101,18 +111,9 @@ def stop_stats_at_end(
         yield from bps.wait(group=group)
 
 
-def _check_position_reached(
-    target_xy: tuple[float, float], current_xy: tuple[float, float]
-) -> bool:
-    _x = target_xy[0] - current_xy[0]
-    _y = target_xy[1] - current_xy[1]
-    if abs(_x) <= TOLERANCE_X and abs(_y) <= TOLERANCE_Y:
-        return True
-    return False
-
-
 def nudge_single_piezo(delta_pos: float, piezo_device: AccessControlledPiezoActuator):
     current_voltage = yield from bps.rd(piezo_device.setpoint)
+    LOGGER.debug(f"Current voltage before nudge: {current_voltage}")
     nudge_size = _calculate_nudge_from_lut(delta_pos, piezo_device.name)
     LOGGER.info(
         f"Calculated {piezo_device.name} nudge for {delta_pos}px move: {nudge_size}V"
@@ -124,6 +125,7 @@ def nudge_single_piezo(delta_pos: float, piezo_device: AccessControlledPiezoActu
 
 def nudge_piezos_and_move_to_beam_centre(
     target_xy: tuple[float, float],
+    max_iterations: int = MAX_TRIES,
     hfm_piezo: AccessControlledPiezoActuator = inject("hfm_piezo"),
     vfm_piezo: AccessControlledPiezoActuator = inject("vfm_piezo"),
     beam_centre: CentroidFromEpics = inject("beam_centre_from_epics"),
@@ -149,12 +151,15 @@ def nudge_piezos_and_move_to_beam_centre(
 
     Args:
         target_xy: Position of the crosshair to centre the beam on, in px.
+        max_iterations: Maximum number of iterations for the algorithm to run.
         hfm_piezo: Device controlling the piezo on the hfm.
         vfm_piezo: Device controlling the piezo on the vfm.
         beam_centre: Device to set up the AD plugin chain and read the centroid.
     """
     yield from setup_centroid_device(beam_centre)
 
+    # NOTE. This is for eh1 only and the already converted value should just come from
+    # GDA when that part is written
     target_xy = (
         target_xy[0],
         target_xy[1] * 4 / 3,
@@ -164,41 +169,19 @@ def nudge_piezos_and_move_to_beam_centre(
     LOGGER.info(f"Starting position: {current_xy}, position to reach: {target_xy}")
 
     num = 0
-    while num < MAX_TRIES:  # Should do something with tolerance here too but for later
-        LOGGER.info(f"LOOP {num}")
-        LOGGER.warning("Start from vfm")
-        # current_vfm_v = yield from bps.rd(vfm_piezo.setpoint)
+    while not _check_position_reached(target_xy, current_xy):
+        if num == max_iterations:
+            LOGGER.warning("Maximum number of iterations reached, stopping loop.")
+            break
+        LOGGER.info("Start nudging vfm")
         delta_y = target_xy[1] - current_xy[1]
-        # vfm_nudge_size = _calculate_nudge_from_lut(delta_y, vfm_piezo.name)
-        # LOGGER.info(
-        #     f"""
-        #     Calculated vfm nudge for {delta_y}px move in y direction:
-        #  {vfm_nudge_size}V
-        #     """
-        # )
-
-        # current_vfm_v += vfm_nudge_size
-        # LOGGER.info(f"Apply {current_vfm_v} to {vfm_piezo.name}")
-        # yield from apply_voltage_to_piezo_actuators(current_vfm_v, vfm_piezo)
         yield from nudge_single_piezo(delta_y, vfm_piezo)
 
         LOGGER.info(f"Wait {TIME_TO_SETTLE}s for vfm to settle")
         yield from bps.sleep(TIME_TO_SETTLE)
 
-        LOGGER.warning("Now hfm")
-        # current_hfm_v = yield from bps.rd(hfm_piezo.setpoint)
+        LOGGER.info("Now nudge hfm")
         delta_x = target_xy[0] - current_xy[0]
-        # hfm_nudge_size = _calculate_nudge_from_lut(delta_x, hfm_piezo.name)
-        # LOGGER.info(
-        #     f"""
-        #     Calculated hfm nudge for {delta_x}px move in x direction:
-        # {hfm_nudge_size}V
-        #     """
-        # )
-
-        # current_hfm_v += hfm_nudge_size
-        # LOGGER.info(f"Apply {current_hfm_v} to {hfm_piezo.name}")
-        # yield from apply_voltage_to_piezo_actuators(current_hfm_v, hfm_piezo)
         yield from nudge_single_piezo(delta_x, hfm_piezo)
 
         LOGGER.info(f"Wait {TIME_TO_SETTLE}s for hfm to settle")
@@ -208,9 +191,7 @@ def nudge_piezos_and_move_to_beam_centre(
         LOGGER.info(f"Beam position after nudge: {current_xy}")
         num += 1
 
-        if _check_position_reached(target_xy, current_xy):
-            break
-    LOGGER.warning("DONE!")
+    LOGGER.info("DONE!")
     yield from stop_stats_at_end(beam_centre)
 
 
@@ -223,26 +204,17 @@ def nudge_hfm_and_move_beam_to_position(
     Current beam position is extracted from epics setting up the ad-plugin chain.
     Using only hfm for now to avoid issues with vfm not being in a closed loop.
     """
-    yield from bps.prepare(beam_centre, PLUGIN_SETTINGS)
+    yield from setup_centroid_device(beam_centre)
 
     current_xy = yield from _read_current_position(beam_centre)
     LOGGER.info(f"Starting position: {current_xy}, position to reach: {target_xy}")
-    current_voltage = yield from bps.rd(piezo_device.setpoint)
 
     delta_x = target_xy[0] - current_xy[0]
     i = 0
-    while abs(delta_x) > TOLERANCE_X:
+    while abs(delta_x) > TOLERANCE:
         if i >= MAX_TRIES:
             break
-        LOGGER.info(f"Loop {i + 1}")
-        nudge_size = _calculate_nudge_from_lut(delta_x, piezo_device.name)
-        LOGGER.info(
-            f"Calculated hfm nudge for {delta_x}px move in x direction: {nudge_size}V"
-        )
-
-        current_voltage += nudge_size
-        LOGGER.info(f"Apply {current_voltage} to {piezo_device.name}")
-        yield from apply_voltage_to_piezo_actuators(current_voltage, piezo_device)
+        yield from nudge_single_piezo(delta_x, piezo_device)
 
         # For now just sleep for half a second to wait for settling
         LOGGER.info(f"Wait {TIME_TO_SETTLE}s to settle")
@@ -252,6 +224,8 @@ def nudge_hfm_and_move_beam_to_position(
         LOGGER.info(f"Beam position after nudge: {current_xy}")
         delta_x = target_xy[0] - current_xy[0]
         i += 1
+
+    yield from stop_stats_at_end(beam_centre)
 
 
 def nudge_vfm_and_move_beam_to_position(
@@ -263,29 +237,18 @@ def nudge_vfm_and_move_beam_to_position(
     Current beam position is extracted from epics setting up the ad-plugin chain.
     Using only hfm for now to avoid issues with vfm not being in a closed loop.
     """
-    yield from bps.prepare(beam_centre, PLUGIN_SETTINGS)
+    yield from setup_centroid_device(beam_centre)
 
     current_xy = yield from _read_current_position(beam_centre)
     LOGGER.info(f"Starting position: {current_xy}, position to reach: {target_xy}")
-    current_voltage = yield from bps.rd(piezo_device.setpoint)
 
     target_y = current_xy[1] * 4 / 3
     delta_y = target_y - (current_xy[1])
     i = 0
-    while abs(delta_y) > TOLERANCE_Y:
+    while abs(delta_y) > TOLERANCE:
         if i >= MAX_TRIES:
             break
-        LOGGER.info(f"Loop {i + 1}")
-        nudge_size = _calculate_nudge_from_lut(delta_y, piezo_device.name)
-        LOGGER.info(
-            f"Calculated vfm nudge for {delta_y}px move in y direction: {nudge_size}V"
-        )
-        if abs(nudge_size) >= 0.05:
-            nudge_size = nudge_size / 2
-
-        current_voltage += nudge_size
-        LOGGER.info(f"Apply {current_voltage} to {piezo_device.name}")
-        yield from apply_voltage_to_piezo_actuators(current_voltage, piezo_device)
+        yield from nudge_single_piezo(delta_y, piezo_device)
 
         # For now just sleep for half a second to wait for settling
         LOGGER.info(f"Wait {TIME_TO_SETTLE}s to settle")
@@ -295,3 +258,5 @@ def nudge_vfm_and_move_beam_to_position(
         LOGGER.info(f"Beam position after nudge: {current_xy}")
         delta_y = target_y - (current_xy[1] * 4 / 3)
         i += 1
+
+    yield from stop_stats_at_end(beam_centre)
