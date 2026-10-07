@@ -42,7 +42,7 @@ async def test_setup_panda_for_rotation(
         )
         patch_load.assert_called_once()
 
-    assert await devices.panda.inenc[1].setp.get_value() == 3500  # type: ignore
+    assert await devices.panda.inenc[3].setp.get_value() == 3500  # type: ignore
 
     expected_seq_table: SeqTable = SeqTable.row(
         trigger=SeqTrigger.POSA_GT,

@@ -49,11 +49,6 @@ class SerialExperiment(VisitParameters):
         ]
         return run_list
 
-    # @property
-    # @abstractmethod
-    # def detector_params(self): ...
-    # TODO see https://github.com/DiamondLightSource/i19-bluesky/issues/103
-
 
 class SerialExperimentEh2(SerialExperiment):
     aperture_request: PinColRequest
