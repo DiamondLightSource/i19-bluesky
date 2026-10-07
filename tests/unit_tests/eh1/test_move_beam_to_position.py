@@ -13,11 +13,14 @@ from i19_bluesky.eh1.move_beam_to_position import (
     _check_position_reached,
     _get_lut_path_and_column_from_name,
     _read_current_position,
+    nudge_hfm_and_move_beam_to_position,
     nudge_piezos_and_move_to_beam_centre,
     nudge_single_piezo,
+    nudge_vfm_and_move_beam_to_position,
     setup_centroid_device,
     stop_stats_at_end,
 )
+from tests.unit_tests.conftest import fake_generator
 
 TEST_HFM_LUT_COLUMNS = [
     [-0.04, -0.01, 0.01, 0.04],
@@ -213,3 +216,57 @@ async def test_nudge_piezos_and_move_to_beam_centre_stops_after_max_iterations(
     # Should only be called twice as only 1 iteration
     assert mock_sleep.call_count == 2
     assert mock_nudge.call_count == 2
+
+
+@patch("i19_bluesky.eh1.move_beam_to_position.bps.sleep")
+@patch("i19_bluesky.eh1.move_beam_to_position._read_current_position")
+@patch("i19_bluesky.eh1.move_beam_to_position.nudge_single_piezo")
+async def test_nudge_hfm_and_move(
+    mock_nudge: MagicMock,
+    mock_read: MagicMock,
+    mock_sleep: MagicMock,
+    centroid_device: CentroidFromEpics,
+    eh1_hfm_piezo: AccessControlledPiezoActuator,
+    RE: RunEngine,
+):
+    # Two loops to reach position
+    target_pos = (706, 250)
+    mock_read.side_effect = [
+        fake_generator((720, 390)),
+        fake_generator((706.9, 390.5)),
+        fake_generator((706.2, 390.54)),
+    ]
+
+    RE(nudge_hfm_and_move_beam_to_position(target_pos, eh1_hfm_piezo, centroid_device))
+
+    assert mock_sleep.call_count == 2
+    mock_nudge.assert_has_calls(
+        [call(-14, eh1_hfm_piezo), call(pytest.approx(-0.9, abs=1e-2), eh1_hfm_piezo)],
+        any_order=True,
+    )
+
+
+@patch("i19_bluesky.eh1.move_beam_to_position.bps.sleep")
+@patch("i19_bluesky.eh1.move_beam_to_position._read_current_position")
+@patch("i19_bluesky.eh1.move_beam_to_position.nudge_single_piezo")
+async def test_nudge_vfm_and_move(
+    mock_nudge: MagicMock,
+    mock_read: MagicMock,
+    mock_sleep: MagicMock,
+    centroid_device: CentroidFromEpics,
+    eh1_vfm_piezo: AccessControlledPiezoActuator,
+    RE: RunEngine,
+):
+    # Oneloop to reach position
+    target_pos = (706, 250)
+    mock_read.side_effect = [
+        fake_generator((707, 346.6)),
+        fake_generator((707.4, 333.5)),
+    ]
+
+    RE(nudge_vfm_and_move_beam_to_position(target_pos, eh1_vfm_piezo, centroid_device))
+
+    assert mock_sleep.call_count == 1
+    mock_nudge.assert_has_calls(
+        [call(pytest.approx(-13.27, abs=1e-2), eh1_vfm_piezo)], any_order=True
+    )

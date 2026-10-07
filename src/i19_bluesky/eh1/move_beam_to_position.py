@@ -195,6 +195,11 @@ def nudge_piezos_and_move_to_beam_centre(
     yield from stop_stats_at_end(beam_centre)
 
 
+# NOTE. The following plans should in the future become just one (if even needed), but
+# until further testing can be done it would be easier to have two separare entry points
+# for the two piezos.
+
+
 def nudge_hfm_and_move_beam_to_position(
     target_xy: tuple[float, float],
     piezo_device: AccessControlledPiezoActuator = inject("hfm_piezo"),
@@ -242,7 +247,8 @@ def nudge_vfm_and_move_beam_to_position(
     current_xy = yield from _read_current_position(beam_centre)
     LOGGER.info(f"Starting position: {current_xy}, position to reach: {target_xy}")
 
-    target_y = current_xy[1] * 4 / 3
+    target_y = round(target_xy[1] * 4 / 3, 3)
+    LOGGER.debug(f"Target Y position in GDA: {target_y}")
     delta_y = target_y - (current_xy[1])
     i = 0
     while abs(delta_y) > TOLERANCE:
@@ -256,7 +262,7 @@ def nudge_vfm_and_move_beam_to_position(
 
         current_xy = yield from _read_current_position(beam_centre)
         LOGGER.info(f"Beam position after nudge: {current_xy}")
-        delta_y = target_y - (current_xy[1] * 4 / 3)
+        delta_y = target_y - current_xy[1]
         i += 1
 
     yield from stop_stats_at_end(beam_centre)
