@@ -16,6 +16,7 @@ from dodal.devices.beamlines.i19.access_controlled.shutter import (
     AccessControlledShutter,
     HutchState,
 )
+from dodal.devices.oav.beam_centre.centroid_from_epics import CentroidFromEpics
 from ophyd_async.core import set_mock_value
 
 
@@ -71,3 +72,12 @@ async def eh1_energy_device(RE: RunEngine) -> AccessControlledEnergyComposite:
     set_mock_value(energy_device.energy_in_kev, 17.9)
     set_mock_value(energy_device.wavelength_in_a, 0.6)
     return energy_device
+
+
+@pytest.fixture
+async def centroid_device(RE: RunEngine) -> CentroidFromEpics:
+    device = CentroidFromEpics("", name="mock_centroid")
+    await device.connect(mock=True)
+    set_mock_value(device.beam_centre_x, 706)
+    set_mock_value(device.beam_centre_y, 283)
+    return device

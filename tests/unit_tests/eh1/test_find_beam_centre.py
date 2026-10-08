@@ -4,10 +4,15 @@ import numpy as np
 import pytest
 from bluesky import RunEngine
 from dodal.devices.oav.beam_centre.beam_centre import CentreEllipseMethod
+from dodal.devices.oav.beam_centre.centroid_from_epics import (
+    CentroidFromEpics,
+)
 from dodal.devices.oav.oav_detector import OAVBeamCentreFile
 from ophyd_async.core import init_devices, set_mock_value
 
-from i19_bluesky.eh1.find_beam_centre import find_beam_centre_plan
+from i19_bluesky.eh1.find_beam_centre import (
+    find_beam_centre_plan,
+)
 
 from ..conftest import fake_generator
 
@@ -31,8 +36,13 @@ async def oav() -> OAVBeamCentreFile:
     return oav
 
 
-def test_trigger_beam_centre_fit():
-    pass
+@pytest.fixture
+async def centroid_device() -> CentroidFromEpics:
+    async with init_devices(mock=True):
+        device = CentroidFromEpics("", name="test-centroid")
+    set_mock_value(device.beam_centre_x, 1024)
+    set_mock_value(device.beam_centre_y, 768)
+    return device
 
 
 @pytest.mark.parametrize(
