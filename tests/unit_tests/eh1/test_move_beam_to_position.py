@@ -1,3 +1,4 @@
+from pathlib import Path
 from unittest.mock import MagicMock, call, patch
 
 import pytest
@@ -13,6 +14,7 @@ from i19_bluesky.eh1.move_beam_to_position import (
     _check_position_reached,
     _get_lut_path_and_column_from_name,
     _read_current_position,
+    _read_lut,
     nudge_hfm_and_move_beam_to_position,
     nudge_piezos_and_move_to_beam_centre,
     nudge_single_piezo,
@@ -32,6 +34,22 @@ TEST_VFM_LUT_COLUMNS = [
     [1.82, 0.45, -0.46, -1.86],
     [-37.67, -9.38, 9.33, 37.3],
 ]
+
+TEST_LUT_FILE = """
+# Columns: nudge size, delta x, delta y
+Units: V pixels pixels
+0.01 8.361 0.035
+0.02 16.769 -0.009
+"""
+
+
+@patch("i19_bluesky.eh1.move_beam_to_position.get_config_client")
+async def test_read_lut(mock_config_client: MagicMock):
+    mock_config_client.return_value.get_file_contents.return_value = TEST_LUT_FILE
+    expected_columns = [[0.01, 0.02], [8.361, 16.769], [0.035, -0.009]]
+
+    columns = _read_lut(Path("/tmp"))
+    assert columns == expected_columns
 
 
 async def test_read_current_position(centroid_device: CentroidFromEpics, RE: RunEngine):

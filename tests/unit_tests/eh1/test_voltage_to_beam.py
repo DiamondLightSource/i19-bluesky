@@ -1,4 +1,4 @@
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, mock_open, patch
 
 from bluesky import RunEngine
 from dodal.devices.beamlines.i19.access_controlled.piezo_control import (
@@ -7,6 +7,7 @@ from dodal.devices.beamlines.i19.access_controlled.piezo_control import (
 from dodal.devices.oav.beam_centre.centroid_from_epics import CentroidFromEpics
 
 from i19_bluesky.eh1.voltage_to_beam_position import (
+    _save_results_to_file,
     apply_voltage_and_read_position,
     measure_piezo_voltages_vs_beam_position,
 )
@@ -62,3 +63,19 @@ async def test_measure_voltages_vs_position(
     # Measurement taken and saved twice
     assert mock_save.call_count == 2
     assert mock_apply_voltage_plan.call_count == 2
+
+
+def test_save_results_to_file():
+    with (
+        patch("i19_bluesky.eh1.voltage_to_beam_position.open", mock_open()) as m,
+        patch("i19_bluesky.eh1.voltage_to_beam_position.csv") as mock_csv,
+    ):
+        mock_csv.writer = MagicMock()
+        _save_results_to_file(
+            "vfm_piezo", [1.27, 1.28, 1.29], [702.2, 702, 702], [346, 355, 362], 0.01
+        )
+        m.assert_called_once()
+        mock_csv.writer().writerow.assert_called_once_with(
+            ["voltage", "beam_position_x", "beam_position_y"]
+        )
+        mock_csv.writer().writerows.assert_called_once()
