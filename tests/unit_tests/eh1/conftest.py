@@ -80,4 +80,6 @@ async def centroid_device(RE: RunEngine) -> CentroidFromEpics:
     await device.connect(mock=True)
     set_mock_value(device.beam_centre_x, 706)
     set_mock_value(device.beam_centre_y, 283)
+    set_mock_value(device.cam_port_name, "OAV1.cam")
+    set_mock_value(device.cc_port_name, "OAV1.cc")
     return device
