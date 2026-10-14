@@ -84,7 +84,7 @@ def measure_piezo_voltages_vs_beam_position(
     yield from bps.prepare(
         beam_centre, CentroidSettings(threshold=20, colour_mode=ColourMode.MONO)
     )
-    yield from bps.trigger(beam_centre)
+    yield from bps.stage(beam_centre)
 
     current_voltage = yield from bps.rd(piezo_device.setpoint)
 

@@ -17,7 +17,6 @@ from dodal.devices.oav.beam_centre.centroid_from_epics import (
     ColourMode,
 )
 from dodal.devices.util.lookup_tables import linear_interpolation_lut
-from ophyd_async.core import EnableDisable
 
 from i19_bluesky.log import LOGGER
 from i19_bluesky.plans.optics_hutch_control_plans import (
@@ -93,22 +92,7 @@ def _check_position_reached(
 def setup_centroid_device(beam_centre: CentroidFromEpics):
     """Sets up the plugin chain and starts the stats plugin"""
     yield from bps.prepare(beam_centre, PLUGIN_SETTINGS)
-    yield from bps.trigger(beam_centre)
-
-
-def stop_stats_at_end(
-    beam_centre: CentroidFromEpics, group: str = "disable-stats", wait: bool = True
-):
-    """Stops the stats plugin at the end of the loop"""
-    yield from bps.abs_set(
-        beam_centre.stats.enable_callbacks, EnableDisable.DISABLE, group=group
-    )
-    yield from bps.abs_set(beam_centre.stats.compute_statistics, False, group=group)
-    yield from bps.abs_set(beam_centre.stats.compute_centroid, False, group=group)
-    yield from bps.abs_set(beam_centre.stats.compute_profiles, False, group=group)
-    yield from bps.abs_set(beam_centre.stats.compute_histogram, False, group=group)
-    if wait:
-        yield from bps.wait(group=group)
+    yield from bps.stage(beam_centre)
 
 
 def nudge_single_piezo(delta_pos: float, piezo_device: AccessControlledPiezoActuator):
@@ -192,7 +176,7 @@ def nudge_piezos_and_move_to_beam_centre(
         num += 1
 
     LOGGER.info("DONE!")
-    yield from stop_stats_at_end(beam_centre)
+    yield from bps.unstage(beam_centre)
 
 
 # NOTE. The following plans should in the future become just one (if even needed), but
@@ -230,7 +214,7 @@ def nudge_hfm_and_move_beam_to_position(
         delta_x = target_xy[0] - current_xy[0]
         i += 1
 
-    yield from stop_stats_at_end(beam_centre)
+    yield from bps.unstage(beam_centre)
 
 
 def nudge_vfm_and_move_beam_to_position(
@@ -265,4 +249,4 @@ def nudge_vfm_and_move_beam_to_position(
         delta_y = target_y - current_xy[1]
         i += 1
 
-    yield from stop_stats_at_end(beam_centre)
+    yield from bps.unstage(beam_centre)

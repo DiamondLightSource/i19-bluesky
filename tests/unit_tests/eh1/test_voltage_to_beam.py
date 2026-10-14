@@ -57,7 +57,7 @@ async def test_measure_voltages_vs_position(
     assert await centroid_device.cc_array_port.get_value() == "OAV1.cam"
     assert await centroid_device.stats.nd_array_port.get_value() == "OAV1.cc"
 
-    # Device triggered
+    # Device staged
     assert await centroid_device.stats.enable_callbacks.get_value() == "Enable"
 
     # Measurement taken and saved twice

@@ -20,7 +20,6 @@ from i19_bluesky.eh1.move_beam_to_position import (
     nudge_single_piezo,
     nudge_vfm_and_move_beam_to_position,
     setup_centroid_device,
-    stop_stats_at_end,
 )
 from tests.unit_tests.conftest import fake_generator
 
@@ -130,16 +129,6 @@ async def test_setup_centroid_device(centroid_device: CentroidFromEpics, RE: Run
     assert await centroid_device.colour_mode.get_value() == "Mono"
     assert await centroid_device.stats.enable_callbacks.get_value() == "Enable"
     assert await centroid_device.stats.compute_centroid.get_value() is True
-
-
-async def test_stop_stats_at_end(centroid_device: CentroidFromEpics, RE: RunEngine):
-    RE(stop_stats_at_end(centroid_device))
-
-    assert await centroid_device.stats.enable_callbacks.get_value() == "Disable"
-    assert await centroid_device.stats.compute_statistics.get_value() is False
-    assert await centroid_device.stats.compute_centroid.get_value() is False
-    assert await centroid_device.stats.compute_profiles.get_value() is False
-    assert await centroid_device.stats.compute_histogram.get_value() is False
 
 
 @patch("i19_bluesky.eh1.move_beam_to_position.apply_voltage_to_piezo_actuators")
