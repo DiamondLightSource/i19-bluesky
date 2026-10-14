@@ -1,10 +1,11 @@
-from unittest.mock import MagicMock, mock_open, patch
+from unittest.mock import MagicMock, call, mock_open, patch
 
 from bluesky import RunEngine
 from dodal.devices.beamlines.i19.access_controlled.piezo_control import (
     AccessControlledPiezoActuator,
 )
 from dodal.devices.oav.beam_centre.centroid_from_epics import CentroidFromEpics
+from ophyd_async.core import EnableDisable, get_mock_put
 
 from i19_bluesky.eh1.voltage_to_beam_position import (
     _save_results_to_file,
@@ -57,8 +58,11 @@ async def test_measure_voltages_vs_position(
     assert await centroid_device.cc_array_port.get_value() == "OAV1.cam"
     assert await centroid_device.stats.nd_array_port.get_value() == "OAV1.cc"
 
-    # Device staged
-    assert await centroid_device.stats.enable_callbacks.get_value() == "Enable"
+    # Device staged and then unstaged
+    enable_callbacks_mock = get_mock_put(centroid_device.stats.enable_callbacks)
+    enable_callbacks_mock.assert_has_calls(
+        [call(EnableDisable.ENABLE), call(EnableDisable.DISABLE)]
+    )
 
     # Measurement taken and saved twice
     assert mock_save.call_count == 2

@@ -116,3 +116,4 @@ def measure_piezo_voltages_vs_beam_position(
             yield from apply_voltage_to_piezo_actuators(
                 current_voltage + nudge_size / 2, piezo_device
             )
+    yield from bps.unstage(beam_centre)
