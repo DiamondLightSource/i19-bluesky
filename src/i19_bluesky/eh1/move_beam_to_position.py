@@ -46,7 +46,9 @@ def _read_current_position(
     return (x, y)
 
 
-# TODO Create model in daq-config-server
+# Move to device once eh2 also has LUT
+# See https://github.com/DiamondLightSource/dodal/issues/2236
+# and https://github.com/DiamondLightSource/i19-bluesky/issues/188
 def _read_lut(lut_path: Path) -> list[list[float]]:
     config_client = get_config_client()
     lut_contents = config_client.get_file_contents(lut_path.as_posix())
