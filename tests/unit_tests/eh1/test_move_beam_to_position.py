@@ -19,7 +19,6 @@ from i19_bluesky.eh1.move_beam_to_position import (
     nudge_piezos_and_move_to_beam_centre,
     nudge_single_piezo,
     nudge_vfm_and_move_beam_to_position,
-    setup_centroid_device,
 )
 from tests.unit_tests.conftest import fake_generator
 
@@ -119,16 +118,6 @@ def test_check_position_reached(
 ):
     res = _check_position_reached(target, position)
     assert res == expected_res
-
-
-async def test_setup_centroid_device(centroid_device: CentroidFromEpics, RE: RunEngine):
-    RE(setup_centroid_device(centroid_device))
-
-    assert await centroid_device.stats.nd_array_port.get_value() == "OAV1.cc"
-    assert await centroid_device.stats.centroid_threshold.get_value() == 20
-    assert await centroid_device.colour_mode.get_value() == "Mono"
-    assert await centroid_device.stats.enable_callbacks.get_value() == "Enable"
-    assert await centroid_device.stats.compute_centroid.get_value() is True
 
 
 @patch("i19_bluesky.eh1.move_beam_to_position.apply_voltage_to_piezo_actuators")

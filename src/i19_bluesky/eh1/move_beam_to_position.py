@@ -2,6 +2,7 @@ from collections.abc import Generator
 from pathlib import Path
 
 import bluesky.plan_stubs as bps
+import bluesky.preprocessors as bpp
 from bluesky.utils import Msg, MsgGenerator
 from daq_config_server.models.lookup_tables import GenericLookupTable
 from dodal.common import inject
@@ -89,12 +90,6 @@ def _check_position_reached(
     return False
 
 
-def setup_centroid_device(beam_centre: CentroidFromEpics):
-    """Sets up the plugin chain and starts the stats plugin"""
-    yield from bps.prepare(beam_centre, PLUGIN_SETTINGS)
-    yield from bps.stage(beam_centre)
-
-
 def nudge_single_piezo(delta_pos: float, piezo_device: AccessControlledPiezoActuator):
     current_voltage = yield from bps.rd(piezo_device.setpoint)
     LOGGER.debug(f"Current voltage before nudge: {current_voltage}")
@@ -140,8 +135,6 @@ def nudge_piezos_and_move_to_beam_centre(
         vfm_piezo: Device controlling the piezo on the vfm.
         beam_centre: Device to set up the AD plugin chain and read the centroid.
     """
-    yield from setup_centroid_device(beam_centre)
-
     # NOTE. This is for eh1 only and the already converted value should just come from
     # GDA when that part is written
     target_xy = (
@@ -149,34 +142,37 @@ def nudge_piezos_and_move_to_beam_centre(
         round(target_xy[1] * 4 / 3, 3),
     )  # beacuse GDA, the input value is that of the crosshair from file
 
-    current_xy = yield from _read_current_position(beam_centre)
-    LOGGER.info(f"Starting position: {current_xy}, position to reach: {target_xy}")
-
-    num = 0
-    while not _check_position_reached(target_xy, current_xy):
-        if num == max_iterations:
-            LOGGER.warning("Maximum number of iterations reached, stopping loop.")
-            break
-        LOGGER.info("Start nudging vfm")
-        delta_y = target_xy[1] - current_xy[1]
-        yield from nudge_single_piezo(delta_y, vfm_piezo)
-
-        LOGGER.info(f"Wait {TIME_TO_SETTLE}s for vfm to settle")
-        yield from bps.sleep(TIME_TO_SETTLE)
-
-        LOGGER.info("Now nudge hfm")
-        delta_x = target_xy[0] - current_xy[0]
-        yield from nudge_single_piezo(delta_x, hfm_piezo)
-
-        LOGGER.info(f"Wait {TIME_TO_SETTLE}s for hfm to settle")
-        yield from bps.sleep(TIME_TO_SETTLE)
-
+    @bpp.stage_decorator([beam_centre])
+    def run_loop():
         current_xy = yield from _read_current_position(beam_centre)
-        LOGGER.info(f"Beam position after nudge: {current_xy}")
-        num += 1
+        LOGGER.info(f"Starting position: {current_xy}, position to reach: {target_xy}")
+        yield from bps.prepare(beam_centre, PLUGIN_SETTINGS, wait=True)
 
-    LOGGER.info("DONE!")
-    yield from bps.unstage(beam_centre)
+        num = 0
+        while not _check_position_reached(target_xy, current_xy):
+            if num == max_iterations:
+                LOGGER.warning("Maximum number of iterations reached, stopping loop.")
+                break
+            LOGGER.info("Start nudging vfm")
+            delta_y = target_xy[1] - current_xy[1]
+            yield from nudge_single_piezo(delta_y, vfm_piezo)
+
+            LOGGER.info(f"Wait {TIME_TO_SETTLE}s for vfm to settle")
+            yield from bps.sleep(TIME_TO_SETTLE)
+
+            LOGGER.info("Now nudge hfm")
+            delta_x = target_xy[0] - current_xy[0]
+            yield from nudge_single_piezo(delta_x, hfm_piezo)
+
+            LOGGER.info(f"Wait {TIME_TO_SETTLE}s for hfm to settle")
+            yield from bps.sleep(TIME_TO_SETTLE)
+
+            current_xy = yield from _read_current_position(beam_centre)
+            LOGGER.info(f"Beam position after nudge: {current_xy}")
+            num += 1
+        LOGGER.info("DONE!")
+
+    yield from run_loop()
 
 
 # NOTE. The following plans should in the future become just one (if even needed), but
@@ -193,7 +189,8 @@ def nudge_hfm_and_move_beam_to_position(
     Current beam position is extracted from epics setting up the ad-plugin chain.
     Using only hfm for now to avoid issues with vfm not being in a closed loop.
     """
-    yield from setup_centroid_device(beam_centre)
+    yield from bps.stage(beam_centre, wait=True)
+    yield from bps.prepare(beam_centre, PLUGIN_SETTINGS, wait=True)
 
     current_xy = yield from _read_current_position(beam_centre)
     LOGGER.info(f"Starting position: {current_xy}, position to reach: {target_xy}")
@@ -226,7 +223,8 @@ def nudge_vfm_and_move_beam_to_position(
     Current beam position is extracted from epics setting up the ad-plugin chain.
     Using only hfm for now to avoid issues with vfm not being in a closed loop.
     """
-    yield from setup_centroid_device(beam_centre)
+    yield from bps.stage(beam_centre, wait=True)
+    yield from bps.prepare(beam_centre, PLUGIN_SETTINGS, wait=True)
 
     current_xy = yield from _read_current_position(beam_centre)
     LOGGER.info(f"Starting position: {current_xy}, position to reach: {target_xy}")

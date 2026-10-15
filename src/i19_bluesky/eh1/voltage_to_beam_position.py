@@ -81,10 +81,13 @@ def measure_piezo_voltages_vs_beam_position(
     used to set up a lookup table.
     """
     # Set up the plugin chain and start the stats plugin
+    yield from bps.stage(beam_centre, group="setup-centroid")
     yield from bps.prepare(
-        beam_centre, CentroidSettings(threshold=20, colour_mode=ColourMode.MONO)
+        beam_centre,
+        CentroidSettings(threshold=20, colour_mode=ColourMode.MONO),
+        group="setup-centroid",
     )
-    yield from bps.stage(beam_centre)
+    yield from bps.wait(group="setup-centroid")
 
     current_voltage = yield from bps.rd(piezo_device.setpoint)
 
@@ -116,4 +119,4 @@ def measure_piezo_voltages_vs_beam_position(
             yield from apply_voltage_to_piezo_actuators(
                 current_voltage + nudge_size / 2, piezo_device
             )
-    yield from bps.unstage(beam_centre)
+    yield from bps.unstage(beam_centre, wait=True)
