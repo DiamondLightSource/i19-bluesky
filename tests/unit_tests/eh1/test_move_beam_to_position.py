@@ -10,15 +10,15 @@ from dodal.devices.oav.beam_centre.centroid_from_epics import CentroidFromEpics
 from ophyd_async.core import set_mock_value
 
 from i19_bluesky.eh1.move_beam_to_position import (
+    NudgeDirection,
     _calculate_nudge_from_lut,
     _check_position_reached,
     _get_lut_path_and_column_from_name,
     _read_current_position,
     _read_lut,
-    nudge_hfm_and_move_beam_to_position,
+    nudge_and_move_in_one_direction,
     nudge_piezos_and_move_to_beam_centre,
     nudge_single_piezo,
-    nudge_vfm_and_move_beam_to_position,
 )
 from tests.unit_tests.conftest import fake_generator
 
@@ -215,9 +215,9 @@ async def test_nudge_piezos_and_move_to_beam_centre_stops_after_max_iterations(
 
 
 @patch("i19_bluesky.eh1.move_beam_to_position.bps.sleep")
-@patch("i19_bluesky.eh1.move_beam_to_position._read_current_position")
+@patch("i19_bluesky.eh1.move_beam_to_position.bps.rd")
 @patch("i19_bluesky.eh1.move_beam_to_position.nudge_single_piezo")
-async def test_nudge_hfm_and_move(
+async def test_nudge_and_move_in_one_direction_for_hfm(
     mock_nudge: MagicMock,
     mock_read: MagicMock,
     mock_sleep: MagicMock,
@@ -225,15 +225,18 @@ async def test_nudge_hfm_and_move(
     eh1_hfm_piezo: AccessControlledPiezoActuator,
     RE: RunEngine,
 ):
-    # Two loops to reach position
-    target_pos = (706, 250)
+    target_pos = 706
     mock_read.side_effect = [
-        fake_generator((720, 390)),
-        fake_generator((706.9, 390.5)),
-        fake_generator((706.2, 390.54)),
+        fake_generator(720),
+        fake_generator(706.9),
+        fake_generator(706.2),
     ]
 
-    RE(nudge_hfm_and_move_beam_to_position(target_pos, eh1_hfm_piezo, centroid_device))
+    RE(
+        nudge_and_move_in_one_direction(
+            target_pos, NudgeDirection.X, eh1_hfm_piezo, centroid_device
+        )
+    )
 
     assert mock_sleep.call_count == 2
     mock_nudge.assert_has_calls(
@@ -243,9 +246,9 @@ async def test_nudge_hfm_and_move(
 
 
 @patch("i19_bluesky.eh1.move_beam_to_position.bps.sleep")
-@patch("i19_bluesky.eh1.move_beam_to_position._read_current_position")
+@patch("i19_bluesky.eh1.move_beam_to_position.bps.rd")
 @patch("i19_bluesky.eh1.move_beam_to_position.nudge_single_piezo")
-async def test_nudge_vfm_and_move(
+async def test_nudge_and_move_in_one_direction_for_vfm(
     mock_nudge: MagicMock,
     mock_read: MagicMock,
     mock_sleep: MagicMock,
@@ -254,15 +257,56 @@ async def test_nudge_vfm_and_move(
     RE: RunEngine,
 ):
     # Oneloop to reach position
-    target_pos = (706, 250)
+    target = 250
     mock_read.side_effect = [
-        fake_generator((707, 346.6)),
-        fake_generator((707.4, 333.5)),
+        fake_generator(346.6),
+        fake_generator(333.5),
     ]
 
-    RE(nudge_vfm_and_move_beam_to_position(target_pos, eh1_vfm_piezo, centroid_device))
+    RE(
+        nudge_and_move_in_one_direction(
+            target, NudgeDirection.Y, eh1_vfm_piezo, centroid_device
+        )
+    )
 
     assert mock_sleep.call_count == 1
     mock_nudge.assert_has_calls(
         [call(pytest.approx(-13.27, abs=1e-2), eh1_vfm_piezo)], any_order=True
     )
+
+
+@patch("i19_bluesky.eh1.move_beam_to_position.bps.sleep")
+@patch("i19_bluesky.eh1.move_beam_to_position.bps.rd")
+@patch("i19_bluesky.eh1.move_beam_to_position.nudge_single_piezo")
+async def test_nudge_and_move_in_one_direction_for_vfm_reaches_max_tries_and_breaks(
+    mock_nudge: MagicMock,
+    mock_read: MagicMock,
+    mock_sleep: MagicMock,
+    centroid_device: CentroidFromEpics,
+    eh1_vfm_piezo: AccessControlledPiezoActuator,
+    RE: RunEngine,
+):
+    # Would need 11 loops to reach position
+    target_pos = 250
+    mock_read.side_effect = [
+        fake_generator(365),
+        fake_generator(351.1),
+        fake_generator(349.6),
+        fake_generator(346.6),
+        fake_generator(342.6),
+        fake_generator(340.2),
+        fake_generator(338.6),
+        fake_generator(336.1),
+        fake_generator(335),
+        fake_generator(334.2),
+        fake_generator(333.9),
+        fake_generator(333.5),
+    ]
+    RE(
+        nudge_and_move_in_one_direction(
+            target_pos, NudgeDirection.Y, eh1_vfm_piezo, centroid_device
+        )
+    )
+
+    assert mock_sleep.call_count == 10
+    assert mock_nudge.call_count == 10

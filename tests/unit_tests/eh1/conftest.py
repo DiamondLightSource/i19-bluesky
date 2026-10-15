@@ -54,7 +54,7 @@ async def eh1_hfm_piezo(RE: RunEngine) -> AccessControlledPiezoActuator:
 @pytest.fixture
 async def eh1_vfm_piezo(RE: RunEngine) -> AccessControlledPiezoActuator:
     vfm_piezo = AccessControlledPiezoActuator(
-        "", FocusingMirrorName.VFM, HutchState.EH1, "", "mock_hfm_piezo"
+        "", FocusingMirrorName.VFM, HutchState.EH1, "", "mock_vfm_piezo"
     )
     await vfm_piezo.connect(mock=True)
     vfm_piezo.url = "http://test-blueapi.url"
