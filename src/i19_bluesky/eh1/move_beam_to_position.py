@@ -183,9 +183,9 @@ def nudge_piezos_and_move_to_beam_centre(
     yield from run_loop()
 
 
-# NOTE. The following plans should in the future become just one (if even needed), but
-# until further testing can be done it would be easier to have two separare entry points
-# for the two piezos.
+# NOTE. The following plan may not be needed at all in the future but until further
+# testing can be done it would be easier to have a separate entry point to test each
+# piezo nudge in isolation.
 
 
 def nudge_and_move_in_one_direction(
@@ -195,7 +195,10 @@ def nudge_and_move_in_one_direction(
     beam_centre: CentroidFromEpics = inject("beam_centre_from_epics"),
 ) -> MsgGenerator:
     """Given a known target position, nudge the single piezo actuator to move the beam
-    towards it.
+    towards it in just one direction - x for the hfm_piezo device and y for vfm_piezo.
+
+    This plan should be used to test the beam move in each direction in isolation,
+    keeping in mind that it will likely not bring the beam to the exact centre.
     """
     if direction is NudgeDirection.X:
         target_position = target
