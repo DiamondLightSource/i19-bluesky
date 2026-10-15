@@ -1,4 +1,5 @@
 from collections.abc import Generator
+from math import dist
 from pathlib import Path
 
 import bluesky.plan_stubs as bps
@@ -90,9 +91,7 @@ def _calculate_nudge_from_lut(distance: float, device_name: str) -> float:
 def _check_position_reached(
     target_xy: tuple[float, float], current_xy: tuple[float, float]
 ) -> bool:
-    _x = target_xy[0] - current_xy[0]
-    _y = target_xy[1] - current_xy[1]
-    if abs(_x) <= TOLERANCE and abs(_y) <= TOLERANCE:
+    if dist(target_xy, current_xy) <= TOLERANCE:
         LOGGER.info("Position reached within tolerance.")
         return True
     return False
