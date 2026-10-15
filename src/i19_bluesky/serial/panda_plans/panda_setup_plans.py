@@ -22,6 +22,7 @@ DEG_TO_ENC_COUNTS = -16667  # From Marks calculations... BUT sign is other way a
 GENERAL_TIMEOUT = 60
 
 
+# NOTE ACTHUNG NEED TO USE SEQ2 FOR NOW!!!
 def setup_panda_for_rotation(
     parameters: PandaRotationParams,
     panda: HDFPanda,
