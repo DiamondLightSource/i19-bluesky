@@ -32,14 +32,18 @@ def trigger_panda_collection(
             panda (HDFPanda): The fastcs PandA ophyd device.
             eiger (EigerDetector): The eiger detector device
     """
+    LOGGER.info("Set up panda")
     yield from setup_panda_for_rotation(
         parameters.panda_rotation_params,
         devices.panda,
+        devices.serial_stages,
     )
+    # LOGGER.info("SEQ! OUTA to TTOLOUT2 (eiger)")
+    # yield from bps.abs_set(devices.panda.)
     LOGGER.info("Arm panda and move phi")
     yield from arm_panda(devices.panda)
-    LOGGER.info("Arm eiger")
-    yield from bps.trigger(devices.eiger.detector.arm)
+    LOGGER.info("Kickoff eiger")
+    yield from bps.kickoff(devices.eiger, wait=True)
     for i, (well_num, coords) in enumerate(parameters.wells_to_collect.items()):
         yield from move_stage_x_and_z(coords[0], coords[2], devices.serial_stages)
         LOGGER.info(f"Moved to well {well_num}")
@@ -49,7 +53,8 @@ def trigger_panda_collection(
                 {parameters.panda_rotation_params.scan_end_deg}"
             )
             yield from bps.abs_set(
-                devices.diffractometer.phi,
+                devices.serial_stages.phi,
+                # devices.diffractometer.phi,
                 parameters.panda_rotation_params.scan_end_deg,
                 wait=True,
             )
@@ -59,7 +64,14 @@ def trigger_panda_collection(
                     {parameters.panda_rotation_params.scan_start_deg}"
             )
             yield from bps.abs_set(
-                devices.diffractometer.phi,
+                devices.serial_stages.phi,
+                # devices.diffractometer.phi,
                 parameters.panda_rotation_params.scan_start_deg,
                 wait=True,
             )
+    LOGGER.info("Run complete eiger")
+    LOGGER.warning("SLEEP FOR 10 s")
+    yield from bps.sleep(
+        10
+    )  # parameters.exposure_time_s * parameters.total_num_images + 1)
+    yield from bps.complete(devices.eiger, wait=True)

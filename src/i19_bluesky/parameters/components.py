@@ -79,3 +79,7 @@ class ZebraRotationParams(RotationParams):
 
 class PandaRotationParams(RotationParams):
     ramp_distance_deg: float = Field(default=RAMP_UP_DEG)
+
+    @property
+    def gate_start(self) -> float:
+        return self.scan_start_deg - self.ramp_distance_deg
