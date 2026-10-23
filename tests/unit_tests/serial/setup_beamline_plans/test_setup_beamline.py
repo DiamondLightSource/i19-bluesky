@@ -72,7 +72,7 @@ async def test_setup_beamline_for_collection(
     )
 
 
-@patch("i19_bluesky.serial.setup_beamline_plans.setup_beamline.write_eiger_params")
+@patch("i19_bluesky.serial.setup_beamline_plans.setup_beamline.set_eiger_params")
 @patch("i19_bluesky.serial.setup_beamline_plans.setup_beamline.setup_sample_stage")
 @patch(
     "i19_bluesky.serial.setup_beamline_plans.setup_beamline.setup_beamline_for_collection"
@@ -82,7 +82,7 @@ def test_setup_eh2_serial_collection(
     mock_open_shutter: MagicMock,
     mock_setup: MagicMock,
     mock_stage: MagicMock,
-    mock_write_eiger_params: MagicMock,
+    mock_set_eiger_params: MagicMock,
     parameters: SerialExperimentEh2,
     devices: SerialCollectionEh2PandaComposite,
     RE: RunEngine,
@@ -92,9 +92,7 @@ def test_setup_eh2_serial_collection(
     RE(setup_eh2_serial_collection(parameters, devices))
 
     mock_open_shutter.assert_called_once_with(devices.shutter)
-    mock_write_eiger_params.assert_called_once_with(
-        parameters, 17.9, 0.6, devices.eiger
-    )
+    mock_set_eiger_params.assert_called_once_with(parameters, 17.9, 0.6, devices.eiger)
     mock_setup.assert_called_once_with(
         "100um", 320, 0, devices.backlight, devices.pincol, devices.diffractometer
     )

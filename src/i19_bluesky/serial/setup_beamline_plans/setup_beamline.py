@@ -19,7 +19,7 @@ from i19_bluesky.serial.device_setup_plans.diffractometer_plans import (
     move_detector_stage,
     setup_sample_stage,
 )
-from i19_bluesky.serial.device_setup_plans.eiger_metadata import write_eiger_params
+from i19_bluesky.serial.device_setup_plans.eiger_setup_plans import set_eiger_params
 
 
 def setup_eh2_serial_collection(
@@ -32,7 +32,7 @@ def setup_eh2_serial_collection(
     # Read energy and wavelength from dcm to then set up eiger
     energ_in_kev = yield from bps.rd(devices.energy_device.energy_in_kev)
     wavelength_in_a = yield from bps.rd(devices.energy_device.wavelength_in_a)
-    yield from write_eiger_params(
+    yield from set_eiger_params(
         parameters, energ_in_kev, wavelength_in_a, devices.eiger
     )
     # Set up beamline for collection
