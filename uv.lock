@@ -1505,8 +1505,8 @@ wheels = [
 
 [[package]]
 name = "dls-dodal"
-version = "3.0.6.dev1+gc38104263"
-source = { git = "https://github.com/DiamondLightSource/dodal?rev=main#c3810426312f6abf7c209b9583da086d86821754" }
+version = "3.0.5"
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiofiles" },
     { name = "aiohttp" },
@@ -1529,6 +1529,10 @@ dependencies = [
     { name = "requests" },
     { name = "scanspec" },
     { name = "zocalo" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/d6/22/63401a492a563e5df73791807fb243f51f72ca2bfc0debb0aafe38a89a7e/dls_dodal-3.0.5.tar.gz", hash = "sha256:ecae059caeab17c2310aa1d07a35ab128c9510d364d733741247aa736a7d6064", size = 1751946, upload-time = "2026-10-22T17:38:44.446Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/5d/7a/f37a38ba8b1f14f92a3c329169d650a2280a7a32b447f21da182630aeeb1/dls_dodal-3.0.5-py3-none-any.whl", hash = "sha256:2fc1603946febdc00b1200305370e1b8c79a2355d8f5ac6050dd23caca18a36a", size = 464520, upload-time = "2026-10-22T17:38:42.924Z" },
 ]
 
 [[package]]
@@ -2738,7 +2742,7 @@ dev = [
 requires-dist = [
     { name = "bluesky", specifier = ">=1.13" },
     { name = "daq-config-server", specifier = ">=1.3.2" },
-    { name = "dls-dodal", git = "https://github.com/DiamondLightSource/dodal?rev=main" },
+    { name = "dls-dodal", specifier = "==3.0.5" },
     { name = "fastapi", extras = ["all"] },
     { name = "nexgen" },
     { name = "numpy" },
