@@ -39,7 +39,7 @@ def test_trigger_panda_call_order(
     RE(trigger_panda_collection(parameters, devices))
     expected_calls = [
         call.mock_setup_panda_for_rotation(
-            parameters.panda_rotation_params, devices.panda
+            parameters.panda_rotation_params, devices.panda, devices.serial_stages
         ),
         call.mock_arm_panda(devices.panda),
         call.mock_arm_or_disarm(devices.eiger.detector.arm),

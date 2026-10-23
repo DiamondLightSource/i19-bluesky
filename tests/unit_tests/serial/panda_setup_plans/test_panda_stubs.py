@@ -4,10 +4,10 @@ from ophyd_async.core import set_mock_value
 from ophyd_async.fastcs.panda import HDFPanda, PandaBitMux, SeqTrigger
 
 from i19_bluesky.serial.panda_plans.panda_stubs import (
+    DEG_TO_ENC_COUNTS,
     arm_panda,
     disarm_panda,
     generate_panda_seq_table,
-    setup_outenc_vals,
 )
 
 
@@ -28,18 +28,13 @@ async def test_panda_disarm(mock_panda: HDFPanda, RE: RunEngine):
 
 
 async def test_seq_table_generated_correctly():
-    inputs = (5.6, 6.7, 25, 0.1)
+    inputs = (2.0, 4.5, 25, 0.1)
     table_from_func = generate_panda_seq_table(*inputs)
 
-    assert table_from_func.trigger == [SeqTrigger.POSA_GT, SeqTrigger.POSA_LT]
-    assert table_from_func.repeats == pytest.approx([25000, 25000])
-    assert table_from_func.position == pytest.approx([5600, 6700])
-    assert table_from_func.time1 == pytest.approx([100, 100])
+    expected_positions = [int(2.0 * DEG_TO_ENC_COUNTS), int(4.5 * DEG_TO_ENC_COUNTS)]
+
+    assert table_from_func.trigger == [SeqTrigger.POSA_LT, SeqTrigger.POSA_GT]
+    assert table_from_func.repeats == pytest.approx([25, 25])
+    assert table_from_func.position == pytest.approx(expected_positions)
+    assert table_from_func.time1 == pytest.approx([100000, 100000])
     assert table_from_func.outa1 == pytest.approx([True, True])
-
-
-async def test_setup_outenc_vals(mock_panda: HDFPanda, RE: RunEngine):
-    RE(setup_outenc_vals(mock_panda, group="setup_outenc_vals"))
-
-    assert await mock_panda.outenc[1].val.get_value() == PandaBitMux.ZERO  # type: ignore
-    assert await mock_panda.outenc[2].val.get_value() == "INENC1.VAL"  # type: ignore
