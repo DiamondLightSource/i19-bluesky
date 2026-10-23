@@ -9,7 +9,8 @@ from i19_bluesky.serial.run_panda_plans.panda_serial_collection import (
 )
 
 
-@patch("i19_bluesky.serial.run_panda_plans.panda_serial_collection.bps.trigger")
+@patch("i19_bluesky.serial.run_panda_plans.panda_serial_collection.bps.complete")
+@patch("i19_bluesky.serial.run_panda_plans.panda_serial_collection.bps.kickoff")
 @patch("i19_bluesky.serial.run_panda_plans.panda_serial_collection.bps.abs_set")
 @patch("i19_bluesky.serial.run_panda_plans.panda_serial_collection.move_stage_x_and_z")
 @patch("i19_bluesky.serial.run_panda_plans.panda_serial_collection.arm_panda")
@@ -21,7 +22,8 @@ def test_trigger_panda_call_order(
     mock_arm_panda: MagicMock,
     mock_move_stage_x_and_z: MagicMock,
     mock_set_value_for_params: MagicMock,
-    mock_arm_or_disarm: MagicMock,
+    mock_kickoff: MagicMock,
+    mock_complete: MagicMock,
     parameters: SerialExperimentEh2,
     devices: SerialCollectionEh2PandaComposite,
     RE: RunEngine,
@@ -35,17 +37,19 @@ def test_trigger_panda_call_order(
         mock_setup_panda_for_rotation, "mock_setup_panda_for_rotation"
     )
     parent_mock.attach_mock(mock_arm_panda, "mock_arm_panda")
-    parent_mock.attach_mock(mock_arm_or_disarm, "mock_arm_or_disarm")
+    parent_mock.attach_mock(mock_kickoff, "mock_kickoff")
+    parent_mock.attach_mock(mock_complete, "mock_complete")
     RE(trigger_panda_collection(parameters, devices))
     expected_calls = [
         call.mock_setup_panda_for_rotation(
             parameters.panda_rotation_params, devices.panda
         ),
         call.mock_arm_panda(devices.panda),
-        call.mock_arm_or_disarm(devices.eiger.detector.arm),
+        call.mock_kickoff(devices.eiger, wait=True),
         call.mock_move_stage_x_and_z(0, 0, devices.serial_stages),
         call.mock_move_stage_x_and_z(1, 0, devices.serial_stages),
         call.mock_set_value_for_params(devices.diffractometer.phi, 6.0, wait=True),
         call.mock_set_value_for_params(devices.diffractometer.phi, 5.0, wait=True),
+        call.mock_complete(devices.eiger, wait=True),
     ]
     parent_mock.assert_has_calls(expected_calls, any_order=True)
