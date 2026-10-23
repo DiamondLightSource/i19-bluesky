@@ -28,7 +28,6 @@ def setup_eh2_serial_collection(
 ) -> MsgGenerator:
     # Open shutter
     yield from open_experiment_shutter(devices.shutter)
-    # Set up eiger - TO BE ADDED - IN SEPARATE BRANCH
     # Read energy and wavelength from dcm to then set up eiger
     energ_in_kev = yield from bps.rd(devices.energy_device.energy_in_kev)
     wavelength_in_a = yield from bps.rd(devices.energy_device.wavelength_in_a)
