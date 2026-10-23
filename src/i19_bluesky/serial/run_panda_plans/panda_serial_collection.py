@@ -33,8 +33,7 @@ def trigger_panda_collection(
             eiger (EigerDetector): The eiger detector device
     """
     yield from setup_panda_for_rotation(
-        parameters.panda_rotation_params,
-        devices.panda,
+        parameters.panda_rotation_params, devices.panda, devices.serial_stages
     )
     LOGGER.info("Arm panda and move phi")
     yield from arm_panda(devices.panda)
