@@ -38,6 +38,7 @@
                         "$ref": "#/$defs/MotorPosition"
                     },
                     "motors": {
+                        "default": "optics_motors",
                         "enum": [
                             "optics_motors"
                         ],
