@@ -17,8 +17,8 @@ DEG_TO_ENC_COUNTS = 1000
 
 @dataclass(frozen=True)
 class DeviceSettingsConstants:
-    PANDA_PC_FILENAME = "panda-pc"
-    PANDA_THROUGH_ZEBRA = "panda-through-zebra"
+    PANDA_SERIAL_FILENAME = "panda_serial_config"
+    PANDA_STANDARD_FILENAME = "panda_standard_config"
     PANDA_DIR = Path("i19-bluesky/src/i19_bluesky/panda_config_files").absolute()
 
 
