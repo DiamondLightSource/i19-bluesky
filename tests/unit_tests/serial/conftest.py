@@ -156,7 +156,7 @@ async def eh2_eiger(RE: RunEngine) -> EigerDetector:
         {
             eiger.detector: {
                 "wavelength": float,
-                "two_theta": float,
+                "two_theta_start": float,
                 "phi_start": float,
                 "phi_increment": float,
                 "chi_start": float,
