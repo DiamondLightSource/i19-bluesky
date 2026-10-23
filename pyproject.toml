@@ -37,11 +37,14 @@ requires-python = ">=3.11"
 
 [dependency-groups]
 dev = [
+<<<<<<< before updating
     "build",
     "blueapi >= 1.18.0",         # To avoid it taking up space in cluster
     "copier",
     "ipython",
     "import-linter",
+=======
+>>>>>>> after updating
     "myst-parser",
     "pre-commit",
     "pydata-sphinx-theme>=0.12",
