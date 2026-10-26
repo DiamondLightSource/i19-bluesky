@@ -239,7 +239,6 @@ def parameters():
         filename_prefix="bar_01",
         images_per_well=10,
         exposure_time_s=0.1,
-        image_width_deg=0.1,
         detector_distance_mm=320,
         two_theta_deg=0,
         transmission_fraction=0.3,
