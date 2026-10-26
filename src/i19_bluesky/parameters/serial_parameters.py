@@ -21,7 +21,6 @@ class SerialExperiment(VisitParameters):
 
     images_per_well: int
     exposure_time_s: float
-    image_width_deg: float
     detector_distance_mm: float
     two_theta_deg: float
     transmission_fraction: float
