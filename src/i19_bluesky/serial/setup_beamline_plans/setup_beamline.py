@@ -29,7 +29,7 @@ def setup_eh2_serial_collection(
 ) -> MsgGenerator:
     # Stage detector
     LOGGER.info("Stage detector")
-    yield from bps.stage(devices.eiger)
+    yield from bps.stage(devices.eiger, wait=True)
     # Open shutter
     LOGGER.info("Open experiment shutter if EH2 is the active hutch")
     yield from open_experiment_shutter(devices.shutter)

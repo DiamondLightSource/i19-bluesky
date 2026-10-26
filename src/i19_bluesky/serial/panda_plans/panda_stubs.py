@@ -2,6 +2,8 @@ from pathlib import Path
 
 import bluesky.plan_stubs as bps
 from bluesky.utils import MsgGenerator
+from dodal.common import inject
+from dodal.plans.load_panda_yaml import load_panda_from_yaml
 from ophyd_async.fastcs.panda import (
     HDFPanda,
     PandaBitMux,
@@ -31,14 +33,22 @@ class DeviceSettingsConstants:
 
 def arm_panda(panda: HDFPanda) -> MsgGenerator[None]:
     LOGGER.debug("Send command to arm the PandA.")
-    yield from bps.abs_set(panda.seq[1].enable, PandaBitMux.ONE, wait=True)  # type: ignore
+    yield from bps.abs_set(panda.seq[2].enable, PandaBitMux.ONE, wait=True)  # type: ignore
     yield from bps.abs_set(panda.pulse[1].enable, PandaBitMux.ONE, wait=True)  # type:ignore
 
 
 def disarm_panda(panda: HDFPanda) -> MsgGenerator[None]:
     LOGGER.debug("Send command to disarm the PandA.")
-    yield from bps.abs_set(panda.seq[1].enable, PandaBitMux.ZERO, wait=True)  # type: ignore
+    yield from bps.abs_set(panda.seq[2].enable, PandaBitMux.ZERO, wait=True)  # type: ignore
     yield from bps.abs_set(panda.pulse[1].enable, PandaBitMux.ZERO, wait=True)  # type: ignore
+
+
+def load_panda(panda: HDFPanda = inject("panda")) -> MsgGenerator[None]:
+    yield from load_panda_from_yaml(
+        DeviceSettingsConstants.PANDA_DIR.as_posix(),
+        DeviceSettingsConstants.PANDA_SERIAL_CONFIG,
+        panda,
+    )
 
 
 def generate_panda_seq_table(
@@ -94,7 +104,7 @@ def generate_panda_seq_table(
     return rows
 
 
-def setup_outenc_vals(panda: HDFPanda, group="setup_outenc_vals"):
-    yield from bps.abs_set(panda.outenc[1].val, "ZERO", group=group)  # type: ignore
-    # Moved to INENC4 as that's there the new serial stages are connected
-    yield from bps.abs_set(panda.outenc[4].val, "INENC4.VAL", group=group)  # type: ignore
+# def setup_outenc_vals(panda: HDFPanda, group="setup_outenc_vals"):
+#     yield from bps.abs_set(panda.outenc[1].val, "ZERO", group=group)  # type: ignore
+#     # Moved to INENC4 as that's there the new serial stages are connected
+#     yield from bps.abs_set(panda.outenc[4].val, "INENC4.VAL", group=group)  # type: ignore

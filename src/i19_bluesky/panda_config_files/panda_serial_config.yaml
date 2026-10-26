@@ -644,7 +644,7 @@ pulse.1.out_capture: false
 pulse.1.pulses: 0
 pulse.1.step: 0.0
 pulse.1.step_units: s
-pulse.1.trig: SEQ1.OUTA
+pulse.1.trig: SEQ2.OUTA
 pulse.1.trig_delay: 0
 pulse.1.trig_edge: Rising
 pulse.1.width: 0.0
@@ -703,13 +703,53 @@ seq.1.outc_capture: false
 seq.1.outd_capture: false
 seq.1.oute_capture: false
 seq.1.outf_capture: false
-seq.1.posa: INENC4.VAL
+seq.1.posa: ZERO # INENC4.VAL
 seq.1.posb: ZERO
 seq.1.posc: ZERO
 seq.1.prescale: 0.0
 seq.1.prescale_units: s
-seq.1.repeats: 20
+seq.1.repeats: 0
 seq.1.table:
+  outa1: [false]
+  outa2: [false]
+  outb1: [false]
+  outb2: [false]
+  outc1: [false]
+  outc2: [false]
+  outd1: [false]
+  outd2: [false]
+  oute1: [false]
+  oute2: [false]
+  outf1: [false]
+  outf2: [false]
+  position: [0]
+  repeats: [0]
+  time1: [0]
+  time2: [0]
+  trigger:
+  - Immediate
+seq.2.active_capture: false
+seq.2.bita: ZERO
+seq.2.bita_delay: 0
+seq.2.bitb: ZERO
+seq.2.bitb_delay: 0
+seq.2.bitc: ZERO
+seq.2.bitc_delay: 0
+seq.2.enable: ZERO
+seq.2.enable_delay: 0
+seq.2.outa_capture: false
+seq.2.outb_capture: false
+seq.2.outc_capture: false
+seq.2.outd_capture: false
+seq.2.oute_capture: false
+seq.2.outf_capture: false
+seq.2.posa: INENC4.VAL
+seq.2.posb: ZERO
+seq.2.posc: ZERO
+seq.2.prescale: 0.0
+seq.2.prescale_units: s
+seq.2.repeats: 20
+seq.2.table:
   outa1: [false, true, true, false]
   outa2: [false, false, false, false]
   outb1: [false, false, false, false]
@@ -731,46 +771,6 @@ seq.1.table:
   - POSA>=POSITION
   - POSA<=POSITION
   - BITA=1
-seq.2.active_capture: false
-seq.2.bita: ZERO
-seq.2.bita_delay: 0
-seq.2.bitb: ZERO
-seq.2.bitb_delay: 0
-seq.2.bitc: ZERO
-seq.2.bitc_delay: 0
-seq.2.enable: ZERO
-seq.2.enable_delay: 0
-seq.2.outa_capture: false
-seq.2.outb_capture: false
-seq.2.outc_capture: false
-seq.2.outd_capture: false
-seq.2.oute_capture: false
-seq.2.outf_capture: false
-seq.2.posa: ZERO
-seq.2.posb: ZERO
-seq.2.posc: ZERO
-seq.2.prescale: 0.0
-seq.2.prescale_units: s
-seq.2.repeats: 0
-seq.2.table:
-  outa1: [false]
-  outa2: [false]
-  outb1: [false]
-  outb2: [false]
-  outc1: [false]
-  outc2: [false]
-  outd1: [false]
-  outd2: [false]
-  oute1: [false]
-  oute2: [false]
-  outf1: [false]
-  outf2: [false]
-  position: [0]
-  repeats: [0]
-  time1: [0]
-  time2: [0]
-  trigger:
-  - Immediate
 sfp3_sync_in.bit1_capture: false
 sfp3_sync_in.bit2_capture: false
 sfp3_sync_in.bit3_capture: false
@@ -875,7 +875,7 @@ ttlout.10.val: BITS.OUTA
 ttlout.10.val_delay: 0
 ttlout.2.val: PULSE1.OUT #SEQ1.OUTA
 ttlout.2.val_delay: 0
-ttlout.3.val: PULSE3.OUT
+ttlout.3.val: ZERO
 ttlout.3.val_delay: 0
 ttlout.4.val: ZERO
 ttlout.4.val_delay: 0

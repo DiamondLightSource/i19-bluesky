@@ -70,8 +70,8 @@ def trigger_panda_collection(
                 wait=True,
             )
     LOGGER.info("Run complete eiger")
-    LOGGER.warning("SLEEP FOR 10 s")
-    yield from bps.sleep(
-        10
-    )  # parameters.exposure_time_s * parameters.total_num_images + 1)
+    # LOGGER.warning("SLEEP FOR 10 s")
+    # yield from bps.sleep(
+    #     10
+    # )  # parameters.exposure_time_s * parameters.total_num_images + 1)
     yield from bps.complete(devices.eiger, wait=True)

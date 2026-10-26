@@ -14,7 +14,7 @@ from i19_bluesky.serial.panda_plans.panda_stubs import (
     DeviceSettingsConstants,
     arm_panda,
     generate_panda_seq_table,
-    setup_outenc_vals,
+    # setup_outenc_vals,
 )
 
 # DEG_TO_ENC_COUNTS = 1000
@@ -52,12 +52,12 @@ def setup_panda_for_rotation(
         panda.inenc[4].setp,  # type: ignore
         gate_start,
         wait=True,
-        # group="panda-setup",
+        group="panda-setup",
     )
-    yield from setup_outenc_vals(panda)
+    # yield from setup_outenc_vals(panda)
 
     yield from bps.abs_set(
-        panda.pulse[1].width, parameters.exposure_time_s, group="setup-panda"
+        panda.pulse[1].width, parameters.exposure_time_s, group="panda-setup"
     )
 
     seq_table = generate_panda_seq_table(
@@ -67,7 +67,7 @@ def setup_panda_for_rotation(
         parameters.exposure_time_s,
     )
 
-    yield from bps.abs_set(panda.seq[1].table, seq_table, group="panda-setup")
+    yield from bps.abs_set(panda.seq[2].table, seq_table, group="panda-setup")
 
     # Values need to be set before blocks are enabled, so wait here
     yield from bps.wait(group="panda-setup", timeout=GENERAL_TIMEOUT)
@@ -87,5 +87,5 @@ def reset_panda(panda: HDFPanda, group="reset_panda"):
         panda,
     )
     # Should go back to zebra settings
-    yield from bps.abs_set(panda.outenc[1].val, "INENC1.VAL", group=group)  # type: ignore
-    yield from bps.abs_set(panda.outenc[4].val, "INENC4.VAL", group=group)  # type: ignore
+    # yield from bps.abs_set(panda.outenc[1].val, "INENC1.VAL", group=group)  # type: ignore
+    # yield from bps.abs_set(panda.outenc[4].val, "INENC4.VAL", group=group)  # type: ignore

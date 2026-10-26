@@ -50,7 +50,7 @@ def run_on_collection_end(
     yield from bps.unstage(eiger, wait=True)
     LOGGER.info("Disarm panda")
     yield from disarm_panda(panda)
-    yield from reset_panda(panda)
+    # yield from reset_panda(panda)
     yield from move_sample_stage_back(serial_stages, rot_axis_start)
     LOGGER.info("Close experiment shutter")
     yield from close_experiment_shutter(shutter)
