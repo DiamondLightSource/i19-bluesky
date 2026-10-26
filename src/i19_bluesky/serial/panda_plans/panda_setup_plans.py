@@ -19,6 +19,8 @@ from i19_bluesky.serial.panda_plans.panda_stubs import (
 
 GENERAL_TIMEOUT = 60
 
+PANDA_SETUP_GRP = "panda-setup"
+
 
 def setup_panda_for_rotation(
     parameters: PandaRotationParams,
@@ -32,7 +34,7 @@ def setup_panda_for_rotation(
         panda (HDFPanda): The fastcs PandA ophyd device.
     """
 
-    yield from bps.stage(panda, group="panda-setup")
+    yield from bps.stage(panda, group=PANDA_SETUP_GRP)
 
     yield from load_panda_from_yaml(
         DeviceSettingsConstants.PANDA_DIR.as_posix(),
@@ -47,11 +49,11 @@ def setup_panda_for_rotation(
     yield from bps.abs_set(
         panda.inenc[4].setp,  # type: ignore
         gate_start,
-        group="panda-setup",
+        group=PANDA_SETUP_GRP,
     )
 
     yield from bps.abs_set(
-        panda.pulse[1].width, parameters.exposure_time_s, group="setup-panda"
+        panda.pulse[1].width, parameters.exposure_time_s, group=PANDA_SETUP_GRP
     )
 
     seq_table = generate_panda_seq_table(
@@ -61,10 +63,10 @@ def setup_panda_for_rotation(
         parameters.exposure_time_s,
     )
 
-    yield from bps.abs_set(panda.seq[2].table, seq_table, group="panda-setup")
+    yield from bps.abs_set(panda.seq[2].table, seq_table, group=PANDA_SETUP_GRP)
 
     # Values need to be set before blocks are enabled, so wait here
-    yield from bps.wait(group="panda-setup", timeout=GENERAL_TIMEOUT)
+    yield from bps.wait(group=PANDA_SETUP_GRP, timeout=GENERAL_TIMEOUT)
 
     LOGGER.info(f"PandA sequencer table has been set to: {str(seq_table)}")
     seq_table_readback = yield from bps.rd(panda.seq[1].table)
@@ -73,7 +75,7 @@ def setup_panda_for_rotation(
     yield from arm_panda(panda)
 
 
-def reset_panda(panda: HDFPanda, group="reset_panda"):
+def reset_panda(panda: HDFPanda):
     yield from load_panda_from_yaml(
         DeviceSettingsConstants.PANDA_DIR.as_posix(),
         DeviceSettingsConstants.PANDA_STANDARD_FILENAME,
