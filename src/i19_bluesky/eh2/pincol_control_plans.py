@@ -10,17 +10,17 @@ from i19_bluesky.log import LOGGER
 
 
 def move_pin_col_out_of_beam(
-    pincol: PinholeCollimatorControl = inject("pinhole_and_collimator"),
+    pinhole_and_collimator: PinholeCollimatorControl = inject("pinhole_and_collimator"),
 ) -> MsgGenerator:
     LOGGER.info("Moving Pinhole and Collimator stages out")
-    yield from bps.abs_set(pincol, PinColRequest.OUT, wait=True)
+    yield from bps.abs_set(pinhole_and_collimator, PinColRequest.OUT, wait=True)
 
 
 def move_pin_col_to_requested_in_position(
     aperture: PinColRequest,
-    pincol: PinholeCollimatorControl = inject("pinhole_and_collimator"),
+    pinhole_and_collimator: PinholeCollimatorControl = inject("pinhole_and_collimator"),
 ) -> MsgGenerator:
     LOGGER.info(
         f"Moving Pinhole and Collimator stages in to aperture: {aperture.value}"
     )
-    yield from bps.abs_set(pincol, aperture, wait=True)
+    yield from bps.abs_set(pinhole_and_collimator, aperture, wait=True)
