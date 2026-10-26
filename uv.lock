@@ -2742,7 +2742,7 @@ requires-dist = [
     { name = "fastapi", extras = ["all"] },
     { name = "nexgen" },
     { name = "numpy" },
-    { name = "ophyd", specifier = "==1.11.0" },
+    { name = "ophyd", specifier = "==1.11.2" },
     { name = "ophyd-async", extras = ["ca", "pva"], specifier = ">=0.17a4" },
     { name = "pydantic" },
     { name = "pydantic-extra-types", specifier = ">=2.10.1" },
@@ -4438,7 +4438,7 @@ wheels = [
 
 [[package]]
 name = "ophyd"
-version = "1.11.0"
+version = "1.11.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "networkx", version = "3.6.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
@@ -4450,9 +4450,9 @@ dependencies = [
     { name = "pint", version = "0.25.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
     { name = "pint", version = "0.26.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/50/54/02465637d447291dd8596584c9b74e8f82cc527d3c0be8dd8ed267feec42/ophyd-1.11.0.tar.gz", hash = "sha256:75e0489436035fe7ba40476f2c2ea7fd08ed02d7cd462b722e347684447ec9cc", size = 312894, upload-time = "2025-09-04T15:34:38.221Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/1c/55/16f692e9030d81b6dd88a8473312c92250cc7bf45499b5bd69b14ae83c6f/ophyd-1.11.2.tar.gz", hash = "sha256:ef63cc291a34d55823ec2f62be91991786ce4b9100e374df097b785d849466c3", size = 313616, upload-time = "2026-06-04T20:39:20.498Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/46/59/e11136fe6db0b1f3aea14de7bc36122aaa0ca67b715e400d45974b8848be/ophyd-1.11.0-py3-none-any.whl", hash = "sha256:216ee73f61409550916aed03773ac5dbe0e43dc2e463d3b865212d1e7ca7b877", size = 279624, upload-time = "2025-09-04T15:34:36.865Z" },
+    { url = "https://files.pythonhosted.org/packages/ef/80/c6dbf1f8d14fbb5615d2e99b798d61b76eb937f09e1e948d0e8aaf8873b2/ophyd-1.11.2-py3-none-any.whl", hash = "sha256:0254dbced299fbff1841b4f80102dd0e0c482176d5812a2246a08763acd87a75", size = 280352, upload-time = "2026-06-04T20:39:18.679Z" },
 ]
 
 [[package]]
