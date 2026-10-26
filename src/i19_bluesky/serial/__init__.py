@@ -17,6 +17,7 @@ from i19_bluesky.serial.panda_plans.panda_stubs import load_panda
 from i19_bluesky.serial.run_panda_plans.run_serial_with_panda import (
     run_serial_with_panda,
 )
+from i19_bluesky.serial.ui_plans.laser import run_laser_plan
 from i19_bluesky.serial.ui_plans.ui_plans import (
     move_backlight_in_via_ui,
     rotate_in_phi,
@@ -37,4 +38,6 @@ __all__ = [
     "move_backlight_in_via_ui",
     "move_backlight_out",
     "load_panda",
+    # Parametric scans
+    "run_laser_plan",
 ]

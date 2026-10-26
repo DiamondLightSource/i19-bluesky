@@ -69,10 +69,10 @@ def setup_out_triggers(
     wait: bool = True,
 ):
     yield from bps.abs_set(
-        zebra.output.out_pvs[1], zebra.mapping.sources.OR1, group=group
+        zebra.output.out_ttl_pvs[1], zebra.mapping.sources.OR1, group=group
     )
     yield from bps.abs_set(
-        zebra.output.out_pvs[2], zebra.mapping.sources.PC_PULSE, group=group
+        zebra.output.out_ttl_pvs[2], zebra.mapping.sources.PC_PULSE, group=group
     )
 
     if wait:

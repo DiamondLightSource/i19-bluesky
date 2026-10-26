@@ -29,7 +29,7 @@ dependencies = [
     # "dls-dodal @ git+https://github.com/DiamondLightSource/dodal.git@i19-serial-test",
     # Pin temporarily removed to avoid it clashing with editable version
     # when deploying blueapi in cluster.
-    "dls-dodal",
+    "dls-dodal @ git+https://github.com/DiamondLightSource/dodal@main",
 ]
 dynamic = ["version"]
 license.file = "LICENSE"
