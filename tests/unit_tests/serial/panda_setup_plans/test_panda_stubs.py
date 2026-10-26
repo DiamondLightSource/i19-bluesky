@@ -12,18 +12,18 @@ from i19_bluesky.serial.panda_plans.panda_stubs import (
 
 
 async def test_panda_arm(mock_panda: HDFPanda, RE: RunEngine):
-    set_mock_value(mock_panda.seq[1].enable, PandaBitMux.ZERO)
+    set_mock_value(mock_panda.seq[2].enable, PandaBitMux.ZERO)
     set_mock_value(mock_panda.pulse[1].enable, PandaBitMux.ZERO)  # type: ignore
     RE(arm_panda(mock_panda))
-    assert await mock_panda.seq[1].enable.get_value() == PandaBitMux.ONE
+    assert await mock_panda.seq[2].enable.get_value() == PandaBitMux.ONE
     assert await mock_panda.pulse[1].enable.get_value() == PandaBitMux.ONE  # type: ignore
 
 
 async def test_panda_disarm(mock_panda: HDFPanda, RE: RunEngine):
-    set_mock_value(mock_panda.seq[1].enable, PandaBitMux.ONE)
+    set_mock_value(mock_panda.seq[2].enable, PandaBitMux.ONE)
     set_mock_value(mock_panda.pulse[1].enable, PandaBitMux.ONE)  # type: ignore
     RE(disarm_panda(mock_panda))
-    assert await mock_panda.seq[1].enable.get_value() == PandaBitMux.ZERO
+    assert await mock_panda.seq[2].enable.get_value() == PandaBitMux.ZERO
     assert await mock_panda.pulse[1].enable.get_value() == PandaBitMux.ZERO  # type: ignore
 
 
