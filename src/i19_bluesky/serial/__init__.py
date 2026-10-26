@@ -13,6 +13,7 @@ from i19_bluesky.serial.coordinate_system.sample_stage import (
 from i19_bluesky.serial.example_zebra_plans.example_trigger_plan_zebra_vs_panda import (
     run_zebra_test,
 )
+from i19_bluesky.serial.panda_plans.panda_stubs import load_panda
 from i19_bluesky.serial.run_panda_plans.run_serial_with_panda import (
     run_serial_with_panda,
 )
@@ -36,6 +37,7 @@ __all__ = [
     "rotate_in_phi",
     "move_backlight_in_via_ui",
     "move_backlight_out",
+    "load_panda",
     # Parametric scans
     "run_laser_plan",
 ]
