@@ -86,5 +86,5 @@ async def test_reset_panda(mock_panda: HDFPanda, RE: RunEngine):
     with patch(
         "i19_bluesky.serial.panda_plans.panda_setup_plans.load_panda_from_yaml"
     ) as patch_load:
-        RE(reset_panda(mock_panda, group="reset panda"))
+        RE(reset_panda(mock_panda))
         patch_load.assert_called_once()
