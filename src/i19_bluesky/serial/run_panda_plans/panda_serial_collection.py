@@ -10,7 +10,6 @@ from i19_bluesky.serial.device_setup_plans.diffractometer_plans import (
 from i19_bluesky.serial.panda_plans.panda_setup_plans import (
     setup_panda_for_rotation,
 )
-from i19_bluesky.serial.panda_plans.panda_stubs import arm_panda
 
 
 def trigger_panda_collection(
@@ -33,11 +32,8 @@ def trigger_panda_collection(
             eiger (EigerDetector): The eiger detector device
     """
     yield from setup_panda_for_rotation(
-        parameters.panda_rotation_params,
-        devices.panda,
+        parameters.panda_rotation_params, devices.panda, devices.serial_stages
     )
-    LOGGER.info("Arm panda and move phi")
-    yield from arm_panda(devices.panda)
     LOGGER.info("Arm eiger")
     yield from bps.trigger(devices.eiger.detector.arm)
     for i, (well_num, coords) in enumerate(parameters.wells_to_collect.items()):

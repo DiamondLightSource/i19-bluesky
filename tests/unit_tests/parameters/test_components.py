@@ -90,3 +90,4 @@ def test_panda_rotation_parameters():
     params = PandaRotationParams(**model)
 
     assert params.ramp_distance_deg == 0.4
+    assert params.gate_start == -10.4
