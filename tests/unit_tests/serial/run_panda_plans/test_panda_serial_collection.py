@@ -12,13 +12,11 @@ from i19_bluesky.serial.run_panda_plans.panda_serial_collection import (
 @patch("i19_bluesky.serial.run_panda_plans.panda_serial_collection.bps.trigger")
 @patch("i19_bluesky.serial.run_panda_plans.panda_serial_collection.bps.abs_set")
 @patch("i19_bluesky.serial.run_panda_plans.panda_serial_collection.move_stage_x_and_z")
-@patch("i19_bluesky.serial.run_panda_plans.panda_serial_collection.arm_panda")
 @patch(
     "i19_bluesky.serial.run_panda_plans.panda_serial_collection.setup_panda_for_rotation"
 )
 def test_trigger_panda_call_order(
     mock_setup_panda_for_rotation: MagicMock,
-    mock_arm_panda: MagicMock,
     mock_move_stage_x_and_z: MagicMock,
     mock_set_value_for_params: MagicMock,
     mock_arm_or_disarm: MagicMock,
@@ -34,14 +32,12 @@ def test_trigger_panda_call_order(
     parent_mock.attach_mock(
         mock_setup_panda_for_rotation, "mock_setup_panda_for_rotation"
     )
-    parent_mock.attach_mock(mock_arm_panda, "mock_arm_panda")
     parent_mock.attach_mock(mock_arm_or_disarm, "mock_arm_or_disarm")
     RE(trigger_panda_collection(parameters, devices))
     expected_calls = [
         call.mock_setup_panda_for_rotation(
             parameters.panda_rotation_params, devices.panda, devices.serial_stages
         ),
-        call.mock_arm_panda(devices.panda),
         call.mock_arm_or_disarm(devices.eiger.detector.arm),
         call.mock_move_stage_x_and_z(0, 0, devices.serial_stages),
         call.mock_move_stage_x_and_z(1, 0, devices.serial_stages),

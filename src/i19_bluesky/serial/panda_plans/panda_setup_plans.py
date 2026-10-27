@@ -69,9 +69,8 @@ def setup_panda_for_rotation(
     yield from bps.wait(group=PANDA_SETUP_GRP, timeout=GENERAL_TIMEOUT)
 
     LOGGER.info(f"PandA sequencer table has been set to: {str(seq_table)}")
-    seq_table_readback = yield from bps.rd(panda.seq[1].table)
-    LOGGER.debug(f"PandA sequencer table readback is: {str(seq_table_readback)}")
 
+    LOGGER.info("Arm panda")
     yield from arm_panda(panda)
 
 
