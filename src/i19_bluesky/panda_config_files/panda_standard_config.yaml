@@ -644,7 +644,7 @@ pulse.1.out_capture: false
 pulse.1.pulses: 0
 pulse.1.step: 0.0
 pulse.1.step_units: s
-pulse.1.trig: SEQ1.OUTA
+pulse.1.trig: ZERO
 pulse.1.trig_delay: 0
 pulse.1.trig_edge: Rising
 pulse.1.width: 0.0
@@ -703,12 +703,12 @@ seq.1.outc_capture: false
 seq.1.outd_capture: false
 seq.1.oute_capture: false
 seq.1.outf_capture: false
-seq.1.posa: INENC1.VAL
+seq.1.posa: ZERO
 seq.1.posb: ZERO
 seq.1.posc: ZERO
-seq.1.prescale: 0.0
-seq.1.prescale_units: s
-seq.1.repeats: 20
+seq.1.prescale: 1.0
+seq.1.prescale_units: us
+seq.1.repeats: 1
 seq.1.table:
   outa1: [false, true, true, false]
   outa2: [false, false, false, false]
