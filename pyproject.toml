@@ -37,11 +37,14 @@ requires-python = ">=3.11"
 
 [dependency-groups]
 dev = [
+<<<<<<< before updating
     "build",
     "blueapi >= 1.18.0",         # To avoid it taking up space in cluster
     "copier",
     "ipython",
     "import-linter",
+=======
+>>>>>>> after updating
     "myst-parser",
     "pre-commit",
     "pydata-sphinx-theme>=0.12",
@@ -70,6 +73,10 @@ GitHub = "https://github.com/DiamondLightSource/i19-bluesky"
 [[project.authors]] # Further authors may be added by duplicating this section
 email = "noemi.frisina@diamond.ac.uk"
 name = "Noemi Frisina"
+
+[tool.uv]
+# Minimum uv to fix eMudhra CA cert incident (see discuss.python.org/t/109576)
+required-version = ">=0.13.5"
 
 [tool.setuptools_scm]
 version_file = "src/i19_bluesky/_version.py"
