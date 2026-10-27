@@ -27,6 +27,9 @@ def setup_sample_stage(
     yield from bps.abs_set(
         serial_stages.phi, rotation_parameters.scan_start_deg, group=group
     )
+    LOGGER.warning(
+        f"Setting phi velocity to {rotation_parameters.rotation_axis_velocity}"
+    )
     yield from bps.abs_set(
         serial_stages.phi.velocity,
         rotation_parameters.rotation_axis_velocity,

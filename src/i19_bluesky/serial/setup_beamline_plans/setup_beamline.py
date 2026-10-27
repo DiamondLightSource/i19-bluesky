@@ -65,7 +65,7 @@ def setup_eh2_serial_collection(
     trigger_info = TriggerInfo(
         collections_per_event=1,  # parameters.total_num_images,
         number_of_events=1,
-        trigger=DetectorTrigger.EXTERNAL_EDGE,
+        trigger=DetectorTrigger.EXTERNAL_EDGE,  # .EXTERNAL_LEVEL,
         livetime=parameters.exposure_time_s,
     )
     # yield from bps.abs_set(devices.eiger.stream.format, "cbor", wait=True)

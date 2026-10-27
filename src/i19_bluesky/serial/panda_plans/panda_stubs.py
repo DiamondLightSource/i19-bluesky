@@ -62,23 +62,27 @@ def generate_panda_seq_table(
     start_forwards_position = int(phi_start * DEG_TO_ENC_COUNTS)
     start_backwards_position = int(phi_end * DEG_TO_ENC_COUNTS)
 
-    delay_between_pulses = int(time_between_images * TIME_TO_US_SCALE)
+    pulse_width_us = int(time_between_images * TIME_TO_US_SCALE)
 
     # NOTE Need to swap the columns around as DEG_TO_ENC converter is negative
     rows += SeqTable.row(
         trigger=SeqTrigger.POSA_LT,  # SeqTrigger.POSA_GT,
         position=start_forwards_position,
         repeats=phi_steps,
-        time1=delay_between_pulses,
+        time1=pulse_width_us,  # - DEFAULT_PULSE_WIDTH_US,
         outa1=True,
+        time2=DEFAULT_PULSE_WIDTH_US,
+        outa2=False,
     )
 
     rows += SeqTable.row(
         trigger=SeqTrigger.POSA_GT,
         position=start_backwards_position,
         repeats=phi_steps,
-        time1=delay_between_pulses,
+        time1=pulse_width_us,  #  - DEFAULT_PULSE_WIDTH_US,
         outa1=True,
+        time2=DEFAULT_PULSE_WIDTH_US,
+        outa2=False,
     )
 
     # rows += SeqTable.row(

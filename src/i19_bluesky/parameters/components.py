@@ -41,6 +41,9 @@ class VisitParameters(BaseModel):
         return self.visit / self.dataset
 
 
+DEAD_TIME_S = 50 * 1e-6
+
+
 class RotationParams(BaseModel):
     rotation_axis: RotationAxis = Field(default=RotationAxis.PHI)
     scan_start_deg: float = Field(default=0)
@@ -62,7 +65,7 @@ class RotationParams(BaseModel):
 
     @property
     def rotation_axis_velocity(self) -> float:
-        return self.scan_increment_deg / self.exposure_time_s
+        return self.scan_increment_deg / (self.exposure_time_s + DEAD_TIME_S)
 
 
 class ZebraRotationParams(RotationParams):

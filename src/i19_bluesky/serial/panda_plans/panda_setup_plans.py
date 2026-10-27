@@ -37,11 +37,11 @@ def setup_panda_for_rotation(
 
     yield from bps.stage(panda, group="panda-setup")
 
-    yield from load_panda_from_yaml(
-        DeviceSettingsConstants.PANDA_DIR.as_posix(),
-        DeviceSettingsConstants.PANDA_SERIAL_CONFIG,
-        panda,
-    )
+    # yield from load_panda_from_yaml(
+    #     DeviceSettingsConstants.PANDA_DIR.as_posix(),
+    #     DeviceSettingsConstants.PANDA_SERIAL_CONFIG,
+    #     panda,
+    # )
     LOGGER.warning(f"Gate start: {parameters.gate_start}")
     LOGGER.info("Move phi to gate start position and home panda there")
     yield from bps.mv(serial_stages.phi, parameters.gate_start)
@@ -73,8 +73,8 @@ def setup_panda_for_rotation(
     yield from bps.wait(group="panda-setup", timeout=GENERAL_TIMEOUT)
 
     LOGGER.info(f"PandA sequencer table has been set to: {str(seq_table)}")
-    seq_table_readback = yield from bps.rd(panda.seq[1].table)
-    LOGGER.debug(f"PandA sequencer table readback is: {str(seq_table_readback)}")
+    # seq_table_readback = yield from bps.rd(panda.seq[2].table)
+    # LOGGER.debug(f"PandA sequencer table readback is: {str(seq_table_readback)}")
 
     yield from arm_panda(panda)
 

@@ -746,9 +746,9 @@ seq.2.outf_capture: false
 seq.2.posa: INENC4.VAL
 seq.2.posb: ZERO
 seq.2.posc: ZERO
-seq.2.prescale: 0.0
-seq.2.prescale_units: s
-seq.2.repeats: 20
+seq.2.prescale: 1.0
+seq.2.prescale_units: us
+seq.2.repeats: 1
 seq.2.table:
   outa1: [false, true, true, false]
   outa2: [false, false, false, false]
