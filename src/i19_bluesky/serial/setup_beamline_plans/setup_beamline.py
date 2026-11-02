@@ -1,16 +1,7 @@
 import bluesky.plan_stubs as bps
 from bluesky.utils import MsgGenerator
-from dodal.devices.beamlines.i19.backlight import BacklightPosition
-from dodal.devices.beamlines.i19.diffractometer import (
-    FourCircleDiffractometer,
-)
-from dodal.devices.beamlines.i19.pin_col_stages import (
-    PinColRequest,
-    PinholeCollimatorControl,
-)
 
-from i19_bluesky.eh2.backlight_plan import move_backlight_out
-from i19_bluesky.eh2.pincol_control_plans import move_pin_col_to_requested_in_position
+from i19_bluesky.eh2.setup_beamline import setup_beamline_for_collection
 from i19_bluesky.log import LOGGER
 from i19_bluesky.parameters.devices_composites import SerialCollectionEh2PandaComposite
 from i19_bluesky.parameters.serial_parameters import SerialExperimentEh2
@@ -26,9 +17,19 @@ def setup_eh2_serial_collection(
     parameters: SerialExperimentEh2,
     devices: SerialCollectionEh2PandaComposite,
 ) -> MsgGenerator:
-    # Open shutter
-    yield from open_experiment_shutter(devices.shutter)
-    # Set up eiger - TO BE ADDED - IN SEPARATE BRANCH
+    """Set up devices on the beamline for a serial collection.
+
+    Performs the following tasks:
+        * Reads energy and wavelength from dcm and sets up the detector
+        * Moves the beamstop into the beam
+        * Moves the backlight to its out position
+        * Moves the pinhole and collimator to the requested aperture
+        * TBD - move the attenuator to requested transmission
+        * Sets up phi start and velocity on the sample stage
+        * Moves the detector stage into place
+        * Opens the experiment shutter
+
+    """
     # Read energy and wavelength from dcm to then set up eiger
     energ_in_kev = yield from bps.rd(devices.energy_device.energy_in_kev)
     wavelength_in_a = yield from bps.rd(devices.energy_device.wavelength_in_a)
@@ -38,57 +39,20 @@ def setup_eh2_serial_collection(
     # Set up beamline for collection
     yield from setup_beamline_for_collection(
         parameters.aperture_request,
-        parameters.detector_distance_mm,
-        parameters.two_theta_deg,
         devices.backlight,
+        devices.beamstop,
         devices.pinhole_and_collimator,
-        devices.diffractometer,
     )
     # Set up sample stage
+    LOGGER.info("Set up sample stage phi axis")
     yield from setup_sample_stage(
         parameters.panda_rotation_params, devices.serial_stages
     )
-
-
-def setup_beamline_for_collection(
-    aperture_request: PinColRequest,
-    detector_distance_mm: float,
-    two_theta_deg: float,
-    backlight: BacklightPosition,
-    pinhole_and_collimator: PinholeCollimatorControl,
-    diffractometer: FourCircleDiffractometer,
-) -> MsgGenerator:
-    """Runs setup tasks prior to data collection. Currently, moves the backlight to its
-    'out' position, then moves the pinhole collimator to position to record at the
-    requested aperture, a placeholder for moving the attenutator wedge, followed by
-    a command to move the diffractometer an inputted distance in the X and Two-Theta
-    axis.
-
-    Args:
-        aperture_request (PinColRequest):
-            Requested position of aperture
-        detector_distance_mm (float):
-            Distance to move in the X axis
-        two_theta_deg (float):
-            Angle to move to in the theta axis
-        backlight (BacklightPosition):
-            Backlight device
-        pinhole_and_collimator (PinholeCollimatorControl):
-            Pinhole Collimator device
-        diffractometer (FourCircleDiffractometer):
-            Diffractometer device
-    """
-    LOGGER.info("Moving backlight out")
-    yield from move_backlight_out(backlight)
-    LOGGER.info("Moving pinhole collimator into position")
-    yield from move_pin_col_to_requested_in_position(
-        aperture_request, pinhole_and_collimator
-    )
-    LOGGER.info("Moving attenuator wedge")
-    # waiting for https://github.com/DiamondLightSource/i19-bluesky/issues/8
     LOGGER.info("Moving detector stage into position")
     yield from move_detector_stage(
-        diffractometer.det_stage,
-        detector_distance_mm,
-        two_theta_deg,
+        devices.diffractometer.det_stage,
+        parameters.detector_distance_mm,
+        parameters.two_theta_deg,
     )
+    # Open shutter
+    yield from open_experiment_shutter(devices.shutter)

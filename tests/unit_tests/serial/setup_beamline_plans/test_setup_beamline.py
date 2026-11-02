@@ -1,104 +1,23 @@
 from unittest.mock import MagicMock, patch
 
-import pytest
 from bluesky.run_engine import RunEngine
-from dodal.common.enums import InOutUpper
-from dodal.devices.beamlines.i19.pin_col_stages import (
-    PinColRequest,
-)
 from ophyd_async.core import set_mock_value
 
 from i19_bluesky.parameters.devices_composites import SerialCollectionEh2PandaComposite
 from i19_bluesky.parameters.serial_parameters import SerialExperimentEh2
 from i19_bluesky.serial.setup_beamline_plans.setup_beamline import (
-    setup_beamline_for_collection,
     setup_eh2_serial_collection,
 )
 
 
-@pytest.mark.parametrize(
-    "detector_z,detector_two_theta,eh2_aperture,in_positions",
-    [
-        (200, 0, PinColRequest.PCOL20, [12, 34.5, 7.1, 28]),
-        (80, 90, PinColRequest.PCOL100, [23.4, 22.1, 12, 18.7]),
-    ],
-)
-async def test_setup_beamline_for_collection(
-    detector_z: float,
-    detector_two_theta: float,
-    eh2_aperture: PinColRequest,
-    in_positions: list[float],
-    RE: RunEngine,
-    parameters: SerialExperimentEh2,
-    devices: SerialCollectionEh2PandaComposite,
-):
-
-    size = int(eh2_aperture.value.strip("um"))
-    parameters.detector_distance_mm = detector_z
-    parameters.two_theta_deg = detector_two_theta
-    parameters.aperture_request = eh2_aperture
-    set_mock_value(
-        devices.pinhole_and_collimator.mapt.pin_x.in_positions[size], in_positions[0]
-    )
-    set_mock_value(
-        devices.pinhole_and_collimator.mapt.pin_y.in_positions[size], in_positions[1]
-    )
-    set_mock_value(
-        devices.pinhole_and_collimator.mapt.col_x.in_positions[size], in_positions[2]
-    )
-    set_mock_value(
-        devices.pinhole_and_collimator.mapt.col_y.in_positions[size],
-        in_positions[3],
-    )
-    RE(
-        setup_beamline_for_collection(
-            parameters.aperture_request,
-            parameters.detector_distance_mm,
-            parameters.two_theta_deg,
-            devices.backlight,
-            devices.pinhole_and_collimator,
-            devices.diffractometer,
-        )
-    )
-    assert (
-        await devices.diffractometer.det_stage.det_z.user_readback.get_value()
-        == detector_z
-    )
-    assert (
-        await devices.diffractometer.det_stage.two_theta.user_readback.get_value()
-        == detector_two_theta
-    )
-
-    assert await devices.backlight.position.get_value() == InOutUpper.OUT
-
-    assert (
-        await devices.pinhole_and_collimator._pinhole.x.user_readback.get_value()
-        == in_positions[0]
-    )
-    assert (
-        await devices.pinhole_and_collimator._pinhole.y.user_readback.get_value()
-        == in_positions[1]
-    )
-    assert (
-        await devices.pinhole_and_collimator._collimator.x.user_readback.get_value()
-        == in_positions[2]
-    )
-    assert (
-        await devices.pinhole_and_collimator._collimator.y.user_readback.get_value()
-        == in_positions[3]
-    )
-
-
 @patch("i19_bluesky.serial.setup_beamline_plans.setup_beamline.write_eiger_params")
-@patch("i19_bluesky.serial.setup_beamline_plans.setup_beamline.setup_sample_stage")
 @patch(
     "i19_bluesky.serial.setup_beamline_plans.setup_beamline.setup_beamline_for_collection"
 )
 @patch("i19_bluesky.serial.setup_beamline_plans.setup_beamline.open_experiment_shutter")
-def test_setup_eh2_serial_collection(
+async def test_setup_eh2_serial_collection(
     mock_open_shutter: MagicMock,
     mock_setup: MagicMock,
-    mock_stage: MagicMock,
     mock_write_eiger_params: MagicMock,
     parameters: SerialExperimentEh2,
     devices: SerialCollectionEh2PandaComposite,
@@ -114,12 +33,26 @@ def test_setup_eh2_serial_collection(
     )
     mock_setup.assert_called_once_with(
         "100um",
-        320,
-        0,
         devices.backlight,
+        devices.beamstop,
         devices.pinhole_and_collimator,
-        devices.diffractometer,
     )
-    mock_stage.assert_called_once_with(
-        parameters.panda_rotation_params, devices.serial_stages
+
+    assert (
+        await devices.serial_stages.phi.velocity.get_value()
+        == parameters.panda_rotation_params.rotation_axis_velocity
+    )
+
+    assert (
+        await devices.serial_stages.phi.user_readback.get_value()
+        == parameters.rot_axis_start
+    )
+
+    assert (
+        await devices.diffractometer.det_stage.det_z.user_readback.get_value()
+        == parameters.detector_distance_mm
+    )
+    assert (
+        await devices.diffractometer.det_stage.two_theta.user_readback.get_value()
+        == parameters.two_theta_deg
     )

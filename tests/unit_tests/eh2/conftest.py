@@ -18,8 +18,15 @@ from dodal.devices.beamlines.i19.access_controlled.shutter import (
     HutchState,
 )
 from dodal.devices.beamlines.i19.backlight import BacklightPosition
+from dodal.devices.beamlines.i19.beamstop import BeamStop
 from dodal.devices.beamlines.i19.pin_col_stages import PinholeCollimatorControl
 from ophyd_async.core import set_mock_value
+
+MOCK_BEAMLINE_PARAMS = """
+# Beamstop
+beamstop_inbeam_x=5.0
+beamstop_outbeam_x=3.37
+"""
 
 
 @pytest.fixture
@@ -31,6 +38,16 @@ async def attenuator_motor_squad(RE: RunEngine) -> AttenuatorMotorSquad:
 
     att_motor_squad.url = "http://test-blueapi.url"
     return att_motor_squad
+
+
+@pytest.fixture
+async def beamstop(RE: RunEngine) -> BeamStop:
+    beamstop = BeamStop(
+        "", HutchState.EH2, "/path/to/parameters/", MagicMock(), name="mock_beamstop"
+    )
+    await beamstop.connect(mock=True)
+    beamstop._read_beamline_parameters = MagicMock(return_value=MOCK_BEAMLINE_PARAMS)
+    return beamstop
 
 
 @pytest.fixture
