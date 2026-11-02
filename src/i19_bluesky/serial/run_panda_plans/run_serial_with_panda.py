@@ -24,7 +24,7 @@ from i19_bluesky.serial.panda_plans.panda_stubs import disarm_panda
 from i19_bluesky.serial.run_panda_plans.panda_serial_collection import (
     trigger_panda_collection,
 )
-from i19_bluesky.serial.setup_beamline_plans.setup_beamline import (
+from i19_bluesky.serial.run_panda_plans.setup_for_collection import (
     setup_eh2_serial_collection,
 )
 

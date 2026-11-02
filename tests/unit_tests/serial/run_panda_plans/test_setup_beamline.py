@@ -5,16 +5,18 @@ from ophyd_async.core import set_mock_value
 
 from i19_bluesky.parameters.devices_composites import SerialCollectionEh2PandaComposite
 from i19_bluesky.parameters.serial_parameters import SerialExperimentEh2
-from i19_bluesky.serial.setup_beamline_plans.setup_beamline import (
+from i19_bluesky.serial.run_panda_plans.setup_for_collection import (
     setup_eh2_serial_collection,
 )
 
 
-@patch("i19_bluesky.serial.setup_beamline_plans.setup_beamline.write_eiger_params")
+@patch("i19_bluesky.serial.run_panda_plans.setup_for_collection.write_eiger_params")
 @patch(
-    "i19_bluesky.serial.setup_beamline_plans.setup_beamline.setup_beamline_for_collection"
+    "i19_bluesky.serial.run_panda_plans.setup_for_collection.setup_beamline_for_collection"
 )
-@patch("i19_bluesky.serial.setup_beamline_plans.setup_beamline.open_experiment_shutter")
+@patch(
+    "i19_bluesky.serial.run_panda_plans.setup_for_collection.open_experiment_shutter"
+)
 async def test_setup_eh2_serial_collection(
     mock_open_shutter: MagicMock,
     mock_setup: MagicMock,
