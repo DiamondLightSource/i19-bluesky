@@ -6,6 +6,7 @@ from dodal.devices.beamlines.i19.access_controlled.shutter import (
     AccessControlledShutter,
 )
 from dodal.devices.beamlines.i19.backlight import BacklightPosition
+from dodal.devices.beamlines.i19.beamstop import BeamStop
 from dodal.devices.beamlines.i19.diffractometer import (
     FourCircleDiffractometer,
 )
@@ -22,6 +23,7 @@ from ophyd_async.fastcs.panda import HDFPanda
 class SerialCollectionEh2PandaComposite:
     diffractometer: FourCircleDiffractometer
     backlight: BacklightPosition
+    beamstop: BeamStop
     pinhole_and_collimator: PinholeCollimatorControl
     panda: HDFPanda
     eiger: EigerDetector
