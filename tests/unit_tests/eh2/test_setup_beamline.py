@@ -1,15 +1,23 @@
+from unittest.mock import MagicMock, patch
+
 import pytest
 from bluesky import RunEngine
 from dodal.common.enums import InOutUpper
 from dodal.devices.beamlines.i19.backlight import BacklightPosition
 from dodal.devices.beamlines.i19.beamstop import BeamStop
+from dodal.devices.beamlines.i19.diffractometer import (
+    FourCircleDiffractometer,
+)
 from dodal.devices.beamlines.i19.pin_col_stages import (
     PinColRequest,
     PinholeCollimatorControl,
 )
 from ophyd_async.core import set_mock_value
 
-from i19_bluesky.eh2.setup_beamline import setup_beamline_for_collection
+from i19_bluesky.eh2.setup_beamline import (
+    setup_beamline_for_collection,
+    setup_for_rotation,
+)
 
 
 @pytest.mark.parametrize(
@@ -54,3 +62,31 @@ async def test_setup_beamline_for_collection(
     assert await pincol._pinhole.y.user_readback.get_value() == in_positions[1]
     assert await pincol._collimator.x.user_readback.get_value() == in_positions[2]
     assert await pincol._collimator.y.user_readback.get_value() == in_positions[3]
+
+
+@patch("i19_bluesky.eh2.setup_beamline.setup_beamline_for_collection")
+async def test_setup_for_rotation(
+    mock_setup_tasks: MagicMock,
+    pincol: PinholeCollimatorControl,
+    eh2_backlight: BacklightPosition,
+    beamstop: BeamStop,
+    diffractometer: FourCircleDiffractometer,
+    RE: RunEngine,
+):
+    RE(
+        setup_for_rotation(
+            10,
+            -80,
+            PinColRequest.PCOL40,
+            eh2_backlight,
+            beamstop,
+            pincol,
+            diffractometer,
+        )
+    )
+
+    assert await diffractometer.omega.user_readback.get_value() == -80
+    assert await diffractometer.phi.user_readback.get_value() == 10
+    mock_setup_tasks.assert_called_once_with(
+        PinColRequest.PCOL40, eh2_backlight, beamstop, pincol
+    )
