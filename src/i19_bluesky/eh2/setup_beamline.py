@@ -75,7 +75,8 @@ def setup_for_rotation(
     LOGGER.info(f"Move omega to {omega_position}")
     yield from bps.abs_set(diffractometer.omega, omega_position, wait=True)
     LOGGER.info(f"Move phi to {phi_position}")
-    yield from bps.abs_set(diffractometer.phi, phi_position, wait=True)
+    yield from bps.abs_set(diffractometer.phi, phi_position)
     yield from setup_beamline_for_collection(
         aperture, backlight, beamstop, pinhole_and_collimator
     )
+    yield from bps.wait()
