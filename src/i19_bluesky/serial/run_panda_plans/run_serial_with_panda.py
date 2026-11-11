@@ -46,7 +46,7 @@ def run_on_collection_end(
     serial_stages: XYZPhiStage,
     shutter: AccessControlledShutter,
 ):
-    LOGGER.info("Disarm eiger")
+    LOGGER.info("Unstage eiger")
     yield from bps.unstage(eiger, wait=True)
     LOGGER.info("Disarm panda")
     yield from disarm_panda(panda)
