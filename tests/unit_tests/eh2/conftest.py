@@ -18,8 +18,18 @@ from dodal.devices.beamlines.i19.access_controlled.shutter import (
     HutchState,
 )
 from dodal.devices.beamlines.i19.backlight import BacklightPosition
+from dodal.devices.beamlines.i19.beamstop import BeamStop
+from dodal.devices.beamlines.i19.diffractometer import (
+    FourCircleDiffractometer,
+)
 from dodal.devices.beamlines.i19.pin_col_stages import PinholeCollimatorControl
 from ophyd_async.core import set_mock_value
+
+MOCK_BEAMLINE_PARAMS = """
+# Beamstop
+beamstop_inbeam_x=5.0
+beamstop_outbeam_x=3.37
+"""
 
 
 @pytest.fixture
@@ -31,6 +41,16 @@ async def attenuator_motor_squad(RE: RunEngine) -> AttenuatorMotorSquad:
 
     att_motor_squad.url = "http://test-blueapi.url"
     return att_motor_squad
+
+
+@pytest.fixture
+async def beamstop(RE: RunEngine) -> BeamStop:
+    beamstop = BeamStop(
+        "", HutchState.EH2, "/path/to/parameters/", MagicMock(), name="mock_beamstop"
+    )
+    await beamstop.connect(mock=True)
+    beamstop._read_beamline_parameters = MagicMock(return_value=MOCK_BEAMLINE_PARAMS)
+    return beamstop
 
 
 @pytest.fixture
@@ -89,3 +109,11 @@ async def eh2_energy_device(RE: RunEngine) -> AccessControlledEnergyComposite:
     set_mock_value(energy_device.energy_in_kev, 17.9)
     set_mock_value(energy_device.wavelength_in_a, 0.6)
     return energy_device
+
+
+@pytest.fixture
+async def diffractometer(RE: RunEngine) -> FourCircleDiffractometer:
+    diffractometer = i19_2.diffractometer.build(connect_immediately=True, mock=True)
+    set_mock_value(diffractometer.phi.user_readback, 0)
+    set_mock_value(diffractometer.omega.user_readback, -90)
+    return diffractometer
