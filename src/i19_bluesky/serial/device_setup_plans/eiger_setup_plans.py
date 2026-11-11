@@ -74,6 +74,7 @@ def set_eiger_params(
     wait: bool = True,
     group: str = "eiger_setup",
 ):
+    LOGGER.info("Set up eiger detector for collection")
     beam_centre = calculate_beam_centre_from_lut(
         parameters.detector_distance_mm,
         parameters.detector_constants.DET_SIZE_CONSTANTS,

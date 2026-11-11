@@ -47,7 +47,7 @@ def run_on_collection_end(
     shutter: AccessControlledShutter,
 ):
     LOGGER.info("Disarm eiger")
-    yield from bps.trigger(eiger.detector.disarm)
+    yield from bps.unstage(eiger, wait=True)
     LOGGER.info("Disarm panda")
     yield from disarm_panda(panda)
     yield from reset_panda(panda)
@@ -63,7 +63,7 @@ def run_on_collection_abort(
 ) -> MsgGenerator:
     LOGGER.warning("ABORT")
     yield from bps.abs_set(diffractometer.phi.motor_stop, 1, wait=True)
-    yield from bps.trigger(eiger.detector.disarm)
+    yield from bps.unstage(eiger, wait=True)
     yield from disarm_panda(panda)
 
 
