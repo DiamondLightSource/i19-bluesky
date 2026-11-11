@@ -15,6 +15,7 @@ from dodal.devices.beamlines.i19.access_controlled.shutter import (
     HutchState,
 )
 from dodal.devices.beamlines.i19.backlight import BacklightPosition
+from dodal.devices.beamlines.i19.beamstop import BeamStop
 from dodal.devices.beamlines.i19.diffractometer import (
     FourCircleDiffractometer,
 )
@@ -141,6 +142,15 @@ async def eh2_backlight(RE: RunEngine) -> BacklightPosition:
 
 
 @pytest.fixture
+async def eh2_beamstop(RE: RunEngine) -> BeamStop:
+    beamstop = BeamStop(
+        "", HutchState.EH2, "/path/to/parameters/", MagicMock(), name="mock_beamstop"
+    )
+    await beamstop.connect(mock=True)
+    return beamstop
+
+
+@pytest.fixture
 async def eh2_eiger(RE: RunEngine) -> EigerDetector:
     eiger = EigerDetector(prefix="ixx-test-eiger", path_provider=get_path_provider())
     await eiger.connect(mock=True)
@@ -195,6 +205,7 @@ async def devices(
     mock_panda,
     eh2_eiger,
     eh2_backlight,
+    eh2_beamstop,
     eh2_diffractometer,
     serial_stages,
     pincol,
@@ -204,6 +215,7 @@ async def devices(
     devices = SerialCollectionEh2PandaComposite(
         diffractometer=eh2_diffractometer,
         backlight=eh2_backlight,
+        beamstop=eh2_beamstop,
         pinhole_and_collimator=pincol,
         panda=mock_panda,
         eiger=eh2_eiger,
