@@ -10,7 +10,7 @@ from i19_bluesky.serial.run_panda_plans.setup_for_collection import (
 )
 
 
-@patch("i19_bluesky.serial.run_panda_plans.setup_for_collection.write_eiger_params")
+@patch("i19_bluesky.serial.run_panda_plans.setup_for_collection.set_eiger_params")
 @patch(
     "i19_bluesky.serial.run_panda_plans.setup_for_collection.setup_beamline_for_collection"
 )
@@ -20,7 +20,7 @@ from i19_bluesky.serial.run_panda_plans.setup_for_collection import (
 async def test_setup_eh2_serial_collection(
     mock_open_shutter: MagicMock,
     mock_setup: MagicMock,
-    mock_write_eiger_params: MagicMock,
+    mock_set_eiger_params: MagicMock,
     parameters: SerialExperimentEh2,
     devices: SerialCollectionEh2PandaComposite,
     RE: RunEngine,
@@ -30,9 +30,7 @@ async def test_setup_eh2_serial_collection(
     RE(setup_eh2_serial_collection(parameters, devices))
 
     mock_open_shutter.assert_called_once_with(devices.shutter)
-    mock_write_eiger_params.assert_called_once_with(
-        parameters, 17.9, 0.6, devices.eiger
-    )
+    mock_set_eiger_params.assert_called_once_with(parameters, 17.9, 0.6, devices.eiger)
     mock_setup.assert_called_once_with(
         "100um",
         devices.backlight,
