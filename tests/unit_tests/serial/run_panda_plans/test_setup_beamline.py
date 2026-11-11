@@ -5,6 +5,7 @@ from ophyd_async.core import DetectorTrigger, TriggerInfo, set_mock_value
 
 from i19_bluesky.parameters.devices_composites import SerialCollectionEh2PandaComposite
 from i19_bluesky.parameters.serial_parameters import SerialExperimentEh2
+from i19_bluesky.serial.device_setup_plans.diffractometer_plans import DEAD_TIME_S
 from i19_bluesky.serial.run_panda_plans.setup_for_collection import (
     setup_eh2_serial_collection,
 )
@@ -33,6 +34,9 @@ async def test_setup_eh2_serial_collection(
         trigger=DetectorTrigger.EXTERNAL_EDGE,
         livetime=0.1,
     )
+    expected_phi_velocity = parameters.rot_axis_increment / (
+        parameters.exposure_time_s + DEAD_TIME_S
+    )
     set_mock_value(devices.energy_device.energy_in_kev, 17.9)
     set_mock_value(devices.energy_device.wavelength_in_a, 0.6)
     RE(setup_eh2_serial_collection(parameters, devices))
@@ -46,10 +50,7 @@ async def test_setup_eh2_serial_collection(
         devices.pinhole_and_collimator,
     )
 
-    assert (
-        await devices.serial_stages.phi.velocity.get_value()
-        == parameters.panda_rotation_params.rotation_axis_velocity
-    )
+    assert await devices.serial_stages.phi.velocity.get_value() == expected_phi_velocity
 
     assert (
         await devices.serial_stages.phi.user_readback.get_value()
