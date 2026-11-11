@@ -34,10 +34,11 @@ def trigger_panda_collection(
     yield from setup_panda_for_rotation(
         parameters.panda_rotation_params, devices.panda, devices.serial_stages
     )
-    LOGGER.info("Arm eiger")
-    yield from bps.trigger(devices.eiger.detector.arm)
+    LOGGER.info("Kickoff eiger")
+    yield from bps.kickoff(devices.eiger, wait=True)
     for i, (well_num, coords) in enumerate(parameters.wells_to_collect.items()):
         yield from move_stage_x_and_z(coords[0], coords[2], devices.serial_stages)
+        # yield from bps.sleep(0.5)  # TESTING
         LOGGER.info(f"Moved to well {well_num}")
         if i % 2 == 0:  # even in list
             LOGGER.info(
@@ -59,3 +60,5 @@ def trigger_panda_collection(
                 parameters.panda_rotation_params.scan_start_deg,
                 wait=True,
             )
+    LOGGER.info("Run complete eiger")
+    yield from bps.complete(devices.eiger, wait=True)

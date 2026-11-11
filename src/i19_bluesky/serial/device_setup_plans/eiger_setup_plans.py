@@ -56,13 +56,13 @@ def calculate_beam_centre_from_lut(
     interpolate_y = linear_interpolation_lut(lut_columns[0], lut_columns[2])
     beam_y_mm = interpolate_y(detector_distance_mm)
 
-    LOGGER.info("Found beam centre.")
-
     beam_centre_px = _convert_beam_centre_to_pixels(
         (beam_x_mm, beam_y_mm),
         det_size_constants.det_dimension,
         det_size_constants.det_size_pixels,
     )
+
+    LOGGER.info(f"Found beam centre at {beam_centre_px} pixels.")
     return beam_centre_px
 
 
