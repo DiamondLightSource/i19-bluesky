@@ -3,6 +3,7 @@ from unittest.mock import MagicMock, call, mock_open, patch
 from bluesky import RunEngine
 from dodal.devices.beamlines.i19.access_controlled.piezo_control import (
     AccessControlledPiezoActuator,
+    HutchState,
 )
 from dodal.devices.oav.beam_centre.centroid_from_epics import CentroidFromEpics
 from ophyd_async.core import EnableDisable, get_mock_put
@@ -76,7 +77,12 @@ def test_save_results_to_file():
     ):
         mock_csv.writer = MagicMock()
         _save_results_to_file(
-            "vfm_piezo", [1.27, 1.28, 1.29], [702.2, 702, 702], [346, 355, 362], 0.01
+            "vfm_piezo",
+            [1.27, 1.28, 1.29],
+            [702.2, 702, 702],
+            [346, 355, 362],
+            0.01,
+            HutchState.EH2,
         )
         m.assert_called_once()
         mock_csv.writer().writerow.assert_called_once_with(
