@@ -6,9 +6,6 @@ from i19_bluesky.eh1.move_beam_to_position import (
     nudge_piezos_and_move_to_beam_centre,
 )
 from i19_bluesky.eh1.pin_tip_detection import pin_tip_detection_plan
-from i19_bluesky.eh1.voltage_to_beam_position import (
-    measure_piezo_voltages_vs_beam_position,
-)
 from i19_bluesky.plans.optics_hutch_control_plans import (
     apply_attenuator_positions,
     apply_voltage_to_piezo_actuators,
@@ -17,6 +14,9 @@ from i19_bluesky.plans.optics_hutch_control_plans import (
     open_experiment_shutter,
 )
 from i19_bluesky.plans.temperature_control_plans import run_temperature_ramp
+from i19_bluesky.plans.voltage_to_beam_position import (
+    measure_piezo_voltages_vs_beam_position,
+)
 
 __all__ = [
     "apply_attenuator_positions",

@@ -1,17 +1,9 @@
 from unittest.mock import MagicMock, patch
 
-import pytest
 from bluesky.run_engine import RunEngine
 from dodal.devices.cryostream import OxfordCryoStream
 
 from i19_bluesky.plans.temperature_control_plans import run_temperature_ramp
-
-
-@pytest.fixture
-async def cryostream(RE: RunEngine) -> OxfordCryoStream:
-    cryo = OxfordCryoStream("", name="mock-cryo")
-    await cryo.connect(mock=True)
-    return cryo
 
 
 @patch("i19_bluesky.plans.temperature_control_plans.bps.trigger")
