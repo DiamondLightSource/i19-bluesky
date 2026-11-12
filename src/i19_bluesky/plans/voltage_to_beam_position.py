@@ -8,6 +8,7 @@ from bluesky.utils import Msg, MsgGenerator
 from dodal.common import inject
 from dodal.devices.beamlines.i19.access_controlled.piezo_control import (
     AccessControlledPiezoActuator,
+    HutchState,
 )
 from dodal.devices.oav.beam_centre.centroid_from_epics import (
     CentroidFromEpics,
@@ -20,7 +21,14 @@ from i19_bluesky.plans.optics_hutch_control_plans import (
     apply_voltage_to_piezo_actuators,
 )
 
-SAVE_FILE_PATH = Path("/dls_sw/i19-1/software/bluesky/voltage_to_beam_position_data")
+SAVE_FILE_PATH = {
+    HutchState.EH1: Path(
+        "/dls_sw/i19-1/software/bluesky/voltage_to_beam_position_data"
+    ),
+    HutchState.EH2: Path(
+        "/dls_sw/i19-2/software/bluesky/voltage_to_beam_position_data"
+    ),
+}
 TIME_TO_SETTLE = 2
 
 NUDGE_SERIES = [
@@ -37,11 +45,12 @@ def _save_results_to_file(
     beam_positions_x: list[float],
     beam_positions_y: list[float],
     nudge_size: float,
+    hutch: HutchState,
 ):
     now = datetime.datetime.now()
     str_now = now.strftime("%H%M%S")
     filename = (
-        SAVE_FILE_PATH
+        SAVE_FILE_PATH[hutch]
         / f"{str_now}_{device_name}_to_beam_centre_nudge_{nudge_size}.csv"
     )
     column_names = ["voltage", "beam_position_x", "beam_position_y"]
@@ -115,6 +124,7 @@ def measure_piezo_voltages_vs_beam_position(
                 beam_positions_x,
                 beam_positions_y,
                 nudge_size,
+                piezo_device.hutch_request,
             )
             yield from apply_voltage_to_piezo_actuators(
                 current_voltage + nudge_size / 2, piezo_device
