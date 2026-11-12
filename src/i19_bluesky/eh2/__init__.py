@@ -13,6 +13,9 @@ from i19_bluesky.plans.optics_hutch_control_plans import (
     open_experiment_shutter,
 )
 from i19_bluesky.plans.temperature_control_plans import run_temperature_ramp
+from i19_bluesky.plans.voltage_to_beam_position import (
+    measure_piezo_voltages_vs_beam_position,
+)
 
 __all__ = [
     "apply_attenuator_positions",
@@ -24,4 +27,5 @@ __all__ = [
     "change_energy",
     "run_temperature_ramp",
     "setup_for_rotation",
+    "measure_piezo_voltages_vs_beam_position",
 ]
