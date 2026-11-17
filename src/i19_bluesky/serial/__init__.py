@@ -19,7 +19,6 @@ from i19_bluesky.serial.run_panda_plans.run_serial_with_panda import (
 from i19_bluesky.serial.ui_plans.laser import run_laser_plan
 from i19_bluesky.serial.ui_plans.ui_plans import (
     move_backlight_in_via_ui,
-    rotate_in_phi,
 )
 
 __all__ = [
@@ -33,7 +32,6 @@ __all__ = [
     "read_current_sample_stage_xyz_position",
     "move_sample_stage",
     "run_coordinate_system_test",
-    "rotate_in_phi",
     "move_backlight_in_via_ui",
     "move_backlight_out",
     # Parametric scans
