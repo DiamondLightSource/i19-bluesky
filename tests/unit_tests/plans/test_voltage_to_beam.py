@@ -3,11 +3,12 @@ from unittest.mock import MagicMock, call, mock_open, patch
 from bluesky import RunEngine
 from dodal.devices.beamlines.i19.access_controlled.piezo_control import (
     AccessControlledPiezoActuator,
+    HutchState,
 )
 from dodal.devices.oav.beam_centre.centroid_from_epics import CentroidFromEpics
 from ophyd_async.core import EnableDisable, get_mock_put
 
-from i19_bluesky.eh1.voltage_to_beam_position import (
+from i19_bluesky.plans.voltage_to_beam_position import (
     _save_results_to_file,
     apply_voltage_and_read_position,
     measure_piezo_voltages_vs_beam_position,
@@ -15,8 +16,8 @@ from i19_bluesky.eh1.voltage_to_beam_position import (
 from tests.unit_tests.conftest import fake_generator
 
 
-@patch("i19_bluesky.eh1.voltage_to_beam_position.apply_voltage_to_piezo_actuators")
-@patch("i19_bluesky.eh1.voltage_to_beam_position.bps.sleep")
+@patch("i19_bluesky.plans.voltage_to_beam_position.apply_voltage_to_piezo_actuators")
+@patch("i19_bluesky.plans.voltage_to_beam_position.bps.sleep")
 async def test_apply_and_read(
     mock_sleep: MagicMock,
     mock_apply_voltage_plan: MagicMock,
@@ -34,14 +35,14 @@ async def test_apply_and_read(
     assert await centroid_device.beam_centre_y.get_value() == beam_y
 
 
-@patch("i19_bluesky.eh1.voltage_to_beam_position._save_results_to_file")
-@patch("i19_bluesky.eh1.voltage_to_beam_position.apply_voltage_to_piezo_actuators")
-@patch("i19_bluesky.eh1.voltage_to_beam_position.apply_voltage_and_read_position")
+@patch("i19_bluesky.plans.voltage_to_beam_position._save_results_to_file")
+@patch("i19_bluesky.plans.voltage_to_beam_position.apply_voltage_to_piezo_actuators")
+@patch("i19_bluesky.plans.voltage_to_beam_position.apply_voltage_and_read_position")
 async def test_measure_voltages_vs_position(
     mock_apply_and_rd: MagicMock,
     mock_apply_voltage_plan: MagicMock,
     mock_save: MagicMock,
-    eh1_vfm_piezo: AccessControlledPiezoActuator,
+    eh2_vfm_piezo: AccessControlledPiezoActuator,
     centroid_device: CentroidFromEpics,
     RE: RunEngine,
 ):
@@ -52,7 +53,7 @@ async def test_measure_voltages_vs_position(
         fake_generator((700, 250)),
         fake_generator((690, 255)),
     ]
-    RE(measure_piezo_voltages_vs_beam_position(eh1_vfm_piezo, nudges, centroid_device))
+    RE(measure_piezo_voltages_vs_beam_position(eh2_vfm_piezo, nudges, centroid_device))
 
     # Prepare was called
     assert await centroid_device.cc_array_port.get_value() == "OAV1.cam"
@@ -71,12 +72,17 @@ async def test_measure_voltages_vs_position(
 
 def test_save_results_to_file():
     with (
-        patch("i19_bluesky.eh1.voltage_to_beam_position.open", mock_open()) as m,
-        patch("i19_bluesky.eh1.voltage_to_beam_position.csv") as mock_csv,
+        patch("i19_bluesky.plans.voltage_to_beam_position.open", mock_open()) as m,
+        patch("i19_bluesky.plans.voltage_to_beam_position.csv") as mock_csv,
     ):
         mock_csv.writer = MagicMock()
         _save_results_to_file(
-            "vfm_piezo", [1.27, 1.28, 1.29], [702.2, 702, 702], [346, 355, 362], 0.01
+            "vfm_piezo",
+            [1.27, 1.28, 1.29],
+            [702.2, 702, 702],
+            [346, 355, 362],
+            0.01,
+            HutchState.EH2,
         )
         m.assert_called_once()
         mock_csv.writer().writerow.assert_called_once_with(
