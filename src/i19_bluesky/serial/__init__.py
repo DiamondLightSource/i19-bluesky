@@ -16,7 +16,6 @@ from i19_bluesky.serial.example_zebra_plans.example_trigger_plan_zebra_vs_panda 
 from i19_bluesky.serial.run_panda_plans.run_serial_with_panda import (
     run_serial_with_panda,
 )
-from i19_bluesky.serial.ui_plans.laser import run_laser_plan
 from i19_bluesky.serial.ui_plans.ui_plans import (
     move_backlight_in_via_ui,
 )
@@ -32,8 +31,7 @@ __all__ = [
     "read_current_sample_stage_xyz_position",
     "move_sample_stage",
     "run_coordinate_system_test",
+    # From buttons on UI
     "move_backlight_in_via_ui",
     "move_backlight_out",
-    # Parametric scans
-    "run_laser_plan",
 ]
