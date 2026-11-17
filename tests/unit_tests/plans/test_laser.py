@@ -4,10 +4,10 @@ from bluesky import RunEngine
 from dodal.devices.zebra.zebra import SoftInState, Zebra
 from ophyd_async.core import get_mock_put
 
-from i19_bluesky.serial.ui_plans.laser import run_laser_plan
+from i19_bluesky.plans.laser import run_laser_plan
 
 
-@patch("i19_bluesky.serial.ui_plans.laser.bps.sleep")
+@patch("i19_bluesky.plans.laser.bps.sleep")
 async def test_laser_plan(mock_sleep: MagicMock, eh2_zebra: Zebra, RE: RunEngine):
     RE(run_laser_plan(2, eh2_zebra))
 
