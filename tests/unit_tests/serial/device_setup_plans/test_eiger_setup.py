@@ -1,8 +1,10 @@
+from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
 from bluesky.run_engine import RunEngine
 from daq_config_server.models.lookup_tables import DetectorXYLookupTable
+from dodal.common.types import UpdatingPathProvider
 from ophyd_async.fastcs.eiger import EigerDetector
 
 from i19_bluesky.parameters.serial_parameters import SerialExperimentEh2
@@ -10,6 +12,7 @@ from i19_bluesky.serial.device_setup_plans.eiger_setup_plans import (
     _convert_beam_centre_to_pixels,
     _read_converter_lut,
     calculate_beam_centre_from_lut,
+    set_collection_directory_and_filename,
     set_eiger_params,
 )
 
@@ -98,3 +101,20 @@ async def test_set_eiger_params(
     assert await eh2_eiger.detector.kappa_increment.get_value() == 0  # type:ignore
     if wait:
         mock_bps_wait.assert_called_once_with("eiger_setup")
+
+
+@patch("i19_bluesky.serial.device_setup_plans.eiger_setup_plans.get_path_provider")
+def test_set_directory_and_filename(
+    mock_get_path_provider: MagicMock, parameters: SerialExperimentEh2, RE: RunEngine
+):
+    mock_path_provider = MagicMock(spec=UpdatingPathProvider)
+    mock_get_path_provider.return_value = mock_path_provider
+
+    RE(
+        set_collection_directory_and_filename(
+            parameters.visit, parameters.dataset, parameters.filename_prefix
+        )
+    )
+    mock_path_provider.update.assert_called_with(
+        directory=Path("/tmp/i19-2/cm12345-1"), subdirectory="foo", prefix="bar_01"
+    )

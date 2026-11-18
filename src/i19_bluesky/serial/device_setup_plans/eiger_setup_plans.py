@@ -1,8 +1,11 @@
+from pathlib import Path
+from typing import cast
+
 import bluesky.plan_stubs as bps
+from bluesky.utils import MsgGenerator
 from daq_config_server.models.lookup_tables import DetectorXYLookupTable
-from dodal.common.beamlines.beamline_utils import (
-    get_config_client,
-)
+from dodal.common.beamlines.beamline_utils import get_config_client, get_path_provider
+from dodal.common.types import UpdatingPathProvider
 from dodal.devices.detector.det_dim_constants import DetectorSize, DetectorSizeConstants
 from dodal.devices.util.lookup_tables import linear_interpolation_lut
 from ophyd_async.fastcs.eiger import EigerDetector
@@ -73,7 +76,7 @@ def set_eiger_params(
     eiger: EigerDetector,
     wait: bool = True,
     group: str = "eiger_setup",
-):
+) -> MsgGenerator:
     LOGGER.info("Set up eiger detector for collection")
     beam_centre = calculate_beam_centre_from_lut(
         parameters.detector_distance_mm,
@@ -129,3 +132,23 @@ def set_eiger_params(
     )
     if wait:
         yield from bps.wait(group)
+
+
+def set_collection_directory_and_filename(
+    visit_directory: Path,
+    dataset_directory: str,
+    filename_prefix: str,
+) -> MsgGenerator:
+    """Update root folder for collection and filename"""
+
+    async def set_directory_and_prefix():
+        LOGGER.debug("Getting path provider")
+
+        await cast(UpdatingPathProvider, get_path_provider()).update(
+            directory=visit_directory,
+            subdirectory=dataset_directory,
+            prefix=filename_prefix,
+        )
+
+    futures = yield from bps.wait_for([set_directory_and_prefix])
+    return futures[0].result()
