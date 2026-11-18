@@ -38,7 +38,6 @@ def trigger_panda_collection(
     yield from bps.kickoff(devices.eiger, wait=True)
     for i, (well_num, coords) in enumerate(parameters.wells_to_collect.items()):
         yield from move_stage_x_and_z(coords[0], coords[2], devices.serial_stages)
-        # yield from bps.sleep(0.5)  # TESTING
         LOGGER.info(f"Moved to well {well_num}")
         if i % 2 == 0:  # even in list
             LOGGER.info(
