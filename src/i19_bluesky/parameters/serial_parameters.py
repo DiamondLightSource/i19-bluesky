@@ -11,7 +11,6 @@ from i19_bluesky.parameters.components import (
     PandaRotationParams,
     RotationAxis,
     VisitParameters,
-    ZebraRotationParams,
 )
 from i19_bluesky.parameters.constants import DetectorConstants, EigerConstants
 
@@ -61,17 +60,6 @@ class SerialExperimentEh2(SerialExperiment):
     aperture_request: PinColRequest
     detector_type: DetectorType
     hutch: HutchName = HutchName.EH2
-
-    @property
-    def zebra_rotation_params(self) -> ZebraRotationParams:
-        return ZebraRotationParams(
-            rotation_axis=self.rotation_axis,
-            scan_start_deg=self.rot_axis_start,
-            scan_increment_deg=self.rot_axis_increment,
-            scan_steps=self.images_per_well,
-            exposure_time_s=self.exposure_time_s,
-            # Assumes rotation starts positive
-        )
 
     @property
     def panda_rotation_params(self) -> PandaRotationParams:

@@ -32,7 +32,6 @@ from ophyd_async.fastcs.panda import HDFPanda
 from i19_bluesky.parameters.components import Path
 from i19_bluesky.parameters.devices_composites import (
     SerialCollectionEh2PandaComposite,
-    SerialCollectionEh2ZebraComposite,
 )
 from i19_bluesky.parameters.serial_parameters import (
     DetectorType,
@@ -225,22 +224,6 @@ async def devices(
     )
 
     return devices
-
-
-@pytest.fixture
-async def devices_zebra(
-    eh2_zebra, eh2_eiger, eh2_backlight, eh2_diffractometer, serial_stages, pincol
-) -> SerialCollectionEh2ZebraComposite:
-    devices_zebra = SerialCollectionEh2ZebraComposite(
-        diffractometer=eh2_diffractometer,
-        backlight=eh2_backlight,
-        pinhole_and_collimator=pincol,
-        zebra=eh2_zebra,
-        eiger=eh2_eiger,
-        serial_stages=serial_stages,
-    )
-
-    return devices_zebra
 
 
 @pytest.fixture

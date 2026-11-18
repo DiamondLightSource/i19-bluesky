@@ -23,7 +23,8 @@ from dodal.devices.beamlines.i19.diffractometer import (
     FourCircleDiffractometer,
 )
 from dodal.devices.beamlines.i19.pin_col_stages import PinholeCollimatorControl
-from ophyd_async.core import set_mock_value
+from dodal.devices.zebra.zebra import Zebra
+from ophyd_async.core import get_mock_put, set_mock_value
 
 MOCK_BEAMLINE_PARAMS = """
 # Beamstop
@@ -117,3 +118,18 @@ async def diffractometer(RE: RunEngine) -> FourCircleDiffractometer:
     set_mock_value(diffractometer.phi.user_readback, 0)
     set_mock_value(diffractometer.omega.user_readback, -90)
     return diffractometer
+
+
+@pytest.fixture
+def zebra(RE: RunEngine) -> Zebra:
+    zebra = i19_2.zebra.build(connect_immediately=True, mock=True)
+
+    def mock_disarm(_):
+        set_mock_value(zebra.pc.arm.armed, 0)
+
+    def mock_arm(_):
+        set_mock_value(zebra.pc.arm.armed, 1)
+
+    get_mock_put(zebra.pc.arm.arm_set).side_effect = mock_arm
+    get_mock_put(zebra.pc.arm.disarm_set).side_effect = mock_disarm
+    return zebra
