@@ -8,6 +8,8 @@ from dodal.devices.motors import XYZPhiStage
 from i19_bluesky.log import LOGGER
 from i19_bluesky.parameters.components import RotationParams
 
+DEAD_TIME_S = 50 * 1e-6  # To account for time2 set on the panda
+
 
 def setup_sample_stage(
     rotation_parameters: RotationParams,
@@ -27,9 +29,13 @@ def setup_sample_stage(
     yield from bps.abs_set(
         serial_stages.phi, rotation_parameters.scan_start_deg, group=group
     )
+    phi_velocity_w_deadtime = rotation_parameters.scan_increment_deg / (
+        rotation_parameters.exposure_time_s + DEAD_TIME_S
+    )
     yield from bps.abs_set(
         serial_stages.phi.velocity,
-        rotation_parameters.rotation_axis_velocity,
+        phi_velocity_w_deadtime,
+        # rotation_parameters.rotation_axis_velocity,
         group=group,
     )
     if wait:

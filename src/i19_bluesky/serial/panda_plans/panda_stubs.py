@@ -14,6 +14,7 @@ from i19_bluesky.log import LOGGER
 
 DEG_TO_ENC_COUNTS = -16667
 TIME_TO_US_SCALE = 1e6  # Panda sequencer prescaler will be set to us
+DEFAULT_PULSE_WIDTH_US = 50  # Eiger only sees rising edge
 
 
 @dataclass(frozen=True)
@@ -56,6 +57,8 @@ def generate_panda_seq_table(
         repeats=phi_steps,
         time1=delay_between_pulses,
         outa1=True,
+        time2=DEFAULT_PULSE_WIDTH_US,
+        outa2=False,
     )
 
     rows += SeqTable.row(
@@ -64,6 +67,8 @@ def generate_panda_seq_table(
         repeats=phi_steps,
         time1=delay_between_pulses,
         outa1=True,
+        time2=DEFAULT_PULSE_WIDTH_US,
+        outa2=False,
     )
 
     return rows

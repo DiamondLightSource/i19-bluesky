@@ -33,7 +33,9 @@ async def test_setup_sample_stage(
     parameters.rot_axis_start = 6.0
     RE(setup_sample_stage(parameters.panda_rotation_params, serial_stages))
     assert await serial_stages.phi.user_readback.get_value() == 6.0
-    assert await serial_stages.phi.velocity.get_value() == 1.0
+    assert await serial_stages.phi.velocity.get_value() == pytest.approx(
+        0.9995, abs=1e-3
+    )
 
 
 @pytest.mark.parametrize(
