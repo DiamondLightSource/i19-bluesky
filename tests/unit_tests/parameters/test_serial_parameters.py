@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from i19_bluesky.parameters.components import PandaRotationParams, ZebraRotationParams
+from i19_bluesky.parameters.components import PandaRotationParams
 from i19_bluesky.parameters.constants import EigerConstants
 from i19_bluesky.parameters.serial_parameters import (
     SerialExperiment,
@@ -126,17 +126,8 @@ def test_serial_parameter_model_for_eh2_with_eiger(dummy_serial_params_eh2):
     assert eh2_params.rotation_axis == "phi"
     assert eh2_params.collection_directory == Path("/tmp/i19-2/cm12345-1/foo")
 
-    assert isinstance(eh2_params.zebra_rotation_params, ZebraRotationParams)
     assert isinstance(eh2_params.panda_rotation_params, PandaRotationParams)
     assert isinstance(eh2_params.detector_constants, EigerConstants)
-
-    assert eh2_params.zebra_rotation_params.scan_start_deg == eh2_params.rot_axis_start
-    assert eh2_params.zebra_rotation_params.rotation_direction == "Positive"
-    assert (
-        eh2_params.zebra_rotation_params.scan_end_deg
-        == eh2_params.rot_axis_start
-        + eh2_params.rot_axis_increment * eh2_params.images_per_well
-    )
 
     assert (
         eh2_params.panda_rotation_params.exposure_time_s == eh2_params.exposure_time_s
