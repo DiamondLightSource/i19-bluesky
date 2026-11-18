@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Any
 
 import pytest
 
@@ -13,7 +14,6 @@ from i19_bluesky.parameters.serial_parameters import (
 @pytest.fixture
 def dummy_serial_params():
     return {
-        "hutch": "EH2",
         "visit": "/tmp/i19-2/cm12345-1",
         "dataset": "foo",
         "filename_prefix": "bar_01",
@@ -113,10 +113,65 @@ def test_split_wells_into_run_list_for_collection(
     params.wells_to_collect = wells_to_collect
     params.wells_series_len = series_length
 
-    wells_per_run = params.split_wells_per_run()
+    wells_per_run = params._split_wells_per_run()
 
     assert wells_per_run == expected_run_list
     assert len(wells_per_run) == expected_run_num
+
+
+@pytest.mark.parametrize(
+    "images_per_well, wells_to_collect, series_length, imgs_per_run, total_num_images",
+    [
+        (
+            50,
+            {"01": (0, 0, 0), "02": (0.1, 0, 0)},
+            2,
+            [100],
+            100,
+        ),
+        (
+            75,
+            {
+                "01": (0, 0, 0),
+                "02": (0.1, 0, 0),
+                "05": (0.4, 0.0, 0.0),
+                "06": (0.0, 0.0, 0.1),
+            },
+            1,
+            [75, 75, 75, 75],
+            300,
+        ),
+        (
+            10,
+            {
+                "01": (0, 0, 0),
+                "02": (0.1, 0, 0),
+                "05": (0.4, 0.0, 0.0),
+                "06": (0.0, 0.0, 0.1),
+                "08": (0.2, 0.0, 0.1),
+            },
+            3,
+            [30, 20],
+            50,
+        ),
+    ],
+)
+def test_images_per_run_list(
+    images_per_well: int,
+    wells_to_collect: dict[str, tuple],
+    series_length: int,
+    imgs_per_run: list[int],
+    total_num_images: int,
+    dummy_serial_params: dict[str, Any],
+):
+    dummy_serial_params["images_per_well"] = images_per_well
+    dummy_serial_params["wells_to_collect"] = wells_to_collect
+    dummy_serial_params["wells_series_len"] = series_length
+
+    params = SerialExperiment(**dummy_serial_params)
+
+    assert params.num_images_per_run == imgs_per_run
+    assert params.total_num_images == total_num_images
 
 
 def test_serial_parameter_model_for_eh2_with_eiger(dummy_serial_params_eh2):

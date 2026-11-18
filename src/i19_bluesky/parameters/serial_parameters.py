@@ -39,7 +39,15 @@ class SerialExperiment(VisitParameters):
     def total_num_images(self) -> int:
         return self.images_per_well * self.total_num_wells
 
-    def split_wells_per_run(self) -> list[dict]:
+    @property
+    def run_list(self) -> list[dict]:
+        return self._split_wells_per_run()
+
+    @property
+    def num_images_per_run(self) -> list[int]:
+        return [len(d) * self.images_per_well for d in self.run_list]
+
+    def _split_wells_per_run(self) -> list[dict]:
         """Divide wells into run list: each to be collected in one detector arm."""
         wells = list(self.wells_to_collect.items())
         run_list = [
