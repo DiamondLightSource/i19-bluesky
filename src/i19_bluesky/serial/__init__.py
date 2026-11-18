@@ -3,7 +3,6 @@
 from i19_bluesky.eh2.backlight_plan import move_backlight_out
 from i19_bluesky.parameters.devices_composites import (
     SerialCollectionEh2PandaComposite,
-    SerialCollectionEh2ZebraComposite,
 )
 from i19_bluesky.serial.coordinate_system.sample_stage import (
     move_sample_stage,
@@ -20,9 +19,7 @@ from i19_bluesky.serial.ui_plans.ui_plans import (
 __all__ = [
     # Composites and params
     "SerialCollectionEh2PandaComposite",
-    "SerialCollectionEh2ZebraComposite",
     # Entry point plans
-    "run_zebra_test",
     "run_serial_with_panda",
     # Coordinate system utils
     "read_current_sample_stage_xyz_position",

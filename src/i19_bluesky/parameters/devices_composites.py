@@ -14,7 +14,6 @@ from dodal.devices.beamlines.i19.pin_col_stages import (
     PinholeCollimatorControl,
 )
 from dodal.devices.motors import XYZPhiStage
-from dodal.devices.zebra.zebra import Zebra
 from ophyd_async.fastcs.eiger import EigerDetector
 from ophyd_async.fastcs.panda import HDFPanda
 
@@ -30,13 +29,3 @@ class SerialCollectionEh2PandaComposite:
     serial_stages: XYZPhiStage
     shutter: AccessControlledShutter
     energy_device: AccessControlledEnergyComposite
-
-
-@pydantic.dataclasses.dataclass(config={"arbitrary_types_allowed": True})
-class SerialCollectionEh2ZebraComposite:
-    diffractometer: FourCircleDiffractometer
-    backlight: BacklightPosition
-    pinhole_and_collimator: PinholeCollimatorControl
-    zebra: Zebra
-    eiger: EigerDetector
-    serial_stages: XYZPhiStage
