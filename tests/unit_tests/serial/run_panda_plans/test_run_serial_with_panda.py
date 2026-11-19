@@ -37,7 +37,7 @@ async def test_run_serial_with_panda(
     "i19_bluesky.serial.run_panda_plans.run_serial_with_panda.setup_eh2_serial_collection"
 )
 @patch(
-    "i19_bluesky.serial.run_panda_plans.run_serial_with_panda.trigger_panda_collection"
+    "i19_bluesky.serial.run_panda_plans.run_serial_with_panda.trigger_serial_collection"
 )
 async def test_main_collection_plan(
     mock_trigger_panda: MagicMock,

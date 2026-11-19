@@ -21,11 +21,11 @@ from i19_bluesky.serial.device_setup_plans.diffractometer_plans import (
 )
 from i19_bluesky.serial.panda_plans.panda_setup_plans import reset_panda
 from i19_bluesky.serial.panda_plans.panda_stubs import disarm_panda
-from i19_bluesky.serial.run_panda_plans.panda_serial_collection import (
-    trigger_panda_collection,
-)
 from i19_bluesky.serial.run_panda_plans.setup_for_collection import (
     setup_eh2_serial_collection,
+)
+from i19_bluesky.serial.run_panda_plans.trigger_serial_collection import (
+    trigger_serial_collection,
 )
 
 
@@ -36,7 +36,13 @@ def main_collection_plan(
     """Run a small rotative serial crystallography collection using the PandA to trigger
     the detector."""
     yield from setup_eh2_serial_collection(parameters, devices)
-    yield from trigger_panda_collection(parameters, devices)
+    yield from trigger_serial_collection(
+        parameters.panda_rotation_params.scan_start_deg,
+        parameters.panda_rotation_params.scan_end_deg,
+        parameters.wells_to_collect,
+        devices.eiger,
+        devices.serial_stages,
+    )
 
 
 def run_on_collection_end(

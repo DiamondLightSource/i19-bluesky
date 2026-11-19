@@ -14,6 +14,7 @@ from i19_bluesky.serial.panda_plans.panda_stubs import (
     DEG_TO_ENC_COUNTS,
     DeviceSettingsConstants,
     arm_panda,
+    disarm_panda,
     generate_panda_seq_table,
 )
 
@@ -75,6 +76,7 @@ def setup_panda_for_rotation(
 
 
 def reset_panda(panda: HDFPanda):
+    yield from disarm_panda(panda)
     yield from load_panda_from_yaml(
         DeviceSettingsConstants.PANDA_DIR.as_posix(),
         DeviceSettingsConstants.PANDA_STANDARD_FILENAME,

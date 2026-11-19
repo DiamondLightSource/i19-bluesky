@@ -3,7 +3,7 @@ from unittest.mock import patch
 from bluesky.run_engine import RunEngine
 from dodal.devices.motors import XYZPhiStage
 from numpy.testing import assert_array_equal
-from ophyd_async.fastcs.panda import HDFPanda, SeqTable, SeqTrigger
+from ophyd_async.fastcs.panda import HDFPanda, PandaBitMux, SeqTable, SeqTrigger
 
 from i19_bluesky.parameters.devices_composites import SerialCollectionEh2PandaComposite
 from i19_bluesky.parameters.serial_parameters import SerialExperimentEh2
@@ -88,3 +88,6 @@ async def test_reset_panda(mock_panda: HDFPanda, RE: RunEngine):
     ) as patch_load:
         RE(reset_panda(mock_panda))
         patch_load.assert_called_once()
+        # Panda disarmed
+        assert await mock_panda.seq[2].enable.get_value() == PandaBitMux.ZERO
+        assert await mock_panda.pulse[1].enable.get_value() == PandaBitMux.ZERO  # type: ignore
