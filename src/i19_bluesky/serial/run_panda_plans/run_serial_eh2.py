@@ -6,6 +6,7 @@ from dodal.devices.beamlines.i19.access_controlled.shutter import (
     AccessControlledShutter,
 )
 from dodal.devices.motors import XYZPhiStage
+from ophyd_async.core import DetectorTrigger, TriggerInfo
 from ophyd_async.fastcs.panda import HDFPanda
 
 from i19_bluesky.eh2.setup_beamline import setup_beamline_for_collection
@@ -21,16 +22,17 @@ from i19_bluesky.serial.device_setup_plans.diffractometer_plans import (
     move_sample_stage_back,
     setup_sample_stage,
 )
+from i19_bluesky.serial.device_setup_plans.eiger_setup_plans import (
+    set_collection_directory_and_filename,
+    set_eiger_params,
+)
 from i19_bluesky.serial.panda_plans.panda_setup_plans import (
     reset_panda,
     setup_panda_for_rotation,
 )
-
-# for n, run in zip(parameters.num_images_per_run, parameters.run_list, strict=True):
-# print(f"setup beamline for {run}")
-# print(f"trigger {n}")
-# print("will need to use num_images_per_run instead of total_num_images")
-# which in some cases it will be the same, in others not
+from i19_bluesky.serial.run_panda_plans.trigger_serial_collection import (
+    trigger_serial_collection,
+)
 
 
 # Common setup plans - detector independent
@@ -90,25 +92,56 @@ def main_collection_plan(
 ) -> MsgGenerator:
     # Things that need to be done once at start and that's it:
     yield from beamline_setup_tasks(parameters, devices)
+    # Read energy and wavelength from dcm to then set up eiger
+    energ_in_kev = yield from bps.rd(devices.energy_device.energy_in_kev)
+    wavelength_in_a = yield from bps.rd(devices.energy_device.wavelength_in_a)
+    yield from set_eiger_params(
+        parameters, energ_in_kev, wavelength_in_a, devices.eiger
+    )
 
     @bpp.stage_decorator([devices.eiger])
     @bpp.run_decorator()
-    def _collect():
-        pass
-
-    # Then for each run:
-    # - call mkdir and update
-    # - stage, set eiger params, ntriggers and prepare
-    # - set up panda (seq table, arm etc) - NOPE, see above
-    # - kick off and complete
-    # num = 1
-    for _n, _run in zip(
-        parameters.num_images_per_run, parameters.run_list, strict=True
+    def _collect(
+        filename_prefix: str, num_triggers: int, wells_to_collect: dict[str, tuple]
     ):
-        pass
+        # Create directory and update path provider
+        parameters.collection_directory.mkdir(exist_ok=True)
+        yield from set_collection_directory_and_filename(
+            parameters.visit, parameters.dataset, filename_prefix
+        )
+        # Set ntriggers
+        # See https://github.com/bluesky/ophyd-async/issues/1288
+        LOGGER.info(f"Set ntriggers to {parameters.total_num_images}")
+        yield from bps.abs_set(devices.eiger.detector.ntrigger, num_triggers, wait=True)
+        trigger_info = TriggerInfo(
+            collections_per_event=1,
+            number_of_events=1,
+            trigger=DetectorTrigger.EXTERNAL_EDGE,
+            livetime=parameters.exposure_time_s,
+        )
+        yield from bps.prepare(devices.eiger, trigger_info, wait=True)
+        LOGGER.debug("Eiger prepare done!")
+
+        yield from trigger_serial_collection(
+            parameters.panda_rotation_params.scan_start_deg,
+            parameters.panda_rotation_params.scan_end_deg,
+            wells_to_collect,
+            devices.eiger,
+            devices.serial_stages,
+        )
+
+    num = 1
+    filename_template = f"{parameters.filename_prefix}_%02d"
+    for n, run in zip(parameters.num_images_per_run, parameters.run_list, strict=True):
+        filename_prefix = filename_template % num
+        # DO the collection
+        yield from _collect(filename_prefix, n, run)
+        # Update filenumber
+        num += 1
 
 
 # Entry point
+@bpp.run_decorator()
 def run_eiger_collection(
     parameters: SerialExperimentEh2,
     devices: SerialCollectionEh2PandaComposite = inject(),
