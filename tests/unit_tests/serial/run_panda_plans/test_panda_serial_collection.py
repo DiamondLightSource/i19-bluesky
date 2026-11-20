@@ -44,8 +44,8 @@ def test_trigger_panda_call_order(
         call.mock_kickoff(devices.eiger, wait=True),
         call.mock_move_stage_x_and_z(0, 0, devices.serial_stages),
         call.mock_move_stage_x_and_z(1, 0, devices.serial_stages),
-        call.mock_set_value_for_params(devices.diffractometer.phi, 6.0, wait=True),
-        call.mock_set_value_for_params(devices.diffractometer.phi, 5.0, wait=True),
+        call.mock_set_value_for_params(devices.serial_stages.phi, 6.0, wait=True),
+        call.mock_set_value_for_params(devices.serial_stages.phi, 5.0, wait=True),
         call.mock_complete(devices.eiger, wait=True),
     ]
     parent_mock.assert_has_calls(expected_calls, any_order=True)

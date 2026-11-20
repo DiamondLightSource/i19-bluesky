@@ -46,7 +46,7 @@ def trigger_panda_collection(
                 {parameters.panda_rotation_params.scan_end_deg}"
             )
             yield from bps.abs_set(
-                devices.diffractometer.phi,
+                devices.serial_stages.phi,
                 parameters.panda_rotation_params.scan_end_deg,
                 wait=True,
             )
@@ -56,7 +56,7 @@ def trigger_panda_collection(
                     {parameters.panda_rotation_params.scan_start_deg}"
             )
             yield from bps.abs_set(
-                devices.diffractometer.phi,
+                devices.serial_stages.phi,
                 parameters.panda_rotation_params.scan_start_deg,
                 wait=True,
             )
