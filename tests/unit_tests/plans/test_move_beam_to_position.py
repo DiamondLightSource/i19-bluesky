@@ -9,7 +9,7 @@ from dodal.devices.beamlines.i19.access_controlled.piezo_control import (
 from dodal.devices.oav.beam_centre.centroid_from_epics import CentroidFromEpics
 from ophyd_async.core import set_mock_value
 
-from i19_bluesky.eh1.move_beam_to_position import (
+from i19_bluesky.plans.move_beam_to_position import (
     NudgeDirection,
     _calculate_nudge_from_lut,
     _check_position_reached,
