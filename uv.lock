@@ -1505,8 +1505,8 @@ wheels = [
 
 [[package]]
 name = "dls-dodal"
-version = "3.1.1.dev1+g80b0ade9f"
-source = { git = "https://github.com/DiamondLightSource/dodal?rev=2236-add-lut-to-piezo-control#80b0ade9f8633db371294c78cc5c299b87fcc565" }
+version = "3.1.1.dev2+gdcc36b528"
+source = { git = "https://github.com/DiamondLightSource/dodal?rev=2236-add-lut-to-piezo-control#dcc36b5287210bb97f3c18a3be4d36516a1d7d23" }
 dependencies = [
     { name = "aiofiles" },
     { name = "aiohttp" },
