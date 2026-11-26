@@ -123,7 +123,7 @@ async def test_nudge_piezos_and_move_to_beam_centre(
     RE: RunEngine,
 ):
     set_mock_value(centroid_device.beam_centre_x, 720)
-    set_mock_value(centroid_device.beam_centre_y, 390.5)
+    set_mock_value(centroid_device.beam_centre_y, 286)
 
     mock_check.side_effect = [False, True]
 
@@ -137,7 +137,7 @@ async def test_nudge_piezos_and_move_to_beam_centre(
     mock_sleep.assert_has_calls([call(2.0), call(2.0)], any_order=True)
     mock_nudge.assert_has_calls(
         [
-            call(pytest.approx(-3.833, abs=1e-3), eh1_vfm_piezo),
+            call(4.0, eh1_vfm_piezo),
             call(-10, eh1_hfm_piezo),
         ],
         any_order=True,

@@ -89,16 +89,6 @@ def nudge_piezos_and_move_to_beam_centre(
     due to it not being in a closed loop). Therefore, the vfm is nudged first in order
     to make up for this shift when nudging the hfm.
 
-    The target (x,y) position usually comes from the display.configuration and refers to
-    the crosshair position in GDA (not the one on the OAV viewer). In this case, the
-    conversion of the position is:
-        x_centroid = x_crosshair
-        y_centroid = y_crosshair * 4/3
-
-    For now the conversion is done in the plan but it should really come from GDA so
-    that we can use the same algorithm when not using it. Additionally, eh2 might have a
-    different ratio they need.
-
     Args:
         target_xy: Position of the crosshair to centre the beam on, in px.
         max_iterations: Maximum number of iterations for the algorithm to run.
@@ -106,12 +96,6 @@ def nudge_piezos_and_move_to_beam_centre(
         vfm_piezo: Device controlling the piezo on the vfm.
         beam_centre: Device to set up the AD plugin chain and read the centroid.
     """
-    # NOTE. This is for eh1 only and the already converted value should just come from
-    # GDA when that part is written
-    target_xy = (
-        target_xy[0],
-        round(target_xy[1] * 4 / 3, 3),
-    )  # beacuse GDA, the input value is that of the crosshair from file
 
     @bpp.stage_decorator([beam_centre])
     def run_loop():
