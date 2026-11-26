@@ -1505,8 +1505,8 @@ wheels = [
 
 [[package]]
 name = "dls-dodal"
-version = "3.1.1.dev3+g8bfe590d5"
-source = { git = "https://github.com/DiamondLightSource/dodal?rev=2236-add-lut-to-piezo-control#8bfe590d5a10ff193726bfe240e9053267f49e25" }
+version = "3.1.1.dev1+g97037c5f5"
+source = { git = "https://github.com/DiamondLightSource/dodal?rev=main#97037c5f525e8bc667f219f9d57d475e6a9faa90" }
 dependencies = [
     { name = "aiofiles" },
     { name = "aiohttp" },
@@ -2737,7 +2737,7 @@ dev = [
 requires-dist = [
     { name = "bluesky", specifier = ">=1.13" },
     { name = "daq-config-server", specifier = ">=1.5.3" },
-    { name = "dls-dodal", git = "https://github.com/DiamondLightSource/dodal?rev=2236-add-lut-to-piezo-control" },
+    { name = "dls-dodal", git = "https://github.com/DiamondLightSource/dodal?rev=main" },
     { name = "fastapi", extras = ["all"] },
     { name = "nexgen" },
     { name = "numpy" },

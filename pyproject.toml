@@ -28,7 +28,7 @@ dependencies = [
     "daq-config-server >= 1.5.3",
     # Pin temporarily removed to avoid it clashing with editable version
     # when deploying blueapi in cluster.
-    "dls-dodal @ git+https://github.com/DiamondLightSource/dodal@2236-add-lut-to-piezo-control",
+    "dls-dodal @ git+https://github.com/DiamondLightSource/dodal@main",
 ]
 dynamic = ["version"]
 license.file = "LICENSE"
