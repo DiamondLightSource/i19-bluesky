@@ -9,7 +9,7 @@ from dodal.devices.beamlines.i19.access_controlled.piezo_control import (
 from dodal.devices.oav.beam_centre.centroid_from_epics import CentroidFromEpics
 from ophyd_async.core import set_mock_value
 
-from i19_bluesky.eh1.move_beam_to_position import (
+from i19_bluesky.plans.move_beam_to_position import (
     NudgeDirection,
     _calculate_nudge_from_lut,
     _check_position_reached,
@@ -41,7 +41,7 @@ Units: V pixels pixels
 """
 
 
-@patch("i19_bluesky.eh1.move_beam_to_position.get_config_client")
+@patch("i19_bluesky.plans.move_beam_to_position.get_config_client")
 async def test_read_lut(mock_config_client: MagicMock):
     mock_config_client.return_value.get_file_contents.return_value = TEST_LUT_FILE
     expected_columns = [[0.01, 0.02], [8.361, 16.769], [0.035, -0.009]]
@@ -88,7 +88,7 @@ def test_get_lut_path_and_column_from_name_fails_for_unexpected_device():
         ("vfm_piezo", TEST_VFM_LUT_COLUMNS, 20, 0.021),
     ],
 )
-@patch("i19_bluesky.eh1.move_beam_to_position._read_lut")
+@patch("i19_bluesky.plans.move_beam_to_position._read_lut")
 def test_calculate_nudge_from_lut(
     mock_lut_columns: MagicMock,
     device_name: str,
@@ -120,8 +120,8 @@ def test_check_position_reached(
     assert res == expected_res
 
 
-@patch("i19_bluesky.eh1.move_beam_to_position.apply_voltage_to_piezo_actuators")
-@patch("i19_bluesky.eh1.move_beam_to_position._calculate_nudge_from_lut")
+@patch("i19_bluesky.plans.move_beam_to_position.apply_voltage_to_piezo_actuators")
+@patch("i19_bluesky.plans.move_beam_to_position._calculate_nudge_from_lut")
 async def test_nudge_single_piezo_hfm(
     mock_calc: MagicMock,
     mock_apply_voltage_plan: MagicMock,
@@ -136,8 +136,8 @@ async def test_nudge_single_piezo_hfm(
     mock_apply_voltage_plan.assert_called_once_with(1.26, eh1_hfm_piezo)
 
 
-@patch("i19_bluesky.eh1.move_beam_to_position.apply_voltage_to_piezo_actuators")
-@patch("i19_bluesky.eh1.move_beam_to_position._calculate_nudge_from_lut")
+@patch("i19_bluesky.plans.move_beam_to_position.apply_voltage_to_piezo_actuators")
+@patch("i19_bluesky.plans.move_beam_to_position._calculate_nudge_from_lut")
 async def test_nudge_single_piezo_vfm(
     mock_calc: MagicMock,
     mock_apply_voltage_plan: MagicMock,
@@ -152,9 +152,9 @@ async def test_nudge_single_piezo_vfm(
     mock_apply_voltage_plan.assert_called_once_with(1.69, eh1_vfm_piezo)
 
 
-@patch("i19_bluesky.eh1.move_beam_to_position.bps.sleep")
-@patch("i19_bluesky.eh1.move_beam_to_position._check_position_reached")
-@patch("i19_bluesky.eh1.move_beam_to_position.nudge_single_piezo")
+@patch("i19_bluesky.plans.move_beam_to_position.bps.sleep")
+@patch("i19_bluesky.plans.move_beam_to_position._check_position_reached")
+@patch("i19_bluesky.plans.move_beam_to_position.nudge_single_piezo")
 async def test_nudge_piezos_and_move_to_beam_centre(
     mock_nudge: MagicMock,
     mock_check: MagicMock,
@@ -186,9 +186,9 @@ async def test_nudge_piezos_and_move_to_beam_centre(
     )
 
 
-@patch("i19_bluesky.eh1.move_beam_to_position.bps.sleep")
-@patch("i19_bluesky.eh1.move_beam_to_position._check_position_reached")
-@patch("i19_bluesky.eh1.move_beam_to_position.nudge_single_piezo")
+@patch("i19_bluesky.plans.move_beam_to_position.bps.sleep")
+@patch("i19_bluesky.plans.move_beam_to_position._check_position_reached")
+@patch("i19_bluesky.plans.move_beam_to_position.nudge_single_piezo")
 async def test_nudge_piezos_and_move_to_beam_centre_stops_after_max_iterations(
     mock_nudge: MagicMock,
     mock_check: MagicMock,
@@ -214,9 +214,9 @@ async def test_nudge_piezos_and_move_to_beam_centre_stops_after_max_iterations(
     assert mock_nudge.call_count == 2
 
 
-@patch("i19_bluesky.eh1.move_beam_to_position.bps.sleep")
-@patch("i19_bluesky.eh1.move_beam_to_position.bps.rd")
-@patch("i19_bluesky.eh1.move_beam_to_position.nudge_single_piezo")
+@patch("i19_bluesky.plans.move_beam_to_position.bps.sleep")
+@patch("i19_bluesky.plans.move_beam_to_position.bps.rd")
+@patch("i19_bluesky.plans.move_beam_to_position.nudge_single_piezo")
 async def test_nudge_and_move_in_one_direction_for_hfm(
     mock_nudge: MagicMock,
     mock_read: MagicMock,
@@ -245,9 +245,9 @@ async def test_nudge_and_move_in_one_direction_for_hfm(
     )
 
 
-@patch("i19_bluesky.eh1.move_beam_to_position.bps.sleep")
-@patch("i19_bluesky.eh1.move_beam_to_position.bps.rd")
-@patch("i19_bluesky.eh1.move_beam_to_position.nudge_single_piezo")
+@patch("i19_bluesky.plans.move_beam_to_position.bps.sleep")
+@patch("i19_bluesky.plans.move_beam_to_position.bps.rd")
+@patch("i19_bluesky.plans.move_beam_to_position.nudge_single_piezo")
 async def test_nudge_and_move_in_one_direction_for_vfm(
     mock_nudge: MagicMock,
     mock_read: MagicMock,
@@ -275,9 +275,9 @@ async def test_nudge_and_move_in_one_direction_for_vfm(
     )
 
 
-@patch("i19_bluesky.eh1.move_beam_to_position.bps.sleep")
-@patch("i19_bluesky.eh1.move_beam_to_position.bps.rd")
-@patch("i19_bluesky.eh1.move_beam_to_position.nudge_single_piezo")
+@patch("i19_bluesky.plans.move_beam_to_position.bps.sleep")
+@patch("i19_bluesky.plans.move_beam_to_position.bps.rd")
+@patch("i19_bluesky.plans.move_beam_to_position.nudge_single_piezo")
 async def test_nudge_and_move_in_one_direction_for_vfm_reaches_max_tries_and_breaks(
     mock_nudge: MagicMock,
     mock_read: MagicMock,

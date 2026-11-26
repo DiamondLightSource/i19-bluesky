@@ -1,11 +1,11 @@
 """A place for eh1 specific plans."""
 
 from i19_bluesky.eh1.find_beam_centre import find_beam_centre_plan
-from i19_bluesky.eh1.move_beam_to_position import (
+from i19_bluesky.eh1.pin_tip_detection import pin_tip_detection_plan
+from i19_bluesky.plans.move_beam_to_position import (
     nudge_and_move_in_one_direction,
     nudge_piezos_and_move_to_beam_centre,
 )
-from i19_bluesky.eh1.pin_tip_detection import pin_tip_detection_plan
 from i19_bluesky.plans.optics_hutch_control_plans import (
     apply_attenuator_positions,
     apply_voltage_to_piezo_actuators,
