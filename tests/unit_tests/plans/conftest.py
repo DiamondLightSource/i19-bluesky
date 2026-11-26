@@ -1,3 +1,5 @@
+from unittest.mock import MagicMock
+
 import pytest
 from bluesky.run_engine import RunEngine
 from dodal.devices.beamlines.i19.access_controlled.piezo_control import (
@@ -33,7 +35,13 @@ async def centroid_device(RE: RunEngine) -> CentroidFromEpics:
 @pytest.fixture
 async def eh1_hfm_piezo(RE: RunEngine) -> AccessControlledPiezoActuator:
     hfm_piezo = AccessControlledPiezoActuator(
-        "", FocusingMirrorName.HFM, HutchState.EH1, "", "mock_hfm_piezo"
+        "",
+        FocusingMirrorName.HFM,
+        HutchState.EH1,
+        "/path/to/config",
+        MagicMock(),
+        "",
+        "mock_hfm_piezo",
     )
     await hfm_piezo.connect(mock=True)
     hfm_piezo.url = "http://test-blueapi.url"
@@ -44,7 +52,13 @@ async def eh1_hfm_piezo(RE: RunEngine) -> AccessControlledPiezoActuator:
 @pytest.fixture
 async def eh2_vfm_piezo(RE: RunEngine) -> AccessControlledPiezoActuator:
     vfm_piezo = AccessControlledPiezoActuator(
-        "", FocusingMirrorName.VFM, HutchState.EH2, "", "mock_vfm_piezo"
+        "",
+        FocusingMirrorName.VFM,
+        HutchState.EH2,
+        "/path/to/config",
+        MagicMock(),
+        "",
+        "mock_vfm_piezo",
     )
     await vfm_piezo.connect(mock=True)
     vfm_piezo.url = "http://test-blueapi.url"
