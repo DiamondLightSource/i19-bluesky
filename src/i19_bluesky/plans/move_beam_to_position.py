@@ -1,15 +1,10 @@
 from collections.abc import Generator
 from math import dist
-from pathlib import Path
 
 import bluesky.plan_stubs as bps
 import bluesky.preprocessors as bpp
 from bluesky.utils import Msg, MsgGenerator
-from daq_config_server.models.lookup_tables import GenericLookupTable
 from dodal.common import inject
-from dodal.common.beamlines.beamline_utils import (
-    get_config_client,
-)
 from dodal.devices.beamlines.i19.access_controlled.piezo_control import (
     AccessControlledPiezoActuator,
     StrEnum,
@@ -27,13 +22,6 @@ from i19_bluesky.plans.optics_hutch_control_plans import (
 )
 
 PLUGIN_SETTINGS = CentroidSettings(threshold=20, colour_mode=ColourMode.MONO)
-
-HFM_LUT = Path(
-    "/dls_sw/i19-1/software/daq_configuration/lookup/hfm_nudge_to_position.txt"
-)
-VFM_LUT = Path(
-    "/dls_sw/i19-1/software/daq_configuration/lookup/vfm_nudge_to_position.txt"
-)
 
 TIME_TO_SETTLE = 2.0
 TOLERANCE = 0.5
@@ -53,37 +41,12 @@ def _read_current_position(
     return (x, y)
 
 
-# Move to device once eh2 also has LUT
-# See https://github.com/DiamondLightSource/dodal/issues/2236
-# and https://github.com/DiamondLightSource/i19-bluesky/issues/188
-def _read_lut(lut_path: Path) -> list[list[float]]:
-    config_client = get_config_client()
-    lut_contents = config_client.get_file_contents(lut_path.as_posix())
-    lut = GenericLookupTable.from_contents(
-        lut_contents, ("nudge", float), ("delta_x", float), ("delta_y", float)
-    )
-    # Column0: nudge, column1: x, column2: y
-    return lut.columns
-
-
-def _get_lut_path_and_column_from_name(device_name: str) -> tuple[Path, int]:
-    match device_name:
-        case "hfm_piezo":
-            return (HFM_LUT, 1)
-        case "vfm_piezo":
-            return (VFM_LUT, 2)
-        case _:
-            raise ValueError("Unknown device name, please pass one of the piezos.")
-
-
-def _calculate_nudge_from_lut(distance: float, device_name: str) -> float:
+def _calculate_nudge_from_lut(distance: float, lut_columns: list[list[float]]) -> float:
     """Read lookup table and extract the voltage needed to get to that position.
     From first tests linear seems a good approximation."""
-    lut_path, column_idx = _get_lut_path_and_column_from_name(device_name)
-    LOGGER.debug("Reading lut for nudge size...")
-    lut_columns = _read_lut(lut_path)
+    LOGGER.debug("Get nudge size from lut...")
 
-    interp_nudge = linear_interpolation_lut(lut_columns[column_idx], lut_columns[0])
+    interp_nudge = linear_interpolation_lut(lut_columns[1], lut_columns[0])
     nudge_size = interp_nudge(distance)
     return nudge_size
 
@@ -100,7 +63,8 @@ def _check_position_reached(
 def nudge_single_piezo(delta_pos: float, piezo_device: AccessControlledPiezoActuator):
     current_voltage = yield from bps.rd(piezo_device.setpoint)
     LOGGER.debug(f"Current voltage before nudge: {current_voltage}")
-    nudge_size = _calculate_nudge_from_lut(delta_pos, piezo_device.name)
+    lut_columns = piezo_device.get_voltage_nudge_vs_pixels_table()
+    nudge_size = _calculate_nudge_from_lut(delta_pos, lut_columns)
     LOGGER.info(
         f"Calculated {piezo_device.name} nudge for {delta_pos}px move: {nudge_size}V"
     )
@@ -125,16 +89,6 @@ def nudge_piezos_and_move_to_beam_centre(
     due to it not being in a closed loop). Therefore, the vfm is nudged first in order
     to make up for this shift when nudging the hfm.
 
-    The target (x,y) position usually comes from the display.configuration and refers to
-    the crosshair position in GDA (not the one on the OAV viewer). In this case, the
-    conversion of the position is:
-        x_centroid = x_crosshair
-        y_centroid = y_crosshair * 4/3
-
-    For now the conversion is done in the plan but it should really come from GDA so
-    that we can use the same algorithm when not using it. Additionally, eh2 might have a
-    different ratio they need.
-
     Args:
         target_xy: Position of the crosshair to centre the beam on, in px.
         max_iterations: Maximum number of iterations for the algorithm to run.
@@ -142,14 +96,9 @@ def nudge_piezos_and_move_to_beam_centre(
         vfm_piezo: Device controlling the piezo on the vfm.
         beam_centre: Device to set up the AD plugin chain and read the centroid.
     """
-    # NOTE. This is for eh1 only and the already converted value should just come from
-    # GDA when that part is written
-    target_xy = (
-        target_xy[0],
-        round(target_xy[1] * 4 / 3, 3),
-    )  # beacuse GDA, the input value is that of the crosshair from file
 
     @bpp.stage_decorator([beam_centre])
+    @bpp.run_decorator()
     def run_loop():
         current_xy = yield from _read_current_position(beam_centre)
         LOGGER.info(f"Starting position: {current_xy}, position to reach: {target_xy}")
@@ -207,6 +156,7 @@ def nudge_and_move_in_one_direction(
         beam_position = beam_centre.beam_centre_y
 
     @bpp.stage_decorator([beam_centre])
+    @bpp.run_decorator()
     def nudge_loop():
         yield from bps.prepare(beam_centre, PLUGIN_SETTINGS, wait=True)
 

@@ -1,4 +1,3 @@
-from pathlib import Path
 from unittest.mock import MagicMock, call, patch
 
 import pytest
@@ -9,13 +8,11 @@ from dodal.devices.beamlines.i19.access_controlled.piezo_control import (
 from dodal.devices.oav.beam_centre.centroid_from_epics import CentroidFromEpics
 from ophyd_async.core import set_mock_value
 
-from i19_bluesky.eh1.move_beam_to_position import (
+from i19_bluesky.plans.move_beam_to_position import (
     NudgeDirection,
     _calculate_nudge_from_lut,
     _check_position_reached,
-    _get_lut_path_and_column_from_name,
     _read_current_position,
-    _read_lut,
     nudge_and_move_in_one_direction,
     nudge_piezos_and_move_to_beam_centre,
     nudge_single_piezo,
@@ -25,29 +22,13 @@ from tests.unit_tests.conftest import fake_generator
 TEST_HFM_LUT_COLUMNS = [
     [-0.04, -0.01, 0.01, 0.04],
     [-33.4, -8.35, 8.36, 33.8],
-    [0.02, 0.04, 0.03, -0.09],
 ]
 TEST_VFM_LUT_COLUMNS = [
     [-0.04, -0.01, 0.01, 0.04],
-    [1.82, 0.45, -0.46, -1.86],
     [-37.67, -9.38, 9.33, 37.3],
 ]
 
-TEST_LUT_FILE = """
-# Columns: nudge size, delta x, delta y
-Units: V pixels pixels
-0.01 8.361 0.035
-0.02 16.769 -0.009
-"""
-
-
-@patch("i19_bluesky.eh1.move_beam_to_position.get_config_client")
-async def test_read_lut(mock_config_client: MagicMock):
-    mock_config_client.return_value.get_file_contents.return_value = TEST_LUT_FILE
-    expected_columns = [[0.01, 0.02], [8.361, 16.769], [0.035, -0.009]]
-
-    columns = _read_lut(Path("/tmp"))
-    assert columns == expected_columns
+TEST_LUT = [[0.01, 0.02], [8.361, 16.769], [0.035, -0.009]]
 
 
 async def test_read_current_position(centroid_device: CentroidFromEpics, RE: RunEngine):
@@ -61,43 +42,18 @@ async def test_read_current_position(centroid_device: CentroidFromEpics, RE: Run
 
 
 @pytest.mark.parametrize(
-    "device_name, expected_idx, expected_filename",
+    "test_lut, distance, expected_nudge",
     [
-        ("hfm_piezo", 1, "hfm_nudge_to_position.txt"),
-        ("vfm_piezo", 2, "vfm_nudge_to_position.txt"),
+        (TEST_HFM_LUT_COLUMNS, 10, 0.012),
+        (TEST_VFM_LUT_COLUMNS, 20, 0.021),
     ],
 )
-def test_get_lut_path_and_column_from_name(
-    device_name: str, expected_idx: int, expected_filename: str
-):
-    filepath, idx = _get_lut_path_and_column_from_name(device_name)
-
-    assert idx == expected_idx
-    assert filepath.name == expected_filename
-
-
-def test_get_lut_path_and_column_from_name_fails_for_unexpected_device():
-    with pytest.raises(ValueError):
-        _get_lut_path_and_column_from_name("beam_centre")
-
-
-@pytest.mark.parametrize(
-    "device_name, test_lut, distance, expected_nudge",
-    [
-        ("hfm_piezo", TEST_HFM_LUT_COLUMNS, 10, 0.012),
-        ("vfm_piezo", TEST_VFM_LUT_COLUMNS, 20, 0.021),
-    ],
-)
-@patch("i19_bluesky.eh1.move_beam_to_position._read_lut")
 def test_calculate_nudge_from_lut(
-    mock_lut_columns: MagicMock,
-    device_name: str,
     test_lut: list,
     distance: float,
     expected_nudge: float,
 ):
-    mock_lut_columns.return_value = test_lut
-    nudge_size = _calculate_nudge_from_lut(distance, device_name)
+    nudge_size = _calculate_nudge_from_lut(distance, test_lut)
 
     assert nudge_size == pytest.approx(expected_nudge, abs=1e-3)
 
@@ -120,14 +76,15 @@ def test_check_position_reached(
     assert res == expected_res
 
 
-@patch("i19_bluesky.eh1.move_beam_to_position.apply_voltage_to_piezo_actuators")
-@patch("i19_bluesky.eh1.move_beam_to_position._calculate_nudge_from_lut")
+@patch("i19_bluesky.plans.move_beam_to_position.apply_voltage_to_piezo_actuators")
+@patch("i19_bluesky.plans.move_beam_to_position._calculate_nudge_from_lut")
 async def test_nudge_single_piezo_hfm(
     mock_calc: MagicMock,
     mock_apply_voltage_plan: MagicMock,
     eh1_hfm_piezo: AccessControlledPiezoActuator,
     RE: RunEngine,
 ):
+    eh1_hfm_piezo._read_lut = MagicMock(return_value=TEST_LUT)
     set_mock_value(eh1_hfm_piezo.setpoint, 1.24)
     mock_calc.return_value = 0.02
 
@@ -136,25 +93,26 @@ async def test_nudge_single_piezo_hfm(
     mock_apply_voltage_plan.assert_called_once_with(1.26, eh1_hfm_piezo)
 
 
-@patch("i19_bluesky.eh1.move_beam_to_position.apply_voltage_to_piezo_actuators")
-@patch("i19_bluesky.eh1.move_beam_to_position._calculate_nudge_from_lut")
+@patch("i19_bluesky.plans.move_beam_to_position.apply_voltage_to_piezo_actuators")
+@patch("i19_bluesky.plans.move_beam_to_position._calculate_nudge_from_lut")
 async def test_nudge_single_piezo_vfm(
     mock_calc: MagicMock,
     mock_apply_voltage_plan: MagicMock,
-    eh1_vfm_piezo: AccessControlledPiezoActuator,
+    eh2_vfm_piezo: AccessControlledPiezoActuator,
     RE: RunEngine,
 ):
-    set_mock_value(eh1_vfm_piezo.setpoint, 1.70)
+    eh2_vfm_piezo._read_lut = MagicMock(return_value=TEST_LUT)
+    set_mock_value(eh2_vfm_piezo.setpoint, 1.70)
     mock_calc.return_value = -0.01
 
-    RE(nudge_single_piezo(-9, eh1_vfm_piezo))
+    RE(nudge_single_piezo(-9, eh2_vfm_piezo))
 
-    mock_apply_voltage_plan.assert_called_once_with(1.69, eh1_vfm_piezo)
+    mock_apply_voltage_plan.assert_called_once_with(1.69, eh2_vfm_piezo)
 
 
-@patch("i19_bluesky.eh1.move_beam_to_position.bps.sleep")
-@patch("i19_bluesky.eh1.move_beam_to_position._check_position_reached")
-@patch("i19_bluesky.eh1.move_beam_to_position.nudge_single_piezo")
+@patch("i19_bluesky.plans.move_beam_to_position.bps.sleep")
+@patch("i19_bluesky.plans.move_beam_to_position._check_position_reached")
+@patch("i19_bluesky.plans.move_beam_to_position.nudge_single_piezo")
 async def test_nudge_piezos_and_move_to_beam_centre(
     mock_nudge: MagicMock,
     mock_check: MagicMock,
@@ -165,7 +123,7 @@ async def test_nudge_piezos_and_move_to_beam_centre(
     RE: RunEngine,
 ):
     set_mock_value(centroid_device.beam_centre_x, 720)
-    set_mock_value(centroid_device.beam_centre_y, 390.5)
+    set_mock_value(centroid_device.beam_centre_y, 286)
 
     mock_check.side_effect = [False, True]
 
@@ -179,23 +137,23 @@ async def test_nudge_piezos_and_move_to_beam_centre(
     mock_sleep.assert_has_calls([call(2.0), call(2.0)], any_order=True)
     mock_nudge.assert_has_calls(
         [
-            call(pytest.approx(-3.833, abs=1e-3), eh1_vfm_piezo),
+            call(4.0, eh1_vfm_piezo),
             call(-10, eh1_hfm_piezo),
         ],
         any_order=True,
     )
 
 
-@patch("i19_bluesky.eh1.move_beam_to_position.bps.sleep")
-@patch("i19_bluesky.eh1.move_beam_to_position._check_position_reached")
-@patch("i19_bluesky.eh1.move_beam_to_position.nudge_single_piezo")
+@patch("i19_bluesky.plans.move_beam_to_position.bps.sleep")
+@patch("i19_bluesky.plans.move_beam_to_position._check_position_reached")
+@patch("i19_bluesky.plans.move_beam_to_position.nudge_single_piezo")
 async def test_nudge_piezos_and_move_to_beam_centre_stops_after_max_iterations(
     mock_nudge: MagicMock,
     mock_check: MagicMock,
     mock_sleep: MagicMock,
     centroid_device: CentroidFromEpics,
-    eh1_hfm_piezo: AccessControlledPiezoActuator,
-    eh1_vfm_piezo: AccessControlledPiezoActuator,
+    eh2_hfm_piezo: AccessControlledPiezoActuator,
+    eh2_vfm_piezo: AccessControlledPiezoActuator,
     RE: RunEngine,
 ):
     set_mock_value(centroid_device.beam_centre_x, 720)
@@ -205,7 +163,7 @@ async def test_nudge_piezos_and_move_to_beam_centre_stops_after_max_iterations(
 
     RE(
         nudge_piezos_and_move_to_beam_centre(
-            (710, 290), 1, eh1_hfm_piezo, eh1_vfm_piezo, centroid_device
+            (710, 290), 1, eh2_hfm_piezo, eh2_vfm_piezo, centroid_device
         )
     )
 
@@ -214,9 +172,9 @@ async def test_nudge_piezos_and_move_to_beam_centre_stops_after_max_iterations(
     assert mock_nudge.call_count == 2
 
 
-@patch("i19_bluesky.eh1.move_beam_to_position.bps.sleep")
-@patch("i19_bluesky.eh1.move_beam_to_position.bps.rd")
-@patch("i19_bluesky.eh1.move_beam_to_position.nudge_single_piezo")
+@patch("i19_bluesky.plans.move_beam_to_position.bps.sleep")
+@patch("i19_bluesky.plans.move_beam_to_position.bps.rd")
+@patch("i19_bluesky.plans.move_beam_to_position.nudge_single_piezo")
 async def test_nudge_and_move_in_one_direction_for_hfm(
     mock_nudge: MagicMock,
     mock_read: MagicMock,
@@ -245,15 +203,15 @@ async def test_nudge_and_move_in_one_direction_for_hfm(
     )
 
 
-@patch("i19_bluesky.eh1.move_beam_to_position.bps.sleep")
-@patch("i19_bluesky.eh1.move_beam_to_position.bps.rd")
-@patch("i19_bluesky.eh1.move_beam_to_position.nudge_single_piezo")
+@patch("i19_bluesky.plans.move_beam_to_position.bps.sleep")
+@patch("i19_bluesky.plans.move_beam_to_position.bps.rd")
+@patch("i19_bluesky.plans.move_beam_to_position.nudge_single_piezo")
 async def test_nudge_and_move_in_one_direction_for_vfm(
     mock_nudge: MagicMock,
     mock_read: MagicMock,
     mock_sleep: MagicMock,
     centroid_device: CentroidFromEpics,
-    eh1_vfm_piezo: AccessControlledPiezoActuator,
+    eh2_vfm_piezo: AccessControlledPiezoActuator,
     RE: RunEngine,
 ):
     # Oneloop to reach position
@@ -265,25 +223,25 @@ async def test_nudge_and_move_in_one_direction_for_vfm(
 
     RE(
         nudge_and_move_in_one_direction(
-            target, NudgeDirection.Y, eh1_vfm_piezo, centroid_device
+            target, NudgeDirection.Y, eh2_vfm_piezo, centroid_device
         )
     )
 
     assert mock_sleep.call_count == 1
     mock_nudge.assert_has_calls(
-        [call(pytest.approx(-13.27, abs=1e-2), eh1_vfm_piezo)], any_order=True
+        [call(pytest.approx(-13.27, abs=1e-2), eh2_vfm_piezo)], any_order=True
     )
 
 
-@patch("i19_bluesky.eh1.move_beam_to_position.bps.sleep")
-@patch("i19_bluesky.eh1.move_beam_to_position.bps.rd")
-@patch("i19_bluesky.eh1.move_beam_to_position.nudge_single_piezo")
+@patch("i19_bluesky.plans.move_beam_to_position.bps.sleep")
+@patch("i19_bluesky.plans.move_beam_to_position.bps.rd")
+@patch("i19_bluesky.plans.move_beam_to_position.nudge_single_piezo")
 async def test_nudge_and_move_in_one_direction_for_vfm_reaches_max_tries_and_breaks(
     mock_nudge: MagicMock,
     mock_read: MagicMock,
     mock_sleep: MagicMock,
     centroid_device: CentroidFromEpics,
-    eh1_vfm_piezo: AccessControlledPiezoActuator,
+    eh2_vfm_piezo: AccessControlledPiezoActuator,
     RE: RunEngine,
 ):
     # Would need 11 loops to reach position
@@ -304,7 +262,7 @@ async def test_nudge_and_move_in_one_direction_for_vfm_reaches_max_tries_and_bre
     ]
     RE(
         nudge_and_move_in_one_direction(
-            target_pos, NudgeDirection.Y, eh1_vfm_piezo, centroid_device
+            target_pos, NudgeDirection.Y, eh2_vfm_piezo, centroid_device
         )
     )
 
