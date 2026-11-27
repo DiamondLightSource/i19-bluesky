@@ -98,6 +98,7 @@ def nudge_piezos_and_move_to_beam_centre(
     """
 
     @bpp.stage_decorator([beam_centre])
+    @bpp.run_decorator()
     def run_loop():
         current_xy = yield from _read_current_position(beam_centre)
         LOGGER.info(f"Starting position: {current_xy}, position to reach: {target_xy}")
@@ -155,6 +156,7 @@ def nudge_and_move_in_one_direction(
         beam_position = beam_centre.beam_centre_y
 
     @bpp.stage_decorator([beam_centre])
+    @bpp.run_decorator()
     def nudge_loop():
         yield from bps.prepare(beam_centre, PLUGIN_SETTINGS, wait=True)
 
